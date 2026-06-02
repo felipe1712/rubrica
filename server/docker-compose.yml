@@ -2,9 +2,23 @@ version: '3.8'
 
 # ══════════════════════════════════════════════════════════════════
 #  RÚBRICA — docker-compose.yml
-#  Dominio: rubrica.com.mx
-#  Servidor: Ubuntu 22.04 LTS
-#  Ruta en servidor: /opt/rubrica/
+#  Dominio: rubrica.com.mx  |  Ruta: /opt/rubrica/server/
+#
+#  COEXISTENCIA CON TWENTY CRM (en /opt/twenty/)
+#  Ambos stacks son completamente independientes.
+#  Red Docker: rubrica_net (aislada de twenty_default)
+#
+#  PUERTOS HOST ASIGNADOS A RÚBRICA (para no chocar con Twenty):
+#    3000 → Twenty CRM (NO TOCAR)
+#    3001 → rubrica_frontend  (React)
+#    3500 → rubrica_docuseal  (DocuSeal, interno)
+#    4000 → rubrica_gateway   (API Gateway)
+#    4001 → rubrica_nom151
+#    8080 → rubrica_stirling
+#    9000 → rubrica_minio (API)
+#    9001 → rubrica_minio (consola)
+#    9443 → rubrica_portainer
+#    3002 → rubrica_uptime
 # ══════════════════════════════════════════════════════════════════
 
 services:
@@ -102,7 +116,8 @@ services:
     networks:
       - rubrica_net
     ports:
-      - "127.0.0.1:3000:3000"
+      # ⚠️  Puerto 3000 ocupado por Twenty CRM → usamos 3500
+      - "127.0.0.1:3500:3000"
 
   # ─── STIRLING-PDF ───────────────────────────────────────────────
   stirling-pdf:
