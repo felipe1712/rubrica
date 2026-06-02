@@ -1,0 +1,38 @@
+# .gitattributes — Rúbrica
+# Forzar LF en scripts de bash (si se usan en Windows y se ejecutan en Linux)
+
+# Shell scripts → siempre LF
+*.sh    text eol=lf
+
+# SQL → siempre LF
+*.sql   text eol=lf
+
+# Configs Nginx → siempre LF
+*.conf  text eol=lf
+
+# YAML/YML → siempre LF
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Archivos de texto generales → CRLF en checkout Windows, LF en repo
+*.md    text
+*.json  text
+*.js    text
+*.jsx   text
+*.ts    text
+*.tsx   text
+*.css   text
+*.html  text
+*.env*  text eol=lf
+
+# Binarios → no modificar
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.svg   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.tar   binary

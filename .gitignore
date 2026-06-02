@@ -1,0 +1,73 @@
+# ══════════════════════════════════════════════════════════════════
+#  RÚBRICA — .gitignore raíz
+#  ⚠️  Nunca versionar secrets, datos de BD, ni documentos de clientes
+# ══════════════════════════════════════════════════════════════════
+
+# ─── Secrets y Variables de Entorno ────────────────────────────
+.env
+.env.local
+.env.production
+.env.production.local
+.env.staging
+*.bak
+
+# ─── Datos del servidor (solo configs, nunca datos) ─────────────
+server/postgres/data/
+server/redis/data/
+server/minio/data/
+server/docuseal/storage/
+server/backups/
+server/logs/
+server/*.log
+
+# ─── Certificados SSL ───────────────────────────────────────────
+server/nginx/ssl/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ─── Dependencias Node.js (Velzon / Frontend) ───────────────────
+rubrica/*/node_modules/
+rubrica/*/build/
+rubrica/*/.cache/
+rubrica/*/dist/
+
+# ─── Archivos de build React ────────────────────────────────────
+rubrica/*/build/
+rubrica/saas/build/
+
+# ─── Yarn / npm lockfiles opcionales ────────────────────────────
+# (sí versionar package-lock.json y yarn.lock para reproducibilidad)
+# rubrica/*/yarn.lock  ← NO ignorar
+
+# ─── Editores y OS ──────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ─── Logs generales ─────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Docker ─────────────────────────────────────────────────────
+# (sí versionar docker-compose.yml y Dockerfiles)
+# No ignorar nada de Docker excepto datos
+
+# ─── Archivos temporales ────────────────────────────────────────
+*.tmp
+*.temp
+.rubrica-cache/

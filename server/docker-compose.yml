@@ -1,0 +1,224 @@
+version: '3.8'
+
+# ══════════════════════════════════════════════════════════════════
+#  RÚBRICA — docker-compose.yml
+#  Dominio: rubrica.com.mx
+#  Servidor: Ubuntu 22.04 LTS
+#  Ruta en servidor: /opt/rubrica/
+# ══════════════════════════════════════════════════════════════════
+
+services:
+
+  # ─── POSTGRESQL ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: rubrica_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - rubrica_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── REDIS ──────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: rubrica_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/data:/data
+    networks:
+      - rubrica_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ─── MINIO (Almacenamiento S3-compatible) ───────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: rubrica_minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./minio/data:/data
+    networks:
+      - rubrica_net
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "127.0.0.1:9000:9000"   # API MinIO (solo local)
+      - "127.0.0.1:9001:9001"   # Consola MinIO (solo local)
+
+  # ─── DOCUSEAL ───────────────────────────────────────────────────
+  docuseal:
+    image: docuseal/docuseal:latest
+    container_name: rubrica_docuseal
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/docuseal_prod
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      SECRET_KEY_BASE: ${DOCUSEAL_SECRET_KEY_BASE}
+      APP_URL: https://app.rubrica.com.mx
+      SMTP_ADDRESS: smtp-relay.brevo.com
+      SMTP_PORT: 587
+      SMTP_USERNAME: ${BREVO_SMTP_USER}
+      SMTP_PASSWORD: ${BREVO_SMTP_KEY}
+      SMTP_FROM_EMAIL: noreply@rubrica.com.mx
+      SMTP_FROM_NAME: "Rúbrica"
+      # Almacenamiento en MinIO (S3-compatible)
+      ACTIVE_STORAGE_SERVICE: amazon
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_BUCKET: documentos-rubrica
+      AWS_ENDPOINT: http://minio:9000
+      AWS_FORCE_PATH_STYLE: "true"
+      AWS_REGION: us-east-1
+    volumes:
+      - ./docuseal/storage:/data
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # ─── STIRLING-PDF ───────────────────────────────────────────────
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    container_name: rubrica_stirling
+    restart: unless-stopped
+    environment:
+      DOCKER_ENABLE_SECURITY: "true"
+      SECURITY_ENABLELOGIN: "true"
+      SECURITY_INITIALLOGIN_USERNAME: "admin"
+      SECURITY_INITIALLOGIN_PASSWORD: "${STIRLING_ADMIN_PASSWORD}"
+      LANGS: "es_MX,en_US"
+      SYSTEM_DEFAULTLOCALE: es_MX
+      UI_APPNAME: "Rúbrica PDF"
+      UI_HOMEDESCRIPTION: "Plataforma de gestión documental"
+      UI_APPNAVBARNAME: "Rúbrica"
+    volumes:
+      - ./stirling/configs:/configs
+      - ./stirling/logs:/logs
+      - ./stirling/customFiles:/customFiles
+      - ./stirling/pipeline:/pipeline
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  # ─── API GATEWAY ────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: rubrica_gateway
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      docuseal:
+        condition: service_started
+    env_file: .env
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:4000:4000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── SERVICIO NOM-151 ───────────────────────────────────────────
+  nom151-service:
+    build:
+      context: ./nom151-service
+      dockerfile: Dockerfile
+    container_name: rubrica_nom151
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    env_file: .env
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:4001:4001"
+
+  # ─── FRONTEND (React — Velzon/Rúbrica) ──────────────────────────
+  # Dashboard del cliente (app.rubrica.com.mx)
+  # + Panel admin (admin.rubrica.com.mx) en mismas rutas /admin/*
+  frontend:
+    build:
+      context: ./rubrica/saas
+      dockerfile: Dockerfile
+    container_name: rubrica_frontend
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    environment:
+      REACT_APP_API_URL: https://api.rubrica.com.mx
+      REACT_APP_ENV: production
+      REACT_APP_BRAND_NAME: "Rúbrica"
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:3001:80"   # Nginx dentro del contenedor sirve el build
+
+  # ─── PORTAINER (Gestión Docker — solo local) ────────────────────
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: rubrica_portainer
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:9443:9443"   # HTTPS (solo acceso local via SSH tunnel)
+
+  # ─── UPTIME KUMA (Monitoreo) ────────────────────────────────────
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: rubrica_uptime
+    restart: unless-stopped
+    volumes:
+      - uptime_data:/app/data
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:3002:3001"   # Solo acceso local
+
+# ═══════════════════════════════════════════════════════════════════
+networks:
+  rubrica_net:
+    driver: bridge
+
+volumes:
+  portainer_data:
+  uptime_data:

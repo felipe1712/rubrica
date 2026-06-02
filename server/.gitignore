@@ -1,0 +1,28 @@
+# Rúbrica — .gitignore del proyecto servidor
+# ─── Nunca versionar ────────────────────────────────────────────
+.env
+.env.production
+.env.local
+
+# Datos de base de datos
+postgres/data/
+redis/data/
+minio/data/
+
+# Documentos de clientes
+docuseal/storage/
+
+# Logs
+logs/
+*.log
+backups/
+
+# SSL
+nginx/ssl/
+*.pem
+*.key
+
+# Editor
+.DS_Store
+Thumbs.db
+*.swp
