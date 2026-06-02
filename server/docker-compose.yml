@@ -189,7 +189,7 @@ services:
   # + Panel admin (admin.rubrica.com.mx) en mismas rutas /admin/*
   frontend:
     build:
-      context: ./rubrica/saas
+      context: ../rubrica/saas
       dockerfile: Dockerfile
     container_name: rubrica_frontend
     restart: unless-stopped
