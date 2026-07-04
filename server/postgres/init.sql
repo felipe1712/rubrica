@@ -110,6 +110,17 @@ CREATE TABLE IF NOT EXISTS nom151_records (
     created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- ─── TABLA: tenant_templates ───────────────────────────────────
+-- Mapeo de plantillas de DocuSeal a cada tenant
+CREATE TABLE IF NOT EXISTS tenant_templates (
+    id                    SERIAL PRIMARY KEY,
+    tenant_id             UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    docuseal_template_id  INTEGER NOT NULL UNIQUE,
+    created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
 -- ─── TABLA: smtp_config ────────────────────────────────────────
 -- Configuración SMTP editable desde el panel admin (Brevo)
 CREATE TABLE IF NOT EXISTS smtp_config (
@@ -159,12 +170,14 @@ CREATE INDEX IF NOT EXISTS idx_tenants_license_key ON tenants(license_key);
 CREATE INDEX IF NOT EXISTS idx_usage_stats_tenant ON usage_stats(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_nom151_tenant ON nom151_records(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_edd_log_license ON edd_webhooks_log(license_key);
+CREATE INDEX IF NOT EXISTS idx_templates_tenant ON tenant_templates(tenant_id);
 
 -- ─── ROW LEVEL SECURITY (RLS) ──────────────────────────────────
 -- Habilitar RLS en tablas críticas para aislamiento multi-tenant
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE usage_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE nom151_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tenant_templates ENABLE ROW LEVEL SECURITY;
 
 -- El API Gateway se conecta como rubrica_user y setea el tenant_id
 -- en cada sesión: SET app.current_tenant_id = 'uuid-del-tenant';
@@ -176,6 +189,10 @@ CREATE POLICY tenant_isolation_usage ON usage_stats
 
 CREATE POLICY tenant_isolation_nom151 ON nom151_records
     USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+CREATE POLICY tenant_isolation_templates ON tenant_templates
+    USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
 
 -- ════════════════════════════════════════════════════════════════
 -- Fin del script de inicialización
