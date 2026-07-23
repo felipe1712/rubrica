@@ -10,6 +10,10 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
+# Aumentar límite de memoria de Node a 4GB y desactivar mapas de fuente para compilación rápida en producción
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV GENERATE_SOURCEMAP=false
+
 RUN npm run build
 
 # Production Stage
