@@ -32,41 +32,52 @@ app.use((err, req, res, next) => {
 // Automatic seeding of SuperAdmin & Demo Tenant on startup
 async function seedDefaults() {
   try {
-    const adminCount = await SuperAdmin.count();
-    if (adminCount === 0) {
-      const email = process.env.ADMIN_EMAIL || 'admin@rubricalo.com';
-      const rawPassword = process.env.ADMIN_PASSWORD || 'rubricaloadmin123';
-      const passwordHash = await SuperAdmin.hashPassword(rawPassword);
+    const email = process.env.ADMIN_EMAIL || 'admin@rubricalo.com';
+    const rawPassword = process.env.ADMIN_PASSWORD || 'rubricaloadmin123';
+    const passwordHash = await SuperAdmin.hashPassword(rawPassword);
 
-      await SuperAdmin.create({
-        email,
-        passwordHash
-      });
-      console.log(`[SEED] Super-Admin creado por defecto: ${email}`);
+    const [admin, createdAdmin] = await SuperAdmin.findOrCreate({
+      where: { email },
+      defaults: { email, passwordHash }
+    });
+    if (!createdAdmin) {
+      admin.passwordHash = passwordHash;
+      await admin.save();
     }
+    console.log(`[SEED] Super-Admin verificado: ${email}`);
 
-    const tenantCount = await Tenant.count();
-    if (tenantCount === 0) {
-      const tenant = await Tenant.create({
+    const [tenant] = await Tenant.findOrCreate({
+      where: { email: 'demo@rubricalo.com' },
+      defaults: {
         name: 'Organización Demo',
-        eddLicenseKey: 'DEMO-LICENSE-KEY',
+        email: 'demo@rubricalo.com',
+        licenseKey: 'DEMO-LICENSE-KEY',
         status: 'active',
         plan: 'enterprise'
-      });
+      }
+    });
 
-      const userEmail = 'demo@rubricalo.com';
-      const userPass = await User.hashPassword('rubricalo123');
+    const userEmail = 'demo@rubricalo.com';
+    const userPass = await User.hashPassword('rubricalo123');
 
-      await User.create({
+    const [user, createdUser] = await User.findOrCreate({
+      where: { tenantId: tenant.id, email: userEmail },
+      defaults: {
         tenantId: tenant.id,
         name: 'Usuario Demo',
         email: userEmail,
         passwordHash: userPass,
         role: 'admin',
         isActive: true
-      });
-      console.log(`[SEED] Usuario Demo creado: ${userEmail} / rubricalo123`);
+      }
+    });
+
+    if (!createdUser) {
+      user.passwordHash = userPass;
+      user.isActive = true;
+      await user.save();
     }
+    console.log(`[SEED] Usuario Demo verificado: ${userEmail} / rubricalo123`);
   } catch (error) {
     console.error('Error en seedDefaults:', error);
   }
