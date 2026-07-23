@@ -8,6 +8,7 @@ import DashboardEcommerce from "../pages/DashboardEcommerce";
 import Documentos from "../pages/Documentos";
 import NuevoDocumento from "../pages/Documentos/NuevoDocumento";
 import DetalleDocumento from "../pages/Documentos/DetalleDocumento";
+import HerramientasPDF from "../pages/HerramientasPDF";
 
 // Authentication pages
 import Login from "../pages/Authentication/Login";
@@ -36,6 +37,9 @@ const authProtectedRoutes = [
   { path: "/documentos",          component: <Documentos /> },
   { path: "/documentos/nuevo",    component: <NuevoDocumento /> },
   { path: "/documentos/:id",      component: <DetalleDocumento /> },
+
+  // Herramientas PDF
+  { path: "/herramientas-pdf",    component: <HerramientasPDF /> },
 
   // Soporte
   { path: "/soporte",     component: <ListView /> },

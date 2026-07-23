@@ -57,6 +57,17 @@ const Navdata = () => {
       ],
     },
     {
+      id: "herramientas-pdf",
+      label: "Herramientas PDF",
+      icon: "ri-tools-line",
+      link: "/herramientas-pdf",
+      click: function (e) {
+        e.preventDefault();
+        setIscurrentState("HerramientasPDF");
+      },
+      stateVariables: iscurrentState === "HerramientasPDF",
+    },
+    {
       id: "usuarios",
       label: "Usuarios",
       icon: "ri-group-line",
