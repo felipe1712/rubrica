@@ -17,12 +17,34 @@ exports.loginUser = async (req, res) => {
     // The user might be trying to log in. We look for a user matching the email.
     // In our system, if an email exists across multiple tenants (e.g. support), they can choose
     // or we can select the first active user.
-    const user = await User.findOne({
+    let user = await User.findOne({
       where: { email, isActive: true },
       include: [{ model: Tenant }]
     });
 
     if (!user) {
+      // Check if SuperAdmin is logging in from main portal
+      const admin = await SuperAdmin.findOne({ where: { email } });
+      if (admin) {
+        const isValidAdmin = await admin.comparePassword(password);
+        if (isValidAdmin) {
+          const token = jwt.sign(
+            { id: admin.id, email: admin.email, role: 'admin', isSuperAdmin: true },
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRY }
+          );
+          return res.json({
+            token,
+            user: {
+              id: admin.id,
+              name: 'Administrador Principal',
+              email: admin.email,
+              role: 'admin',
+              plan: 'enterprise'
+            }
+          });
+        }
+      }
       return res.status(401).json({ error: 'Credenciales inválidas.' });
     }
 

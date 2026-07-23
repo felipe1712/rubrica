@@ -29,8 +29,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Ha ocurrido un error en el servidor.' });
 });
 
-// Automatic seeding of SuperAdmin on startup
-async function seedSuperAdmin() {
+// Automatic seeding of SuperAdmin & Demo Tenant on startup
+async function seedDefaults() {
   try {
     const adminCount = await SuperAdmin.count();
     if (adminCount === 0) {
@@ -44,8 +44,31 @@ async function seedSuperAdmin() {
       });
       console.log(`[SEED] Super-Admin creado por defecto: ${email}`);
     }
+
+    const tenantCount = await Tenant.count();
+    if (tenantCount === 0) {
+      const tenant = await Tenant.create({
+        name: 'Organización Demo',
+        eddLicenseKey: 'DEMO-LICENSE-KEY',
+        status: 'active',
+        plan: 'enterprise'
+      });
+
+      const userEmail = 'demo@rubricalo.com';
+      const userPass = await User.hashPassword('rubricalo123');
+
+      await User.create({
+        tenantId: tenant.id,
+        name: 'Usuario Demo',
+        email: userEmail,
+        passwordHash: userPass,
+        role: 'admin',
+        isActive: true
+      });
+      console.log(`[SEED] Usuario Demo creado: ${userEmail} / rubricalo123`);
+    }
   } catch (error) {
-    console.error('Error al sembrar el Super-Admin:', error);
+    console.error('Error en seedDefaults:', error);
   }
 }
 
@@ -59,8 +82,8 @@ async function startServer() {
     await sequelize.sync();
     console.log('Database synchronized.');
 
-    // Seed default admin
-    await seedSuperAdmin();
+    // Seed default admin and demo tenant
+    await seedDefaults();
 
     app.listen(PORT, () => {
       console.log(`API Gateway running on port ${PORT}`);
