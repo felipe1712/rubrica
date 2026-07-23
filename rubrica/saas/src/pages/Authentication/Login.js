@@ -13,6 +13,7 @@ import { useFormik } from "formik";
 
 // actions
 import { loginUser, socialLogin, resetLoginFlag } from "../../slices/thunks";
+import { apiError } from "../../slices/auth/login/reducer";
 
 import logoLight from "../../assets/images/logo-light.png";
 import { createSelector } from 'reselect';
@@ -59,9 +60,7 @@ const {
     }, [user]);
 
     const validation = useFormik({
-        // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
-
         initialValues: {
             email: userLogin.email || "demo@rubricalo.com",
             password: userLogin.password || "rubricalo123",
@@ -70,8 +69,26 @@ const {
             email: Yup.string().required("Please Enter Your Email"),
             password: Yup.string().required("Please Enter Your Password"),
         }),
-        onSubmit: (values) => {
-            dispatch(loginUser(values, props.router.navigate));
+        onSubmit: async (values, { setSubmitting }) => {
+            try {
+                const apiUrl = process.env.REACT_APP_API_URL || "https://api.rubricalo.com";
+                const res = await fetch(`${apiUrl}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: values.email, password: values.password }),
+                });
+                const data = await res.json();
+                if (res.ok && data.token) {
+                    sessionStorage.setItem("authUser", JSON.stringify(data));
+                    window.location.href = "/dashboard";
+                } else {
+                    dispatch(apiError(data.error || "Credenciales inválidas"));
+                }
+            } catch (err) {
+                dispatch(apiError("Error de conexión con el servidor"));
+            } finally {
+                setSubmitting(false);
+            }
         }
     });
 
