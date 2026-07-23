@@ -200,6 +200,7 @@ const {
                                                     <Label className="form-check-label" htmlFor="auth-remember-check">Remember me</Label>
                                                 </div>
 
+                                                <div className="mt-4">
                                                     <Button color="success" disabled={validation.isSubmitting} className="btn btn-success w-100" type="submit">
                                                         {validation.isSubmitting ? <Spinner size="sm" className='me-2'> Loading... </Spinner> : null}
                                                         Sign In
