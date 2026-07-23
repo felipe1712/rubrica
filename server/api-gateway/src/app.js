@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const sequelize = require('./config/database');
 const routes = require('./routes');
-const { SuperAdmin } = require('./models');
+const { SuperAdmin, Tenant, User } = require('./models');
 require('dotenv').config();
 
 const app = express();
