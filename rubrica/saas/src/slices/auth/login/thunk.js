@@ -1,56 +1,24 @@
-//Include Both Helper File with needed methods
-import { getFirebaseBackend } from "../../../helpers/firebase_helper";
-import {
-  postFakeLogin,
-  postJwtLogin,
-} from "../../../helpers/fakebackend_helper";
-
-import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
+import { APIClient, setAuthorization } from "../../../helpers/api_helper";
+const api = new APIClient();
 
 export const loginUser = (user, history) => async (dispatch) => {
-
   try {
-    let response;
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      let fireBaseBackend = getFirebaseBackend();
-      response = fireBaseBackend.loginUser(
-        user.email,
-        user.password
-      );
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
-      response = postJwtLogin({
-        email: user.email,
-        password: user.password
-      });
+    const response = await api.create("/auth/login", {
+      email: user.email,
+      password: user.password,
+    });
 
-    } else if (process.env.REACT_APP_API_URL) {
-      response = postFakeLogin({
-        email: user.email,
-        password: user.password,
-      });
-    }
-    
-    var data = await response;
-
-    if (data) {
-      sessionStorage.setItem("authUser", JSON.stringify(data));
-      if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
-        var finallogin = JSON.stringify(data);
-        finallogin = JSON.parse(finallogin)
-        data = finallogin.data;
-        if (finallogin.status === "success") {
-          dispatch(loginSuccess(data));
-          history('/dashboard')
-        } else {
-          dispatch(apiError(finallogin));
-        }
-      }else{
-        dispatch(loginSuccess(data));
-        history('/dashboard')
-      }
+    if (response && response.token) {
+      setAuthorization(response.token);
+      sessionStorage.setItem("authUser", JSON.stringify(response));
+      dispatch(loginSuccess(response));
+      history('/dashboard');
+    } else {
+      dispatch(apiError(response.error || "Error al iniciar sesión"));
     }
   } catch (error) {
-    dispatch(apiError(error));
+    console.error("Error en loginUser:", error);
+    dispatch(apiError(error.response?.data?.error || error.message || error));
   }
 };
 
