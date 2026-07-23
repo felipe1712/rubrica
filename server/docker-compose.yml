@@ -202,7 +202,7 @@ services:
     networks:
       - rubrica_net
     ports:
-      - "127.0.0.1:3001:80"   # Nginx dentro del contenedor sirve el build
+      - "127.0.0.1:3003:80"   # Nginx dentro del contenedor sirve el build
 
   # ─── PORTAINER (Gestión Docker — solo local) ────────────────────
   portainer:
