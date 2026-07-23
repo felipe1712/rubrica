@@ -13,9 +13,10 @@ const PORT = process.env.PORT || 4000;
 // Security and Logging Middlewares
 app.use(helmet());
 app.use(cors({
-  origin: '*', // Adjust this to allow only specific domains (like app.rubricalo.com) in production
+  origin: ['https://app.rubricalo.com', 'https://api.rubricalo.com', 'http://localhost:3000', 'http://localhost:3003'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(morgan('combined'));
 app.use(express.json());
