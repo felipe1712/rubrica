@@ -19,7 +19,10 @@ const SuperAdmin = sequelize.define('SuperAdmin', {
     field: 'password_hash'
   }
 }, {
-  tableName: 'super_admins'
+  tableName: 'super_admins',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: false
 });
 
 SuperAdmin.prototype.comparePassword = async function (password) {

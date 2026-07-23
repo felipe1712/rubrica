@@ -59,7 +59,10 @@ const Tenant = sequelize.define('Tenant', {
     field: 'docuseal_org_id'
   }
 }, {
-  tableName: 'tenants'
+  tableName: 'tenants',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
 module.exports = Tenant;
