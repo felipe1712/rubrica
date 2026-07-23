@@ -97,6 +97,7 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       SECRET_KEY_BASE: ${DOCUSEAL_SECRET_KEY_BASE}
       APP_URL: https://app.rubricalo.com/docuseal
+      RAILS_RELATIVE_URL_ROOT: /docuseal
       SMTP_ADDRESS: smtp-relay.brevo.com
       SMTP_PORT: 587
       SMTP_USERNAME: ${BREVO_SMTP_USER}
