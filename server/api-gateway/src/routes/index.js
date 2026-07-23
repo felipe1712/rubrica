@@ -6,6 +6,7 @@ const webhookRoutes = require('./webhook.routes');
 const docusealRoutes = require('./docuseal.routes');
 const stirlingRoutes = require('./stirling.routes');
 const adminRoutes = require('./admin.routes');
+const documentsRoutes = require('./documents.routes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -13,6 +14,7 @@ router.use('/webhooks', webhookRoutes);
 router.use('/docuseal', docusealRoutes);
 router.use('/pdf', stirlingRoutes);
 router.use('/admin', adminRoutes);
+router.use('/documents', documentsRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

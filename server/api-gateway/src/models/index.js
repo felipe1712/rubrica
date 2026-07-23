@@ -7,6 +7,7 @@ const Nom151Record = require('./Nom151Record');
 const SmtpConfig = require('./SmtpConfig');
 const PlanConfig = require('./PlanConfig');
 const TenantTemplate = require('./TenantTemplate');
+const Document = require('./Document');
 
 // Relationships
 Tenant.hasMany(User, { foreignKey: 'tenant_id', onDelete: 'CASCADE' });
@@ -21,6 +22,11 @@ Nom151Record.belongsTo(Tenant, { foreignKey: 'tenant_id' });
 Tenant.hasMany(TenantTemplate, { foreignKey: 'tenant_id', onDelete: 'CASCADE' });
 TenantTemplate.belongsTo(Tenant, { foreignKey: 'tenant_id' });
 
+Tenant.hasMany(Document, { foreignKey: 'tenant_id', onDelete: 'CASCADE' });
+Document.belongsTo(Tenant, { foreignKey: 'tenant_id' });
+User.hasMany(Document, { foreignKey: 'uploaded_by' });
+Document.belongsTo(User, { foreignKey: 'uploaded_by', as: 'uploader' });
+
 module.exports = {
   sequelize,
   Tenant,
@@ -30,5 +36,6 @@ module.exports = {
   Nom151Record,
   SmtpConfig,
   PlanConfig,
-  TenantTemplate
+  TenantTemplate,
+  Document
 };

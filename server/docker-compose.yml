@@ -159,6 +159,8 @@ services:
       docuseal:
         condition: service_started
     env_file: .env
+    volumes:
+      - uploads_data:/app/uploads
     networks:
       - rubrica_net
     ports:
@@ -196,9 +198,9 @@ services:
     depends_on:
       - api-gateway
     environment:
-      REACT_APP_API_URL: https://api.rubrica.com.mx
+      REACT_APP_API_URL: https://api.rubricalo.com
       REACT_APP_ENV: production
-      REACT_APP_BRAND_NAME: "Rúbrica"
+      REACT_APP_BRAND_NAME: "Rubricalo"
     networks:
       - rubrica_net
     ports:
@@ -237,3 +239,4 @@ networks:
 volumes:
   portainer_data:
   uptime_data:
+  uploads_data:

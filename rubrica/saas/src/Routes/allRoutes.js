@@ -4,6 +4,11 @@ import { Navigate } from "react-router-dom";
 // Dashboard
 import DashboardEcommerce from "../pages/DashboardEcommerce";
 
+// Documentos
+import Documentos from "../pages/Documentos";
+import NuevoDocumento from "../pages/Documentos/NuevoDocumento";
+import DetalleDocumento from "../pages/Documentos/DetalleDocumento";
+
 // Authentication pages
 import Login from "../pages/Authentication/Login";
 import Logout from "../pages/Authentication/Logout";
@@ -26,6 +31,11 @@ const authProtectedRoutes = [
   // Dashboard principal
   { path: "/dashboard", component: <DashboardEcommerce /> },
   { path: "/index",     component: <DashboardEcommerce /> },
+
+  // Documentos
+  { path: "/documentos",          component: <Documentos /> },
+  { path: "/documentos/nuevo",    component: <NuevoDocumento /> },
+  { path: "/documentos/:id",      component: <DetalleDocumento /> },
 
   // Soporte
   { path: "/soporte",     component: <ListView /> },
