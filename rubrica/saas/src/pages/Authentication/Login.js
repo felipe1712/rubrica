@@ -43,13 +43,18 @@ const {
 
 
     useEffect(() => {
-        if (user && user) {
-            const updatedUserData = process.env.REACT_APP_DEFAULTAUTH === "firebase" ? user.multiFactor.user.email : user.user.email;
-            const updatedUserPassword = process.env.REACT_APP_DEFAULTAUTH === "firebase" ? "" : user.user.confirm_password;
-            setUserLogin({
-                email: updatedUserData,
-                password: updatedUserPassword
-            });
+        if (user && (user.token || user.user)) {
+            window.location.href = "/dashboard";
+            return;
+        }
+        const authUser = sessionStorage.getItem("authUser");
+        if (authUser) {
+            try {
+                const parsed = JSON.parse(authUser);
+                if (parsed && (parsed.token || parsed.user)) {
+                    window.location.href = "/dashboard";
+                }
+            } catch (e) {}
         }
     }, [user]);
 
