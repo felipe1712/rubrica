@@ -12,7 +12,10 @@ export const loginUser = (user, history) => async (dispatch) => {
       setAuthorization(response.token);
       sessionStorage.setItem("authUser", JSON.stringify(response));
       dispatch(loginSuccess(response));
-      history('/dashboard');
+      if (history) {
+        history('/dashboard');
+      }
+      window.location.href = "/dashboard";
     } else {
       dispatch(apiError(response.error || "Error al iniciar sesión"));
     }
