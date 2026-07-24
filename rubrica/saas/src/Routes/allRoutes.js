@@ -9,6 +9,7 @@ import Documentos from "../pages/Documentos";
 import NuevoDocumento from "../pages/Documentos/NuevoDocumento";
 import DetalleDocumento from "../pages/Documentos/DetalleDocumento";
 import HerramientasPDF from "../pages/HerramientasPDF";
+import Editor from "../pages/Editor";
 
 // Authentication pages
 import Login from "../pages/Authentication/Login";
@@ -40,6 +41,9 @@ const authProtectedRoutes = [
 
   // Herramientas PDF
   { path: "/herramientas-pdf",    component: <HerramientasPDF /> },
+
+  // Editor de documentos (OnlyOffice)
+  { path: "/editor/:id",          component: <Editor /> },
 
   // Soporte
   { path: "/soporte",     component: <ListView /> },

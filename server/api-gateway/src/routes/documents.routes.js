@@ -16,11 +16,22 @@ const storage = multer.diskStorage({
   }
 });
 
+const ALLOWED_MIMES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
+  'application/msword',                                                        // doc
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',        // xlsx
+  'application/vnd.ms-excel',                                                  // xls
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // pptx
+  'application/vnd.ms-powerpoint',                                             // ppt
+  'text/plain',                                                                 // txt
+];
+
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
+  if (ALLOWED_MIMES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Solo se permiten archivos PDF.'), false);
+    cb(new Error('Formato no permitido. Sube PDF, Word, Excel, PowerPoint o TXT.'), false);
   }
 };
 

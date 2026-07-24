@@ -144,6 +144,25 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
 
+  # ─── ONLYOFFICE DOCUMENT SERVER ─────────────────────────────────
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    container_name: rubrica_onlyoffice
+    restart: unless-stopped
+    environment:
+      JWT_ENABLED: "true"
+      JWT_SECRET: ${ONLYOFFICE_JWT_SECRET}
+      JWT_HEADER: Authorization
+      JWT_IN_BODY: "true"
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_log:/var/log/onlyoffice
+      - onlyoffice_cache:/var/lib/onlyoffice/documentserver/App_Data/cache/files
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:8081:80"
+
   # ─── API GATEWAY ────────────────────────────────────────────────
   api-gateway:
     build:
@@ -240,3 +259,6 @@ volumes:
   portainer_data:
   uptime_data:
   uploads_data:
+  onlyoffice_data:
+  onlyoffice_log:
+  onlyoffice_cache:

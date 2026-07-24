@@ -180,7 +180,16 @@ const DetalleDocumento = () => {
                 <CardHeader><h5 className="card-title mb-0">Acciones</h5></CardHeader>
                 <CardBody className="d-grid gap-2">
                   <Button color="primary" outline onClick={handleDownload}>
-                    <i className="ri-download-2-line me-1"></i> Descargar PDF
+                    <i className="ri-download-2-line me-1"></i> Descargar
+                  </Button>
+
+                  <Button
+                    color="info"
+                    tag={Link}
+                    to={`/editor/${doc.id}`}
+                    target="_blank"
+                  >
+                    <i className="ri-edit-2-line me-1"></i> Editar Documento
                   </Button>
 
                   {doc.status === "uploaded" && (

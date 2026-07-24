@@ -28,10 +28,21 @@ const NuevoDocumento = () => {
     return { Authorization: `Bearer ${token}` };
   };
 
+  const ALLOWED_MIMES = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.ms-powerpoint',
+    'text/plain',
+  ];
+
   const handleFile = (f) => {
     if (!f) return;
-    if (f.type !== "application/pdf") {
-      setError("Solo se permiten archivos PDF.");
+    if (!ALLOWED_MIMES.includes(f.type)) {
+      setError("Formato no permitido. Sube PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx) o TXT.");
       return;
     }
     if (f.size > 20 * 1024 * 1024) {
@@ -159,7 +170,7 @@ const NuevoDocumento = () => {
                       <input
                         ref={fileRef}
                         type="file"
-                        accept="application/pdf"
+                        accept=".pdf,.docx,.doc,.xlsx,.xls,.pptx,.ppt,.txt"
                         className="d-none"
                         onChange={e => handleFile(e.target.files[0])}
                       />
