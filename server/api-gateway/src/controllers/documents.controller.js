@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { Document } = require('../models');
 const docusealService = require('../services/docuseal.service');
+const { verifyFileType } = require('../services/magika.service');
 
 const UPLOADS_DIR = process.env.UPLOADS_DIR || '/app/uploads';
 
@@ -39,12 +40,33 @@ exports.getDocument = async (req, res) => {
   }
 };
 
-// POST /documents/upload — subir PDF
+// POST /documents/upload — subir documento con verificación Magika
 exports.uploadDocument = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No se recibió ningún archivo.' });
     }
+
+    // ── Verificación de tipo real con Google Magika ──────────────────────────
+    const verification = await verifyFileType(req.file.path, req.file.mimetype);
+
+    if (!verification.ok) {
+      // Eliminar el archivo del disco — no lo guardamos si es sospechoso
+      if (fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
+      const msg = verification.isDangerous
+        ? `Archivo rechazado por seguridad: el contenido detectado es '${verification.detectedLabel}'. No se permiten archivos ejecutables o scripts.`
+        : `Tipo de archivo no permitido. Se detectó '${verification.detectedLabel}'. Solo se aceptan PDF, Word, Excel, PowerPoint y TXT.`;
+
+      return res.status(400).json({
+        error: msg,
+        detectedType: verification.detectedLabel,
+        confidence: `${(verification.score * 100).toFixed(1)}%`
+      });
+    }
+    // ────────────────────────────────────────────────────────────────────────
 
     const { name } = req.body;
     const doc = await Document.create({
@@ -60,6 +82,10 @@ exports.uploadDocument = async (req, res) => {
 
     res.status(201).json(doc);
   } catch (error) {
+    // Si quedó un archivo huérfano, limpiarlo
+    if (req.file?.path && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (_) {}
+    }
     console.error('Error subiendo documento:', error);
     res.status(500).json({ error: 'Error al subir el documento.' });
   }
