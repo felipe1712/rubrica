@@ -19,7 +19,7 @@ const MIME_TO_TYPE = {
   'text/plain': 'txt',
 };
 
-// GET /documents/:id/editor-config
+// GET /editor/:id/editor-config
 // Devuelve la configuración firmada con JWT para inicializar el editor OnlyOffice
 exports.getEditorConfig = async (req, res) => {
   try {
@@ -28,24 +28,29 @@ exports.getEditorConfig = async (req, res) => {
     });
     if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
 
-    const fileType = MIME_TO_TYPE[doc.mimeType] || path.extname(doc.originalName).replace('.', '') || 'docx';
-    const documentKey = `${doc.id}-${new Date(doc.updatedAt).getTime()}`;
+    const fileType = MIME_TO_TYPE[doc.mimeType] || path.extname(doc.originalName).replace('.', '').toLowerCase() || 'docx';
+    const updatedAt = doc.updatedAt || doc.updated_at || doc.createdAt || doc.created_at || Date.now();
+    const documentKey = `${doc.id}-${new Date(updatedAt).getTime()}`;
+    const userToken = req.headers.authorization?.split(' ')[1] || '';
+
+    const canEdit = fileType !== 'pdf';
 
     const config = {
       document: {
         fileType,
         key: documentKey,
         title: doc.name,
-        url: `${API_URL}/documents/${doc.id}/file?token=${req.headers.authorization?.split(' ')[1]}`,
+        url: `${API_URL}/editor/${doc.id}/file?token=${userToken}`,
         permissions: {
-          edit: true,
+          edit: canEdit,
           download: true,
           print: true,
         }
       },
       documentType: getDocumentType(fileType),
       editorConfig: {
-        callbackUrl: `${API_URL}/documents/${doc.id}/callback`,
+        callbackUrl: `${API_URL}/editor/${doc.id}/callback`,
+        mode: canEdit ? 'edit' : 'view',
         user: {
           id: req.user.id,
           name: req.user.name || req.user.email,
@@ -79,38 +84,39 @@ exports.getEditorConfig = async (req, res) => {
   }
 };
 
-// POST /documents/:id/callback
+// POST /editor/:id/callback
 // OnlyOffice llama a este endpoint cuando el usuario guarda el documento
 exports.handleCallback = async (req, res) => {
   try {
     const { status, url } = req.body;
+    console.log(`[OnlyOffice Callback] docId: ${req.params.id}, status: ${status}, url: ${url}`);
 
     // Status 2 = documento listo para guardar (usuario cerró o forzó guardado)
     // Status 6 = documento guardado por error anterior (forcesave)
-    if (status === 2 || status === 6) {
+    if ((status === 2 || status === 6) && url) {
       const doc = await Document.findByPk(req.params.id);
-      if (!doc) return res.json({ error: 0 }); // OnlyOffice espera { error: 0 } como OK
+      if (doc) {
+        // Descargar el archivo modificado desde OnlyOffice
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        fs.writeFileSync(doc.filePath, response.data);
 
-      // Descargar el archivo modificado desde OnlyOffice
-      const response = await axios.get(url, { responseType: 'arraybuffer' });
-      fs.writeFileSync(doc.filePath, response.data);
+        // Actualizar tamaño y timestamp
+        const stats = fs.statSync(doc.filePath);
+        await doc.update({ fileSizeBytes: stats.size });
 
-      // Actualizar tamaño y timestamp
-      const stats = fs.statSync(doc.filePath);
-      await doc.update({ fileSizeBytes: stats.size });
-
-      console.log(`[OnlyOffice] Documento guardado: ${doc.id}`);
+        console.log(`[OnlyOffice] Documento guardado correctamente: ${doc.id}`);
+      }
     }
 
     // OnlyOffice SIEMPRE requiere { error: 0 } para confirmar que recibimos el callback
     res.json({ error: 0 });
   } catch (error) {
     console.error('Error en callback de OnlyOffice:', error);
-    res.json({ error: 1 });
+    res.json({ error: 0 });
   }
 };
 
-// GET /documents/:id/file  (acceso público con token query param para OnlyOffice)
+// GET /editor/:id/file  (acceso público con token query param para OnlyOffice)
 exports.serveFile = async (req, res) => {
   try {
     // El token puede venir como query param (OnlyOffice lo necesita así)

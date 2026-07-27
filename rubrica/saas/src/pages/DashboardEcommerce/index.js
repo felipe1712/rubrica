@@ -1,7 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Col, Container, Row, Card, CardBody, CardHeader } from "reactstrap";
+Ôªøimport React, { useEffect, useState, useCallback } from "react";
+import { Col, Container, Row, Card, CardBody, CardHeader, Table, Badge, Spinner } from "reactstrap";
 import BreadCrumb from "../../Components/Common/BreadCrumb";
 import { Link } from "react-router-dom";
+
+const API_URL = process.env.REACT_APP_API_URL || "https://api.rubricalo.com";
+
+const STATUS_MAP = {
+  uploaded:          { label: "Subido",       color: "secondary" },
+  pending_signature: { label: "Pend. Firma",  color: "warning"   },
+  signed:            { label: "Firmado",      color: "success"   },
+  rejected:          { label: "Rechazado",    color: "danger"    },
+  expired:           { label: "Expirado",     color: "dark"      },
+};
+
+const formatDate = (val) => {
+  if (!val) return "‚Äî";
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return "‚Äî";
+  return d.toLocaleDateString("es-MX", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+};
 
 // Widgets de Rubricalo
 const StatCard = ({ icon, title, value, sub, color }) => (
@@ -32,12 +49,45 @@ const StatCard = ({ icon, title, value, sub, color }) => (
 const DashboardEcommerce = () => {
   document.title = "Dashboard | Rubricalo";
 
-  // Datos de ejemplo ñ se conectar·n al API m·s adelante
-  const stats = [
-    { icon: "ri-file-text-line",    title: "Documentos Totales",   value: "0", sub: "Total",    color: "primary" },
-    { icon: "ri-pen-nib-line",      title: "Pendientes de Firma",  value: "0", sub: "Pendiente", color: "warning" },
-    { icon: "ri-checkbox-circle-line", title: "Firmados Hoy",      value: "0", sub: "Hoy",       color: "success" },
-    { icon: "ri-group-line",        title: "Usuarios Activos",     value: "0", sub: "Activos",   color: "info" },
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    stats: { totalDocs: 0, pendingDocs: 0, totalSigned: 0, activeUsers: 0 },
+    recentActivity: []
+  });
+
+  const getAuthHeaders = () => {
+    const authUser = sessionStorage.getItem("authUser");
+    if (!authUser) return {};
+    const { token } = JSON.parse(authUser);
+    return { Authorization: `Bearer ${token}` };
+  };
+
+  const fetchDashboardStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/documents/dashboard-stats`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+      }
+    } catch (e) {
+      console.error("Error al cargar estad√≠sticas del dashboard:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
+
+  const statsCards = [
+    { icon: "ri-file-text-line",       title: "Documentos Totales",  value: data.stats.totalDocs,   sub: "Total",    color: "primary" },
+    { icon: "ri-pen-nib-line",         title: "Pendientes de Firma", value: data.stats.pendingDocs, sub: "Pendiente", color: "warning" },
+    { icon: "ri-checkbox-circle-line", title: "Firmados",            value: data.stats.totalSigned, sub: "Acumulado", color: "success" },
+    { icon: "ri-group-line",           title: "Usuarios Activos",    value: data.stats.activeUsers, sub: "Activos",   color: "info" },
   ];
 
   return (
@@ -48,7 +98,7 @@ const DashboardEcommerce = () => {
 
           {/* KPI Cards */}
           <Row>
-            {stats.map((s, i) => (
+            {statsCards.map((s, i) => (
               <Col xl={3} md={6} key={i}>
                 <StatCard {...s} />
               </Col>
@@ -56,21 +106,24 @@ const DashboardEcommerce = () => {
           </Row>
 
           <Row>
-            {/* Accesos r·pidos */}
+            {/* Accesos r√°pidos */}
             <Col xl={4}>
-              <Card>
+              <Card className="h-100">
                 <CardHeader>
-                  <h4 className="card-title mb-0">Acciones R·pidas</h4>
+                  <h4 className="card-title mb-0">Acciones R√°pidas</h4>
                 </CardHeader>
                 <CardBody>
                   <div className="d-grid gap-2">
-                    <Link to="/documentos/nuevo" className="btn btn-primary btn-sm">
+                    <Link to="/documentos/nuevo" className="btn btn-primary btn-sm py-2">
                       <i className="ri-upload-2-line me-1"></i> Subir Documento
                     </Link>
-                    <Link to="/documentos" className="btn btn-outline-secondary btn-sm">
+                    <Link to="/documentos" className="btn btn-outline-secondary btn-sm py-2">
                       <i className="ri-file-list-3-line me-1"></i> Ver Mis Documentos
                     </Link>
-                    <Link to="/soporte" className="btn btn-outline-secondary btn-sm">
+                    <Link to="/herramientas-pdf" className="btn btn-outline-info btn-sm py-2">
+                      <i className="ri-tools-line me-1"></i> Herramientas PDF
+                    </Link>
+                    <Link to="/soporte" className="btn btn-outline-secondary btn-sm py-2">
                       <i className="ri-customer-service-2-line me-1"></i> Soporte
                     </Link>
                   </div>
@@ -80,18 +133,72 @@ const DashboardEcommerce = () => {
 
             {/* Actividad reciente */}
             <Col xl={8}>
-              <Card>
-                <CardHeader>
-                  <h4 className="card-title mb-0">Actividad Reciente</h4>
+              <Card className="h-100">
+                <CardHeader className="d-flex align-items-center">
+                  <h4 className="card-title mb-0 flex-grow-1">Actividad Reciente</h4>
+                  <Link to="/documentos" className="btn btn-sm btn-soft-primary">
+                    Ver todos
+                  </Link>
                 </CardHeader>
                 <CardBody>
-                  <div className="text-center py-4 text-muted">
-                    <i className="ri-file-search-line fs-1 mb-2 d-block"></i>
-                    <p>No hay actividad reciente. Sube tu primer documento para comenzar.</p>
-                    <Link to="/documentos/nuevo" className="btn btn-primary btn-sm">
-                      <i className="ri-add-line me-1"></i> Subir Documento
-                    </Link>
-                  </div>
+                  {loading ? (
+                    <div className="text-center py-4">
+                      <Spinner color="primary" size="sm" />
+                      <span className="ms-2 text-muted">Cargando actividad...</span>
+                    </div>
+                  ) : data.recentActivity.length === 0 ? (
+                    <div className="text-center py-4 text-muted">
+                      <i className="ri-file-search-line fs-1 mb-2 d-block"></i>
+                      <p>No hay actividad reciente. Sube tu primer documento para comenzar.</p>
+                      <Link to="/documentos/nuevo" className="btn btn-primary btn-sm">
+                        <i className="ri-add-line me-1"></i> Subir Documento
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="table-responsive">
+                      <Table className="table-hover table-nowrap mb-0 align-middle">
+                        <thead className="table-light">
+                          <tr>
+                            <th>Documento</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th className="text-end">Acci√≥n</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {data.recentActivity.map((doc) => {
+                            const st = STATUS_MAP[doc.status] || { label: doc.status, color: "secondary" };
+                            return (
+                              <tr key={doc.id}>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <i className="ri-file-text-line text-primary fs-4"></i>
+                                    <div>
+                                      <p className="mb-0 fw-medium">{doc.name}</p>
+                                      <small className="text-muted">{doc.originalName}</small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>
+                                  <Badge color={st.color} pill>
+                                    {st.label}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <small className="text-muted">{formatDate(doc.createdAt || doc.created_at)}</small>
+                                </td>
+                                <td className="text-end">
+                                  <Link to={`/documentos/${doc.id}`} className="btn btn-sm btn-soft-secondary">
+                                    Ver
+                                  </Link>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                    </div>
+                  )}
                 </CardBody>
               </Card>
             </Col>

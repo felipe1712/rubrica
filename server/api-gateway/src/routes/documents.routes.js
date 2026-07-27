@@ -44,8 +44,9 @@ const upload = multer({
 // Todas las rutas requieren autenticación
 router.use(authenticateUser);
 
-router.get('/',           docsCtrl.listDocuments);
-router.get('/:id',        docsCtrl.getDocument);
+router.get('/dashboard-stats', docsCtrl.getDashboardStats);
+router.get('/',               docsCtrl.listDocuments);
+router.get('/:id',            docsCtrl.getDocument);
 router.get('/:id/download', docsCtrl.downloadDocument);
 router.post('/upload',    upload.single('file'), docsCtrl.uploadDocument);
 router.post('/:id/send-for-signature', docsCtrl.sendForSignature);

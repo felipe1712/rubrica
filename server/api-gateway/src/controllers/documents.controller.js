@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { Document } = require('../models');
+const { Document, User } = require('../models');
 const docusealService = require('../services/docuseal.service');
 const { verifyFileType } = require('../services/magika.service');
 
@@ -10,6 +10,38 @@ const UPLOADS_DIR = process.env.UPLOADS_DIR || '/app/uploads';
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
+
+// GET /documents/dashboard-stats — estadísticas para el Dashboard del tenant
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const tenantId = req.tenantId;
+
+    const totalDocs = await Document.count({ where: { tenantId } });
+    const pendingDocs = await Document.count({ where: { tenantId, status: 'pending_signature' } });
+    const totalSigned = await Document.count({ where: { tenantId, status: 'signed' } });
+    const activeUsers = await User.count({ where: { tenantId, isActive: true } });
+
+    const recentActivity = await Document.findAll({
+      where: { tenantId },
+      order: [['created_at', 'DESC']],
+      limit: 5,
+      attributes: ['id', 'name', 'originalName', 'status', 'fileSizeBytes', 'signerEmail', 'signerName', 'createdAt', 'created_at']
+    });
+
+    res.json({
+      stats: {
+        totalDocs,
+        pendingDocs,
+        totalSigned,
+        activeUsers
+      },
+      recentActivity
+    });
+  } catch (error) {
+    console.error('Error al obtener estadisticas del dashboard:', error);
+    res.status(500).json({ error: 'Error al obtener datos del dashboard.' });
+  }
+};
 
 // GET /documents — listar documentos del tenant
 exports.listDocuments = async (req, res) => {
