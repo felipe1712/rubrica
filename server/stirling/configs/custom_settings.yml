@@ -3,8 +3,8 @@ system:
   googlevars:
     enabled: false
 ui:
-  appName: 'Rubricalo PDF'
+  appName: 'Herramientas PDF'
   homeDescription: 'Plataforma de gestión documental'
-  appNavbarName: 'Rubricalo'
+  appNavbarName: 'Herramientas PDF'
 security:
   enableLogin: false

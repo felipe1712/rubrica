@@ -130,9 +130,9 @@ services:
       LANGS: "es_ES"
       SYSTEM_DEFAULTLOCALE: "es_ES"
       SYSTEM_LOCALE: "es_ES"
-      UI_APPNAME: "Rubricalo PDF"
+      UI_APPNAME: "Herramientas PDF"
       UI_HOMEDESCRIPTION: "Plataforma de gestión documental"
-      UI_APPNAVBARNAME: "Rubricalo"
+      UI_APPNAVBARNAME: "Herramientas PDF"
     volumes:
       - ./stirling/configs:/configs
       - ./stirling/logs:/logs
