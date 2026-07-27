@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" width="320" height="60">
+  <g fill="none" fill-rule="evenodd">
+    <!-- Icono de documento con degradado azul/índigo -->
+    <rect width="42" height="50" x="4" y="5" fill="#3d4ed8" rx="8"/>
+    <path fill="#ffffff" d="M16 17h18v3H16zm0 8h18v3H16zm0 8h12v3H16z"/>
+    <!-- Texto: Herramientas PDF -->
+    <text x="58" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="700" fill="#1e293b">Herramientas <tspan fill="#3d4ed8">PDF</tspan></text>
+  </g>
+</svg>
