@@ -22,12 +22,45 @@ const authenticateUser = async (req, res, next) => {
       return res.status(401).json({ error: 'Token inválido o expirado.' });
     }
 
-    const user = await User.findByPk(decoded.id, {
+    let user = await User.findByPk(decoded.id, {
       include: [{ model: Tenant, attributes: ['plan', 'status', 'expiresAt', 'docusealOrgId'] }]
     });
 
-    if (!user || !user.isActive) {
+    if (!user) {
+      // Soporte para SuperAdmin navegando en la app principal
+      if (decoded.isSuperAdmin || decoded.role === 'admin') {
+        const admin = await SuperAdmin.findByPk(decoded.id);
+        if (admin) {
+          let firstTenant = await Tenant.findOne();
+          if (!firstTenant) {
+            firstTenant = await Tenant.create({
+              name: 'Organización Principal',
+              email: admin.email,
+              plan: 'enterprise',
+              status: 'active'
+            });
+          }
+          req.user = {
+            id: admin.id,
+            name: 'Administrador Principal',
+            email: admin.email,
+            role: 'admin',
+            tenantId: firstTenant.id
+          };
+          req.tenantId = firstTenant.id;
+
+          try {
+            await sequelize.query(`SET app.current_tenant_id = '${req.tenantId}'`);
+          } catch (_) {}
+
+          return next();
+        }
+      }
       return res.status(401).json({ error: 'Usuario inactivo o no encontrado.' });
+    }
+
+    if (!user.isActive) {
+      return res.status(401).json({ error: 'Usuario inactivo.' });
     }
 
     if (user.Tenant) {
