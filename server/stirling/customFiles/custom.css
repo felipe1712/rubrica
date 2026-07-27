@@ -1,4 +1,4 @@
-/* Custom CSS para ocultar branding, barra superior, pie de página y logos de Stirling-PDF */
+/* Ocultar barra superior y logotipos de Stirling-PDF */
 
 header,
 footer,
@@ -22,16 +22,33 @@ img[alt*="Stirling"] {
     display: none !important;
 }
 
-/* Ocultar el título/logo central si dice Stirling PDF y mostrar Herramientas PDF */
-h1.text-3xl, .font-bold.text-2xl, .text-xl.font-bold, .logo-title {
-    font-size: 0 !important;
+/* Ocultar el texto del logo superior izquierdo */
+div.flex.items-center.gap-2 > span,
+button.flex.items-center > span,
+.flex.items-center > span.font-bold {
+    display: none !important;
 }
 
-h1.text-3xl::after, .font-bold.text-2xl::after, .text-xl.font-bold::after, .logo-title::after {
+/* Ocultar el título central "Stirling PDF" y reemplazar por "Herramientas PDF" */
+div.flex.flex-col.items-center > h2,
+div.flex.flex-col.items-center > h1,
+.text-4xl.font-bold,
+.text-3xl.font-bold,
+.text-2xl.font-bold {
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+
+div.flex.flex-col.items-center > h2::after,
+div.flex.flex-col.items-center > h1::after,
+.text-4xl.font-bold::after,
+.text-3xl.font-bold::after {
     content: "Herramientas PDF" !important;
-    font-size: 1.5rem !important;
+    font-size: 2rem !important;
+    line-height: 2.5rem !important;
     font-weight: 700 !important;
     color: #3d4ed8 !important;
+    display: block !important;
 }
 
 body {

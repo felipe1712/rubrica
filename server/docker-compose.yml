@@ -130,6 +130,8 @@ services:
       LANGS: "es_ES"
       SYSTEM_DEFAULTLOCALE: "es_ES"
       SYSTEM_LOCALE: "es_ES"
+      SYSTEM_CUSTOMFILESPATH: "/customFiles"
+      SYSTEM_CUSTOM_FILES_PATH: "/customFiles"
       UI_APPNAME: "Herramientas PDF"
       UI_HOMEDESCRIPTION: "Plataforma de gestión documental"
       UI_APPNAVBARNAME: "Herramientas PDF"
