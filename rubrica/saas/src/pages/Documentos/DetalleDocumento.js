@@ -41,10 +41,15 @@ const DetalleDocumento = () => {
   const [sendSuccess, setSendSuccess] = useState(false);
 
   const getAuthHeaders = () => {
-    const authUser = sessionStorage.getItem("authUser");
-    if (!authUser) return {};
-    const { token } = JSON.parse(authUser);
-    return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+    try {
+      const authUser = sessionStorage.getItem("authUser");
+      if (!authUser) return {};
+      const parsed = JSON.parse(authUser);
+      const token = parsed.token || parsed.accessToken;
+      return token ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } : {};
+    } catch (e) {
+      return {};
+    }
   };
 
   useEffect(() => {

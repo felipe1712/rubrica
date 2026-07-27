@@ -22,10 +22,15 @@ const NuevoDocumento = () => {
   const [success, setSuccess] = useState(false);
 
   const getAuthHeaders = () => {
-    const authUser = sessionStorage.getItem("authUser");
-    if (!authUser) return {};
-    const { token } = JSON.parse(authUser);
-    return { Authorization: `Bearer ${token}` };
+    try {
+      const authUser = sessionStorage.getItem("authUser");
+      if (!authUser) return {};
+      const parsed = JSON.parse(authUser);
+      const token = parsed.token || parsed.accessToken;
+      return token ? { Authorization: `Bearer ${token}` } : {};
+    } catch (e) {
+      return {};
+    }
   };
 
   const ALLOWED_MIMES = [
