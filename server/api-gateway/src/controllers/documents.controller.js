@@ -13,39 +13,65 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 
 // GET /documents/dashboard-stats — estadísticas para el Dashboard del tenant
 exports.getDashboardStats = async (req, res) => {
+  const tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+  if (!tenantId) {
+    return res.json({
+      stats: { totalDocs: 0, pendingDocs: 0, totalSigned: 0, activeUsers: 0 },
+      recentActivity: []
+    });
+  }
+
+  let totalDocs = 0;
+  let pendingDocs = 0;
+  let totalSigned = 0;
+  let activeUsers = 0;
+  let recentActivity = [];
+
   try {
-    const tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
-    if (!tenantId) {
-      return res.json({
-        stats: { totalDocs: 0, pendingDocs: 0, totalSigned: 0, activeUsers: 0 },
-        recentActivity: []
-      });
+    totalDocs = await Document.count({ where: { tenantId } });
+  } catch (e) {
+    console.error('[Dashboard Stats Error] totalDocs count failed:', e.message);
+  }
+
+  try {
+    pendingDocs = await Document.count({ where: { tenantId, status: 'pending_signature' } });
+  } catch (e) {
+    console.error('[Dashboard Stats Error] pendingDocs count failed:', e.message);
+  }
+
+  try {
+    totalSigned = await Document.count({ where: { tenantId, status: 'signed' } });
+  } catch (e) {
+    console.error('[Dashboard Stats Error] totalSigned count failed:', e.message);
+  }
+
+  try {
+    if (User) {
+      activeUsers = await User.count({ where: { tenantId, isActive: true } });
     }
+  } catch (e) {
+    console.error('[Dashboard Stats Error] activeUsers count failed:', e.message);
+  }
 
-    const totalDocs = await Document.count({ where: { tenantId } });
-    const pendingDocs = await Document.count({ where: { tenantId, status: 'pending_signature' } });
-    const totalSigned = await Document.count({ where: { tenantId, status: 'signed' } });
-    const activeUsers = await User.count({ where: { tenantId, isActive: true } });
-
-    const recentActivity = await Document.findAll({
+  try {
+    recentActivity = await Document.findAll({
       where: { tenantId },
       order: [['createdAt', 'DESC']],
       limit: 5
     });
-
-    res.json({
-      stats: {
-        totalDocs,
-        pendingDocs,
-        totalSigned,
-        activeUsers
-      },
-      recentActivity: recentActivity || []
-    });
-  } catch (error) {
-    console.error('Error al obtener estadisticas del dashboard:', error);
-    res.status(500).json({ error: error.message || 'Error al obtener datos del dashboard.' });
+  } catch (e) {
+    console.error('[Dashboard Stats Error] recentActivity query failed:', e.message);
   }
+
+  res.json({
+    stats: {
+      totalDocs,
+      pendingDocs,
+      totalSigned,
+      activeUsers
+    },
+    recentActivity: recentActivity || []
+  });
 };
 
 // GET /documents — listar documentos del tenant
