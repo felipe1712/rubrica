@@ -58,12 +58,12 @@ const DashboardEcommerce = () => {
 
   const getAuthHeaders = () => {
     try {
-      const authUser = sessionStorage.getItem("authUser");
-      if (!authUser) return {};
-      const parsed = JSON.parse(authUser);
-      const token = parsed.token || parsed.accessToken;
+      const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      const token = parsed?.token || parsed?.accessToken || (typeof parsed === "string" ? parsed : null);
       return token ? { Authorization: `Bearer ${token}` } : {};
-    } catch (e) {
+    } catch (_) {
       return {};
     }
   };

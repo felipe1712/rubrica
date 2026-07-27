@@ -1,0 +1,10 @@
+system:
+  defaultLocale: 'es_ES'
+  googlevars:
+    enabled: false
+ui:
+  appName: 'Rubricalo PDF'
+  homeDescription: 'Plataforma de gestión documental'
+  appNavbarName: 'Rubricalo'
+security:
+  enableLogin: false

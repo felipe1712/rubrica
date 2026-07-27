@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { Document, User } = require('../models');
+const { Document, User, Tenant } = require('../models');
 const docusealService = require('../services/docuseal.service');
 const { verifyFileType } = require('../services/magika.service');
 
