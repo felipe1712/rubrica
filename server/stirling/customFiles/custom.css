@@ -1,0 +1,28 @@
+/* Custom CSS para ocultar todo el branding, barra superior, pie de página y enlaces de Stirling-PDF */
+
+header,
+footer,
+nav,
+.navbar,
+.stirling-logo,
+.sidebar-brand,
+#footer,
+.github-icon,
+.github-link,
+.help-icon,
+.navbar-brand-box,
+a[href*="github.com"],
+a[href*="stirlingpdf.com"] {
+    display: none !important;
+}
+
+body {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    background-color: #ffffff !important;
+}
+
+.container, .container-fluid, .page-content {
+    margin-top: 0 !important;
+    padding-top: 10px !important;
+}

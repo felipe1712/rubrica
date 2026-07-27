@@ -14,7 +14,13 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 // GET /documents/dashboard-stats — estadísticas para el Dashboard del tenant
 exports.getDashboardStats = async (req, res) => {
   try {
-    const tenantId = req.tenantId;
+    const tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+    if (!tenantId) {
+      return res.json({
+        stats: { totalDocs: 0, pendingDocs: 0, totalSigned: 0, activeUsers: 0 },
+        recentActivity: []
+      });
+    }
 
     const totalDocs = await Document.count({ where: { tenantId } });
     const pendingDocs = await Document.count({ where: { tenantId, status: 'pending_signature' } });
@@ -34,25 +40,30 @@ exports.getDashboardStats = async (req, res) => {
         totalSigned,
         activeUsers
       },
-      recentActivity
+      recentActivity: recentActivity || []
     });
   } catch (error) {
     console.error('Error al obtener estadisticas del dashboard:', error);
-    res.status(500).json({ error: 'Error al obtener datos del dashboard.' });
+    res.status(500).json({ error: error.message || 'Error al obtener datos del dashboard.' });
   }
 };
 
 // GET /documents — listar documentos del tenant
 exports.listDocuments = async (req, res) => {
   try {
+    const tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+    if (!tenantId) {
+      return res.json([]);
+    }
+
     const docs = await Document.findAll({
-      where: { tenantId: req.tenantId },
+      where: { tenantId },
       order: [['createdAt', 'DESC']]
     });
-    res.json(docs);
+    res.json(docs || []);
   } catch (error) {
     console.error('Error listando documentos:', error);
-    res.status(500).json({ error: 'Error al obtener los documentos.' });
+    res.status(500).json({ error: error.message || 'Error al obtener los documentos.' });
   }
 };
 

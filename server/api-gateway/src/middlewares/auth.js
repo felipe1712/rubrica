@@ -30,20 +30,26 @@ const authenticateUser = async (req, res, next) => {
       return res.status(401).json({ error: 'Usuario inactivo o no encontrado.' });
     }
 
-    if (user.Tenant.status === 'suspended') {
-      return res.status(403).json({ error: 'La cuenta de su organización se encuentra suspendida. Contacte soporte.' });
-    }
+    if (user.Tenant) {
+      if (user.Tenant.status === 'suspended') {
+        return res.status(403).json({ error: 'La cuenta de su organización se encuentra suspendida. Contacte soporte.' });
+      }
 
-    if (user.Tenant.status === 'expired' || (user.Tenant.expiresAt && new Date(user.Tenant.expiresAt) < new Date())) {
-      return res.status(403).json({ error: 'La licencia de su organización ha expirado.' });
+      if (user.Tenant.status === 'expired' || (user.Tenant.expiresAt && new Date(user.Tenant.expiresAt) < new Date())) {
+        return res.status(403).json({ error: 'La licencia de su organización ha expirado.' });
+      }
     }
 
     // Attach to request
     req.user = user;
-    req.tenantId = user.tenantId;
+    req.tenantId = user.tenantId || user.tenant_id;
 
     // Set Row Level Security context for postgres
-    await sequelize.query(`SET app.current_tenant_id = '${user.tenantId}'`);
+    try {
+      if (req.tenantId) {
+        await sequelize.query(`SET app.current_tenant_id = '${req.tenantId}'`);
+      }
+    } catch (_) {}
 
     next();
   } catch (error) {
