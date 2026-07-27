@@ -125,10 +125,8 @@ services:
     container_name: rubrica_stirling
     restart: unless-stopped
     environment:
-      DOCKER_ENABLE_SECURITY: "true"
-      SECURITY_ENABLELOGIN: "true"
-      SECURITY_INITIALLOGIN_USERNAME: "admin"
-      SECURITY_INITIALLOGIN_PASSWORD: "${STIRLING_ADMIN_PASSWORD}"
+      DOCKER_ENABLE_SECURITY: "false"
+      SECURITY_ENABLELOGIN: "false"
       LANGS: "es_MX,en_US"
       SYSTEM_DEFAULTLOCALE: es_MX
       UI_APPNAME: "Rúbrica PDF"
