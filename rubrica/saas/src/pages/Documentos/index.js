@@ -23,6 +23,22 @@ const formatSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+const formatDate = (val) => {
+  if (!val) return "—";
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const fileIcon = (name = "") => {
+  const ext = name.split(".").pop().toLowerCase();
+  if (["docx", "doc"].includes(ext)) return { icon: "ri-file-word-line", color: "text-primary" };
+  if (["xlsx", "xls"].includes(ext)) return { icon: "ri-file-excel-line", color: "text-success" };
+  if (["pptx", "ppt"].includes(ext)) return { icon: "ri-file-ppt-line", color: "text-warning" };
+  if (ext === "txt") return { icon: "ri-file-text-line", color: "text-secondary" };
+  return { icon: "ri-file-pdf-2-line", color: "text-danger" };
+};
+
 const Documentos = () => {
   document.title = "Documentos | Rubricalo";
 
@@ -122,7 +138,7 @@ const Documentos = () => {
                               <tr key={doc.id}>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <i className="ri-file-pdf-2-line text-danger fs-4"></i>
+                                    {(() => { const fi = fileIcon(doc.originalName); return <i className={`${fi.icon} ${fi.color} fs-4`}></i>; })()}
                                     <div>
                                       <p className="mb-0 fw-medium">{doc.name}</p>
                                       <small className="text-muted">{doc.originalName}</small>
@@ -146,7 +162,7 @@ const Documentos = () => {
                                   )}
                                 </td>
                                 <td>
-                                  <small>{new Date(doc.createdAt).toLocaleDateString("es-MX")}</small>
+                                  <small>{formatDate(doc.createdAt || doc.created_at)}</small>
                                 </td>
                                 <td className="text-end">
                                   <div className="d-flex gap-2 justify-content-end">

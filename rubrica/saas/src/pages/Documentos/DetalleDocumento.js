@@ -17,6 +17,14 @@ const STATUS_MAP = {
   expired:           { label: "Expirado",           color: "dark",      icon: "ri-error-warning-line"   },
 };
 
+// Maneja tanto camelCase (createdAt) como snake_case (created_at) que puede venir del API
+const formatDate = (val) => {
+  if (!val) return "—";
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" });
+};
+
 const DetalleDocumento = () => {
   document.title = "Detalle Documento | Rubricalo";
   const { id } = useParams();
@@ -141,7 +149,7 @@ const DetalleDocumento = () => {
                         </tr>
                         <tr>
                           <td className="text-muted fw-medium">Fecha de subida</td>
-                          <td>{new Date(doc.createdAt).toLocaleString("es-MX")}</td>
+                          <td>{formatDate(doc.createdAt || doc.created_at)}</td>
                         </tr>
                         {doc.signerEmail && (
                           <>
@@ -155,10 +163,10 @@ const DetalleDocumento = () => {
                             </tr>
                           </>
                         )}
-                        {doc.signedAt && (
+                        {(doc.signedAt || doc.signed_at) && (
                           <tr>
                             <td className="text-muted fw-medium">Firmado el</td>
-                            <td>{new Date(doc.signedAt).toLocaleString("es-MX")}</td>
+                            <td>{formatDate(doc.signedAt || doc.signed_at)}</td>
                           </tr>
                         )}
                         {doc.docusealSubmissionId && (
@@ -187,7 +195,6 @@ const DetalleDocumento = () => {
                     color="info"
                     tag={Link}
                     to={`/editor/${doc.id}`}
-                    target="_blank"
                   >
                     <i className="ri-edit-2-line me-1"></i> Editar Documento
                   </Button>
