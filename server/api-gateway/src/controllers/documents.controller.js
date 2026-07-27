@@ -23,9 +23,8 @@ exports.getDashboardStats = async (req, res) => {
 
     const recentActivity = await Document.findAll({
       where: { tenantId },
-      order: [['created_at', 'DESC']],
-      limit: 5,
-      attributes: ['id', 'name', 'originalName', 'status', 'fileSizeBytes', 'signerEmail', 'signerName', 'createdAt', 'created_at']
+      order: [['createdAt', 'DESC']],
+      limit: 5
     });
 
     res.json({
@@ -48,8 +47,7 @@ exports.listDocuments = async (req, res) => {
   try {
     const docs = await Document.findAll({
       where: { tenantId: req.tenantId },
-      order: [['created_at', 'DESC']],
-      attributes: ['id', 'name', 'originalName', 'status', 'fileSizeBytes', 'signerEmail', 'signerName', 'signedAt', 'createdAt']
+      order: [['createdAt', 'DESC']]
     });
     res.json(docs);
   } catch (error) {
