@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { Document, User, Tenant } = require('../models');
+const { Document, User, Tenant, sequelize } = require('../models');
 const docusealService = require('../services/docuseal.service');
 const { verifyFileType } = require('../services/magika.service');
 
@@ -61,7 +61,7 @@ exports.getDashboardStats = async (req, res) => {
   try {
     recentActivity = await Document.findAll({
       where: { tenantId },
-      order: [['createdAt', 'DESC']],
+      order: [sequelize.literal('created_at DESC')],
       limit: 5
     });
   } catch (e) {
@@ -94,7 +94,7 @@ exports.listDocuments = async (req, res) => {
 
     const docs = await Document.findAll({
       where: { tenantId },
-      order: [['createdAt', 'DESC']]
+      order: [sequelize.literal('created_at DESC')]
     });
     res.json(docs || []);
   } catch (error) {

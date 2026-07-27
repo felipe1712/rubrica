@@ -39,7 +39,7 @@ exports.getStats = async (req, res) => {
 exports.getTenants = async (req, res) => {
   try {
     const tenants = await Tenant.findAll({
-      order: [['createdAt', 'DESC']]
+      order: [sequelize.literal('created_at DESC')]
     });
     res.json(tenants);
   } catch (error) {
