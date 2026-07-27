@@ -13,7 +13,12 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 
 // GET /documents/dashboard-stats — estadísticas para el Dashboard del tenant
 exports.getDashboardStats = async (req, res) => {
-  const tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+  let tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+  if (!tenantId) {
+    const firstTenant = await Tenant.findOne();
+    if (firstTenant) tenantId = firstTenant.id;
+  }
+
   if (!tenantId) {
     return res.json({
       stats: { totalDocs: 0, pendingDocs: 0, totalSigned: 0, activeUsers: 0 },
@@ -77,7 +82,12 @@ exports.getDashboardStats = async (req, res) => {
 // GET /documents — listar documentos del tenant
 exports.listDocuments = async (req, res) => {
   try {
-    const tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+    let tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+    if (!tenantId) {
+      const firstTenant = await Tenant.findOne();
+      if (firstTenant) tenantId = firstTenant.id;
+    }
+
     if (!tenantId) {
       return res.json([]);
     }

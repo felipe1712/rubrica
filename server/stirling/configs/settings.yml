@@ -1,5 +1,5 @@
 system:
-  defaultLocale: 'es_MX'
+  defaultLocale: 'es_ES'
 ui:
   appName: 'Rubricalo PDF'
   homeDescription: 'Plataforma de gestión documental'

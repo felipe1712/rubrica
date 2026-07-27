@@ -127,9 +127,9 @@ services:
     environment:
       DOCKER_ENABLE_SECURITY: "false"
       SECURITY_ENABLELOGIN: "false"
-      LANGS: "es_MX,es_ES"
-      SYSTEM_DEFAULTLOCALE: "es_MX"
-      SYSTEM_LOCALE: "es_MX"
+      LANGS: "es_ES"
+      SYSTEM_DEFAULTLOCALE: "es_ES"
+      SYSTEM_LOCALE: "es_ES"
       UI_APPNAME: "Rubricalo PDF"
       UI_HOMEDESCRIPTION: "Plataforma de gestión documental"
       UI_APPNAVBARNAME: "Rubricalo"

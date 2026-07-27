@@ -64,7 +64,7 @@ const HerramientasPDF = () => {
   const openTool = (path) => {
     setFrameLoading(true);
     const sep = path.includes("?") ? "&" : "?";
-    setActiveFrame(`${PDF_URL}${path}${sep}lang=es_MX`);
+    setActiveFrame(`${PDF_URL}${path}${sep}lang=es_ES`);
   };
 
   return (
