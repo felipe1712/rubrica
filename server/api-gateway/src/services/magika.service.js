@@ -7,6 +7,8 @@
  * Esto previene ataques de file type confusion (ej: malware.exe renombrado como contrato.pdf).
  */
 
+const fs = require('fs');
+
 let magikaInstance = null;
 
 // Tipos permitidos en Rubricalo (etiquetas que devuelve Magika)
@@ -31,13 +33,14 @@ const DANGEROUS_LABELS = new Set([
 ]);
 
 /**
- * Inicializa Magika de forma lazy (solo al primer uso).
+ * Inicializa MagikaNode de forma lazy (solo al primer uso).
  * El modelo ONNX tarda ~1-2s en cargar, después las verificaciones son <100ms.
  */
 async function getMagika() {
   if (!magikaInstance) {
-    const { Magika } = await import('magika');
-    magikaInstance = new Magika();
+    // v1.0.0: usar MagikaNode desde 'magika/node' (versión optimizada para Node.js)
+    const { MagikaNode } = require('magika/node');
+    magikaInstance = new MagikaNode();
     console.log('[Magika] Modelo cargado correctamente.');
   }
   return magikaInstance;
@@ -52,8 +55,7 @@ async function getMagika() {
  */
 async function verifyFileType(filePath, declaredMime = '') {
   try {
-    const fs = await import('fs');
-    const fileBuffer = fs.default.readFileSync(filePath);
+    const fileBuffer = fs.readFileSync(filePath);
 
     const magika = await getMagika();
     const result = await magika.identifyBytes(fileBuffer);
