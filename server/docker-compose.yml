@@ -127,11 +127,12 @@ services:
     environment:
       DOCKER_ENABLE_SECURITY: "false"
       SECURITY_ENABLELOGIN: "false"
-      LANGS: "es_MX,en_US"
-      SYSTEM_DEFAULTLOCALE: es_MX
-      UI_APPNAME: "Rúbrica PDF"
+      LANGS: "es_MX,es_ES"
+      SYSTEM_DEFAULTLOCALE: "es_MX"
+      SYSTEM_LOCALE: "es_MX"
+      UI_APPNAME: "Rubricalo PDF"
       UI_HOMEDESCRIPTION: "Plataforma de gestión documental"
-      UI_APPNAVBARNAME: "Rúbrica"
+      UI_APPNAVBARNAME: "Rubricalo"
     volumes:
       - ./stirling/configs:/configs
       - ./stirling/logs:/logs
