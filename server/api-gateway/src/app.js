@@ -97,7 +97,7 @@ async function startServer() {
     // Seed default admin and demo tenant
     await seedDefaults();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`API Gateway running on port ${PORT}`);
     });
   } catch (error) {
