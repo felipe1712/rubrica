@@ -41,14 +41,14 @@ const {
 
     const [userLogin, setUserLogin] = useState([]);
     const [passwordShow, setPasswordShow] = useState(false);
-
+    const [loginError, setLoginError] = useState(null);
 
     useEffect(() => {
         if (user && (user.token || user.user)) {
             window.location.href = "/dashboard";
             return;
         }
-        const authUser = sessionStorage.getItem("authUser");
+        const authUser = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
         if (authUser) {
             try {
                 const parsed = JSON.parse(authUser);
@@ -66,10 +66,11 @@ const {
             password: userLogin.password || "rubricalo123",
         },
         validationSchema: Yup.object({
-            email: Yup.string().required("Please Enter Your Email"),
-            password: Yup.string().required("Please Enter Your Password"),
+            email: Yup.string().required("Ingresa tu correo electrónico"),
+            password: Yup.string().required("Ingresa tu contraseña"),
         }),
         onSubmit: async (values, { setSubmitting }) => {
+            setLoginError(null);
             try {
                 const apiUrl = process.env.REACT_APP_API_URL || "https://api.rubricalo.com";
                 const res = await fetch(`${apiUrl}/auth/login`, {
@@ -80,11 +81,14 @@ const {
                 const data = await res.json();
                 if (res.ok && data.token) {
                     sessionStorage.setItem("authUser", JSON.stringify(data));
+                    localStorage.setItem("authUser", JSON.stringify(data));
                     window.location.href = "/dashboard";
                 } else {
+                    setLoginError(data.error || "Credenciales inválidas");
                     dispatch(apiError(data.error || "Credenciales inválidas"));
                 }
             } catch (err) {
+                setLoginError("Error de conexión con el servidor: " + err.message);
                 dispatch(apiError("Error de conexión con el servidor"));
             } finally {
                 setSubmitting(false);
@@ -141,7 +145,7 @@ const {
                                             <h5 className="text-primary">Welcome Back !</h5>
                                             <p className="text-muted">Sign in to continue to Velzon.</p>
                                         </div>
-                                        {error && error ? (<Alert color="danger"> {error} </Alert>) : null}
+                                        {(loginError || error) ? (<Alert color="danger"> {loginError || error} </Alert>) : null}
                                         <div className="p-2 mt-4">
                                             <Form
                                                 onSubmit={(e) => {
