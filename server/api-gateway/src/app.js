@@ -12,8 +12,24 @@ const PORT = process.env.PORT || 4000;
 
 // Security and Logging Middlewares
 app.use(helmet());
+const ALLOWED_ORIGINS = [
+  'https://rubricalo.com',
+  'https://www.rubricalo.com',
+  'https://app.rubricalo.com',
+  'https://admin.rubricalo.com',
+  'https://api.rubricalo.com',
+  'http://localhost:3000',
+  'http://localhost:3003'
+];
+
 app.use(cors({
-  origin: ['https://app.rubricalo.com', 'https://api.rubricalo.com', 'http://localhost:3000', 'http://localhost:3003'],
+  origin: function (origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.rubricalo.com')) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
