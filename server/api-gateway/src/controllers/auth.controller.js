@@ -135,6 +135,81 @@ exports.loginAdmin = async (req, res) => {
   }
 };
 
+exports.registerTenant = async (req, res) => {
+  try {
+    const { companyName, userName, email, password } = req.body;
+    if (!companyName || !email || !password) {
+      return res.status(400).json({ error: 'Nombre de la empresa, correo y contraseña son obligatorios.' });
+    }
+
+    // Verificar si ya existe una empresa o usuario registrado con este correo
+    const existingTenant = await Tenant.findOne({ where: { email } });
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingTenant || existingUser) {
+      return res.status(400).json({ error: 'Ya existe una cuenta registrada con este correo electrónico.' });
+    }
+
+    const licenseKey = `RUBRIC-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+
+    // Crear Tenant en Plan Gratuito (Freemium: 3 docs/mes, 1 usuario)
+    const tenant = await Tenant.create({
+      name: companyName,
+      email,
+      plan: 'free',
+      status: 'active',
+      licenseKey,
+      maxUsers: 1,
+      maxDocsMonth: 3,
+      maxStorageGb: 1
+    });
+
+    const passwordHash = await User.hashPassword(password);
+    const user = await User.create({
+      tenantId: tenant.id,
+      name: userName || companyName,
+      email,
+      passwordHash,
+      role: 'admin',
+      isActive: true
+    });
+
+    // Enviar correo transaccional de bienvenida vía Brevo
+    try {
+      const mailer = require('../utils/mailer');
+      await mailer.sendWelcomeEmail({
+        to: email,
+        name: user.name,
+        companyName: tenant.name
+      });
+    } catch (mailErr) {
+      console.warn('Advertencia: No se pudo enviar el correo de bienvenida vía Brevo:', mailErr.message);
+    }
+
+    // Generar Token JWT para autenticación inmediata
+    const token = jwt.sign(
+      { id: user.id, tenantId: tenant.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+
+    res.status(201).json({
+      message: 'Empresa creada exitosamente.',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        tenantId: tenant.id,
+        plan: tenant.plan
+      }
+    });
+  } catch (error) {
+    console.error('Error en registro de empresa:', error);
+    res.status(500).json({ error: 'Error al registrar la empresa.' });
+  }
+};
+
 exports.getMe = async (req, res) => {
   try {
     const user = req.user;
@@ -144,7 +219,7 @@ exports.getMe = async (req, res) => {
       email: user.email,
       role: user.role,
       tenantId: user.tenantId,
-      plan: user.Tenant.plan
+      plan: user.Tenant ? user.Tenant.plan : 'free'
     });
   } catch (error) {
     console.error('Error en getMe:', error);

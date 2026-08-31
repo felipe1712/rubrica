@@ -4,6 +4,7 @@ const authController = require('../controllers/auth.controller');
 const { authenticateUser } = require('../middlewares/auth');
 
 router.post('/login', authController.loginUser);
+router.post('/register-tenant', authController.registerTenant);
 router.post('/admin/login', authController.loginAdmin);
 router.get('/me', authenticateUser, authController.getMe);
 
