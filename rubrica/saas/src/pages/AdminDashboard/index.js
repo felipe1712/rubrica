@@ -10,9 +10,10 @@ import BreadCrumb from "../../Components/Common/BreadCrumb";
 const API_URL = process.env.REACT_APP_API_URL || "https://api.rubricalo.com";
 
 const PLAN_MAP = {
-  basic:      { label: "Básico",      color: "info"    },
-  pro:        { label: "Pro",         color: "warning" },
-  enterprise: { label: "Enterprise",  color: "primary" }
+  free:       { label: "Gratuito (3 docs)", color: "secondary" },
+  standard:   { label: "Estándar ($499)",   color: "info"      },
+  pro:        { label: "Pro ($1,299)",      color: "warning"   },
+  enterprise: { label: "Enterprise ($2,999)", color: "primary" }
 };
 
 const STATUS_MAP = {
@@ -377,9 +378,10 @@ const AdminDashboard = () => {
                       value={formData.plan}
                       onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
                     >
-                      <option value="basic">Básico</option>
-                      <option value="pro">Pro</option>
-                      <option value="enterprise">Enterprise</option>
+                      <option value="free">Gratuito (3 docs/mes - $0)</option>
+                      <option value="standard">Estándar (50 docs/mes - $499 MXN)</option>
+                      <option value="pro">Pro (250 docs/mes - $1,299 MXN)</option>
+                      <option value="enterprise">Enterprise (Ilimitado - $2,999 MXN)</option>
                     </Input>
                   </FormGroup>
                 </Col>
