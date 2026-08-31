@@ -9,6 +9,8 @@ const adminRoutes = require('./admin.routes');
 const documentsRoutes = require('./documents.routes');
 const onlyofficeRoutes = require('./onlyoffice.routes');
 
+const usersRoutes = require('./users.routes');
+
 // Mount routes
 router.use('/auth', authRoutes);
 router.use('/webhooks', webhookRoutes);
@@ -17,6 +19,7 @@ router.use('/pdf', stirlingRoutes);
 router.use('/admin', adminRoutes);
 router.use('/documents', documentsRoutes);
 router.use('/editor', onlyofficeRoutes);
+router.use('/users', usersRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

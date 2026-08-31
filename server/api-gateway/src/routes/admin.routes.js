@@ -9,6 +9,7 @@ router.get('/stats', adminController.getStats);
 router.get('/health', adminController.getPlatformHealth);
 
 router.get('/tenants', adminController.getTenants);
+router.post('/tenants', adminController.createTenant);
 router.get('/tenants/:id', adminController.getTenant);
 router.put('/tenants/:id', adminController.updateTenant);
 router.delete('/tenants/:id', adminController.deleteTenant);

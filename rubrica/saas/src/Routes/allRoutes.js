@@ -22,6 +22,10 @@ import UserProfile from "../pages/Authentication/user-profile";
 import ListView from "../pages/SupportTickets/ListView";
 import TicketsDetails from "../pages/SupportTickets/TicketsDetails";
 
+// Equipo y Plataforma SuperAdmin
+import Usuarios from "../pages/Usuarios";
+import AdminDashboard from "../pages/AdminDashboard";
+
 // Pages
 import Settings from "../pages/Pages/Profile/Settings/Settings";
 import Basic404 from "../pages/AuthenticationInner/Errors/Basic404";
@@ -44,6 +48,13 @@ const authProtectedRoutes = [
 
   // Editor de documentos (OnlyOffice)
   { path: "/editor/:id",          component: <Editor /> },
+
+  // Usuarios del Equipo (Tenant)
+  { path: "/usuarios",            component: <Usuarios /> },
+
+  // SuperAdmin Dashboard (Plataforma)
+  { path: "/admin",               component: <AdminDashboard /> },
+  { path: "/admin/dashboard",     component: <AdminDashboard /> },
 
   // Soporte
   { path: "/soporte",     component: <ListView /> },

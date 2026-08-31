@@ -48,6 +48,35 @@ exports.getTenants = async (req, res) => {
   }
 };
 
+// Create new tenant manually
+exports.createTenant = async (req, res) => {
+  try {
+    const { name, email, plan, status, licenseKey, maxUsers } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Nombre de la empresa y correo son obligatorios.' });
+    }
+
+    const existing = await Tenant.findOne({ where: { email } });
+    if (existing) {
+      return res.status(400).json({ error: 'Ya existe una empresa registrada con ese correo.' });
+    }
+
+    const tenant = await Tenant.create({
+      name,
+      email,
+      plan: plan || 'enterprise',
+      status: status || 'active',
+      licenseKey: licenseKey || `RUBRIC-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+      maxUsers: maxUsers || 10
+    });
+
+    res.status(201).json({ success: true, message: 'Empresa creada correctamente.', tenant });
+  } catch (error) {
+    console.error('Error creando cliente:', error);
+    res.status(500).json({ error: 'Error al crear la empresa.' });
+  }
+};
+
 // Get single tenant details
 exports.getTenant = async (req, res) => {
   try {

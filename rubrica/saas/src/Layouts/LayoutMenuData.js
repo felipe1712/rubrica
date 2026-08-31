@@ -101,6 +101,17 @@ const Navdata = () => {
       stateVariables: iscurrentState === "Facturas",
     },
     {
+      id: "admin-dashboard",
+      label: "Plataforma (Admin)",
+      icon: "ri-shield-user-line",
+      link: "/admin",
+      click: function (e) {
+        e.preventDefault();
+        setIscurrentState("AdminDashboard");
+      },
+      stateVariables: iscurrentState === "AdminDashboard",
+    },
+    {
       label: "Cuenta",
       isHeader: true,
     },
