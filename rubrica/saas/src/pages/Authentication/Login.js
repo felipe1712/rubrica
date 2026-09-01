@@ -2,44 +2,35 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Col, Container, Input, Label, Row, Button, Form, FormFeedback, Alert, Spinner } from 'reactstrap';
 import ParticlesAuth from "../AuthenticationInner/ParticlesAuth";
 
-//redux
+// redux
 import { useSelector, useDispatch } from "react-redux";
-
 import { Link } from "react-router-dom";
 import withRouter from "../../Components/Common/withRouter";
+
 // Formik validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // actions
-import { loginUser, socialLogin, resetLoginFlag } from "../../slices/thunks";
 import { apiError } from "../../slices/auth/login/reducer";
-
-import logoLight from "../../assets/images/logo-light.png";
 import { createSelector } from 'reselect';
-//import images
 
 const Login = (props) => {
     const dispatch = useDispatch();
     const selectLayoutState = (state) => state.Account;
-const selectLayoutProperties = createSelector(
-    selectLayoutState,
-    (layout) => ({
-        user: layout.user,
-           errorMsg: layout.errorMsg,
-            loading:layout.loading,
+    const selectLayoutProperties = createSelector(
+        selectLayoutState,
+        (layout) => ({
+            user: layout.user,
+            errorMsg: layout.errorMsg,
+            loading: layout.loading,
             error: layout.error,
-    })
-  );
-  // Inside your component
-const {
-    user, 
-    errorMsg, 
-    loading, 
-    error
-} = useSelector(selectLayoutProperties);
+        })
+    );
 
-    const [userLogin, setUserLogin] = useState([]);
+    const { user, errorMsg, error } = useSelector(selectLayoutProperties);
+
+    const [userLogin] = useState([]);
     const [passwordShow, setPasswordShow] = useState(false);
     const [loginError, setLoginError] = useState(null);
 
@@ -96,28 +87,7 @@ const {
         }
     });
 
-    const signIn = type => {
-        dispatch(socialLogin(type, props.router.navigate));
-    };
-
-    //handleTwitterLoginResponse
-    // const twitterResponse = e => {}
-
-    //for facebook and google authentication
-    const socialResponse = type => {
-        signIn(type);
-    };
-
-
-    useEffect(() => {
-        if (errorMsg) {
-            setTimeout(() => {
-                dispatch(resetLoginFlag());
-            }, 3000);
-        }
-    }, [dispatch, errorMsg]);
-
-    document.title = "Basic SignIn | Velzon - React Admin & Dashboard Template";
+    document.title = "Iniciar Sesión | Rúbricalo";
 
     return (
         <React.Fragment>
@@ -128,24 +98,30 @@ const {
                             <Col lg={12}>
                                 <div className="text-center mt-sm-5 mb-4 text-white-50">
                                     <div>
-                                        <Link to="/" className="d-inline-block auth-logo">
-                                            <img src={logoLight} alt="" height="20" />
-                                        </Link>
+                                        <a href="https://rubricalo.com" className="d-inline-flex align-items-center gap-2 text-decoration-none">
+                                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="40" height="40" rx="8" fill="#3D4ED8"/>
+                                                <path d="M12 14H28V17H12V14ZM12 20H28V23H12V20ZM12 26H22V29H12V26Z" fill="white"/>
+                                            </svg>
+                                            <span style={{ fontSize: "1.8rem", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
+                                                RÚBRICALO
+                                            </span>
+                                        </a>
                                     </div>
-                                    <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
+                                    <p className="mt-2 fs-15 text-white-50">Plataforma Empresarial de Firma Digital y Gestión Documental</p>
                                 </div>
                             </Col>
                         </Row>
 
                         <Row className="justify-content-center">
                             <Col md={8} lg={6} xl={5}>
-                                <Card className="mt-4">
+                                <Card className="mt-4 border-0 shadow-lg" style={{ borderRadius: "12px" }}>
                                     <CardBody className="p-4">
                                         <div className="text-center mt-2">
-                                            <h5 className="text-primary">Welcome Back !</h5>
-                                            <p className="text-muted">Sign in to continue to Velzon.</p>
+                                            <h4 className="fw-bold text-primary" style={{ color: "#3d4ed8" }}>¡Bienvenido a Rúbricalo!</h4>
+                                            <p className="text-muted">Ingresa tus credenciales para acceder a tu plataforma.</p>
                                         </div>
-                                        {(loginError || error) ? (<Alert color="danger"> {loginError || error} </Alert>) : null}
+                                        {(loginError || error) ? (<Alert color="danger" className="mt-3"> {loginError || error} </Alert>) : null}
                                         <div className="p-2 mt-4">
                                             <Form
                                                 onSubmit={(e) => {
@@ -156,11 +132,11 @@ const {
                                                 action="#">
 
                                                 <div className="mb-3">
-                                                    <Label htmlFor="email" className="form-label">Email</Label>
+                                                    <Label htmlFor="email" className="form-label fw-semibold">Correo Electrónico</Label>
                                                     <Input
                                                         name="email"
-                                                        className="form-control"
-                                                        placeholder="Enter email"
+                                                        className="form-control form-control-lg"
+                                                        placeholder="ej. demo@rubricalo.com"
                                                         type="email"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
@@ -176,16 +152,16 @@ const {
 
                                                 <div className="mb-3">
                                                     <div className="float-end">
-                                                        <Link to="/forgot-password" className="text-muted">Forgot password?</Link>
+                                                        <Link to="/forgot-password" className="text-muted small">¿Olvidaste tu contraseña?</Link>
                                                     </div>
-                                                    <Label className="form-label" htmlFor="password-input">Password</Label>
+                                                    <Label className="form-label fw-semibold" htmlFor="password-input">Contraseña</Label>
                                                     <div className="position-relative auth-pass-inputgroup mb-3">
                                                         <Input
                                                             name="password"
                                                             value={validation.values.password || ""}
                                                             type={passwordShow ? "text" : "password"}
-                                                            className="form-control pe-5"
-                                                            placeholder="Enter Password"
+                                                            className="form-control form-control-lg pe-5"
+                                                            placeholder="Ingresa tu contraseña"
                                                             onChange={validation.handleChange}
                                                             onBlur={validation.handleBlur}
                                                             invalid={
@@ -201,46 +177,19 @@ const {
 
                                                 <div className="form-check">
                                                     <Input className="form-check-input" type="checkbox" value="" id="auth-remember-check" />
-                                                    <Label className="form-check-label" htmlFor="auth-remember-check">Remember me</Label>
+                                                    <Label className="form-check-label" htmlFor="auth-remember-check">Recordarme en este equipo</Label>
                                                 </div>
 
                                                 <div className="mt-4">
-                                                    <Button color="success" disabled={validation.isSubmitting} className="btn btn-success w-100" type="submit">
-                                                        {validation.isSubmitting ? <Spinner size="sm" className='me-2'> Loading... </Spinner> : null}
-                                                        Sign In
+                                                    <Button
+                                                        disabled={validation.isSubmitting}
+                                                        className="btn btn-lg w-100 fw-bold"
+                                                        style={{ backgroundColor: "#3d4ed8", borderColor: "#3d4ed8", color: "#ffffff" }}
+                                                        type="submit"
+                                                    >
+                                                        {validation.isSubmitting ? <Spinner size="sm" className='me-2'> Validando... </Spinner> : null}
+                                                        Iniciar Sesión
                                                     </Button>
-                                                </div>
-
-                                                <div className="mt-4 text-center">
-                                                    <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title">Sign In with</h5>
-                                                    </div>
-                                                    <div>
-                                                        <Link
-                                                            to="#"
-                                                            className="btn btn-primary btn-icon me-1"
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                socialResponse("facebook");
-                                                            }}
-                                                            >
-                                                            <i className="ri-facebook-fill fs-16" />
-                                                        </Link>
-                                                        <Link
-                                                            to="#"
-                                                            className="btn btn-danger btn-icon me-1"
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                socialResponse("google");
-                                                            }}
-                                                            >
-                                                            <i className="ri-google-fill fs-16" />
-                                                        </Link>
-                                                        {/* <Button color="primary" className="btn-icon"><i className="ri-facebook-fill fs-16"></i></Button>{" "} */}
-                                                        {/* <Button color="danger" className="btn-icon"><i className="ri-google-fill fs-16"></i></Button>{" "} */}
-                                                        <Button color="dark" className="btn-icon"><i className="ri-github-fill fs-16"></i></Button>{" "}
-                                                        <Button color="info" className="btn-icon"><i className="ri-twitter-fill fs-16"></i></Button>
-                                                    </div>
                                                 </div>
                                             </Form>
                                         </div>
@@ -248,7 +197,12 @@ const {
                                 </Card>
 
                                 <div className="mt-4 text-center">
-                                    <p className="mb-0">Don't have an account ? <Link to="/register" className="fw-semibold text-primary text-decoration-underline"> Signup </Link> </p>
+                                    <p className="mb-0 text-white-50">
+                                        ¿Aún no tienes cuenta?{" "}
+                                        <a href="https://rubricalo.com#precios" className="fw-bold text-white text-decoration-underline">
+                                            Registrar Mi Empresa
+                                        </a>
+                                    </p>
                                 </div>
 
                             </Col>
