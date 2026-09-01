@@ -192,23 +192,31 @@
         }
 
         .feature-icon-box {
-            background: #f8fafc !important;
-            border: 1px solid #f1f5f9 !important;
-            border-radius: 10px !important;
-            padding: 30px 20px !important;
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 14px !important;
+            padding: 35px 25px !important;
             height: 100% !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
             transition: all 0.3s ease !important;
         }
         .feature-icon-box:hover {
-            background: #ffffff !important;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08) !important;
-            transform: translateY(-3px) !important;
+            box-shadow: 0 20px 25px -5px rgba(61, 78, 216, 0.15) !important;
+            border-color: #3d4ed8 !important;
+            transform: translateY(-5px) !important;
         }
-        .feature-icon-box i {
-            font-size: 2.2rem !important;
-            color: #3d4ed8 !important;
-            margin-bottom: 15px !important;
-            display: inline-block !important;
+        .feature-icon-box h4, h4.feature-title {
+            font-weight: 800 !important;
+            font-size: 1.3rem !important;
+            color: #0f172a !important;
+            margin: 15px 0 12px !important;
+        }
+        .feature-icon-box p, p.feature-desc {
+            color: #475569 !important;
+            font-size: 1.05rem !important;
+            line-height: 1.65 !important;
+            font-weight: 500 !important;
+            margin: 0 !important;
         }
         .modal-header-custom {
             background: #3d4ed8 !important;
@@ -349,48 +357,59 @@
     <section id="caracteristicas" style="padding: 90px 0; background: #ffffff;">
         <div class="container">
             <div class="text-center" style="margin-bottom: 60px;">
-                <h2 style="font-weight: 800; color: #0f172a;">Todo lo que tu empresa necesita en una sola plataforma</h2>
-                <p style="color: #64748b; font-size: 1.1rem; max-width: 700px; margin: 10px auto 0;">
+                <h2 style="font-weight: 800; color: #0f172a; font-size: 2.4rem;">Todo lo que tu empresa necesita en una sola plataforma</h2>
+                <p style="color: #475569; font-size: 1.3rem; font-weight: 600; max-width: 780px; margin: 15px auto 0; line-height: 1.6;">
                     Elimina licencias costosas y simplifica tu gestión documental con tecnología de punta.
                 </p>
             </div>
 
             <div class="row">
+                <!-- Tarjeta 1: Firma NOM-151 -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
                     <div class="feature-icon-box text-center">
-                        <i class="icon-pen"></i>
-                        <h4 style="font-weight: 700; color: #1e293b;">Firma Digital NOM-151</h4>
-                        <p style="color: #64748b; font-size: 0.95rem;">
+                        <i class="icon-pen" style="font-size: 2.8rem; color: #3d4ed8; display: block; margin-bottom: 15px;"></i>
+                        <h4 class="feature-title">Firma Digital NOM-151</h4>
+                        <p class="feature-desc">
                             Envía y firma contratos con sellado de tiempo oficial conforme al Código de Comercio en México.
                         </p>
                     </div>
                 </div>
 
+                <!-- Tarjeta 2: Edición de archivos en la nube (Icono Nube) -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
                     <div class="feature-icon-box text-center">
-                        <i class="icon-file-text"></i>
-                        <h4 style="font-weight: 700; color: #1e293b;">Edición OnlyOffice Nube</h4>
-                        <p style="color: #64748b; font-size: 0.95rem;">
+                        <i class="icon-cloud" style="font-size: 2.8rem; color: #3d4ed8; display: block; margin-bottom: 15px;"></i>
+                        <h4 class="feature-title">Edición de archivos en la nube</h4>
+                        <p class="feature-desc">
                             Edita documentos de Word, Excel y PowerPoint directamente en el navegador sin pagar licencias adicionales.
                         </p>
                     </div>
                 </div>
 
+                <!-- Tarjeta 3: Herramientas PDF -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
                     <div class="feature-icon-box text-center">
-                        <i class="icon-tools"></i>
-                        <h4 style="font-weight: 700; color: #1e293b;">Herramientas PDF</h4>
-                        <p style="color: #64748b; font-size: 0.95rem;">
+                        <i class="icon-tools" style="font-size: 2.8rem; color: #3d4ed8; display: block; margin-bottom: 15px;"></i>
+                        <h4 class="feature-title">Herramientas PDF</h4>
+                        <p class="feature-desc">
                             Une, divide, comprime, aplica OCR, rotar y marca de agua a tus archivos PDF en segundos.
                         </p>
                     </div>
                 </div>
 
+                <!-- Tarjeta 4: Seguridad con IA (Icono Robot IA) -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
                     <div class="feature-icon-box text-center">
-                        <i class="icon-shield-check"></i>
-                        <h4 style="font-weight: 700; color: #1e293b;">Seguridad con IA</h4>
-                        <p style="color: #64748b; font-size: 0.95rem;">
+                        <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#3d4ed8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 15px; display: block;">
+                            <rect x="3" y="11" width="18" height="10" rx="3"></rect>
+                            <circle cx="12" cy="5" r="2"></circle>
+                            <path d="M12 7v4"></path>
+                            <line x1="8" y1="16" x2="8" y2="16.01"></line>
+                            <line x1="16" y1="16" x2="16" y2="16.01"></line>
+                            <path d="M9 19h6"></path>
+                        </svg>
+                        <h4 class="feature-title">Seguridad con IA</h4>
+                        <p class="feature-desc">
                             Inspección binaria en tiempo real impulsada por Google Magika para bloquear cualquier malware o amenaza.
                         </p>
                     </div>
