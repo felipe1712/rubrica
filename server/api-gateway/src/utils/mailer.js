@@ -12,7 +12,7 @@ require('dotenv').config();
 exports.sendEmail = async ({ to, name, subject, htmlContent }) => {
   const apiKey = process.env.BREVO_API_KEY;
   const senderEmail = process.env.BREVO_SENDER_EMAIL || 'notificaciones@rubricalo.com';
-  const senderName = process.env.BREVO_SENDER_NAME || 'Rúbricalo';
+  const senderName = process.env.BREVO_SENDER_NAME || 'Rubrícalo';
 
   if (!apiKey) {
     console.log(`[MAILER MOCK] No hay BREVO_API_KEY configurada. Correo a <${to}>: "${subject}"`);
@@ -52,11 +52,11 @@ exports.sendWelcomeEmail = async ({ to, name, companyName, loginUrl }) => {
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
       <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: #3d4ed8; margin: 0;">RÚBRICALO</h2>
+        <h2 style="color: #3d4ed8; margin: 0;">RUBRÍCALO</h2>
         <p style="color: #666; font-size: 14px; margin-top: 5px;">Gestión Documental y Firma Digital Legal</p>
       </div>
       <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-      <h3 style="color: #333;">¡Bienvenido a Rúbricalo, ${name}!</h3>
+      <h3 style="color: #333;">¡Bienvenido a Rubrícalo, ${name}!</h3>
       <p style="color: #555; line-height: 1.6;">
         Tu cuenta para la empresa <strong>${companyName}</strong> ha sido creada exitosamente en nuestro <strong>Plan Gratuito</strong>.
       </p>
@@ -70,7 +70,7 @@ exports.sendWelcomeEmail = async ({ to, name, companyName, loginUrl }) => {
       </div>
       <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
       <p style="color: #888; font-size: 12px; text-align: center;">
-        Rúbricalo México — Firma Digital y Gestión Documental Legal<br />
+        Rubrícalo México — Firma Digital y Gestión Documental Legal<br />
         Si tienes dudas, contáctanos en soporte@rubricalo.com
       </p>
     </div>
@@ -79,7 +79,7 @@ exports.sendWelcomeEmail = async ({ to, name, companyName, loginUrl }) => {
   return exports.sendEmail({
     to,
     name,
-    subject: `¡Bienvenido a Rúbricalo! Tu cuenta para ${companyName} está lista`,
+    subject: `¡Bienvenido a Rubrícalo! Tu cuenta para ${companyName} está lista`,
     htmlContent
   });
 };

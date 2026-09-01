@@ -87,7 +87,7 @@ const Login = (props) => {
         }
     });
 
-    document.title = "Iniciar Sesión | Rúbricalo";
+    document.title = "Iniciar Sesión | Rubrícalo";
 
     return (
         <React.Fragment>
@@ -104,7 +104,7 @@ const Login = (props) => {
                                                 <path d="M12 14H28V17H12V14ZM12 20H28V23H12V20ZM12 26H22V29H12V26Z" fill="white"/>
                                             </svg>
                                             <span style={{ fontSize: "1.8rem", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
-                                                RÚBRICALO
+                                                RUBRÍCALO
                                             </span>
                                         </a>
                                     </div>
@@ -118,7 +118,7 @@ const Login = (props) => {
                                 <Card className="mt-4 border-0 shadow-lg" style={{ borderRadius: "12px" }}>
                                     <CardBody className="p-4">
                                         <div className="text-center mt-2">
-                                            <h4 className="fw-bold text-primary" style={{ color: "#3d4ed8" }}>¡Bienvenido a Rúbricalo!</h4>
+                                            <h4 className="fw-bold text-primary" style={{ color: "#3d4ed8" }}>¡Bienvenido a Rubrícalo!</h4>
                                             <p className="text-muted">Ingresa tus credenciales para acceder a tu plataforma.</p>
                                         </div>
                                         {(loginError || error) ? (<Alert color="danger" className="mt-3"> {loginError || error} </Alert>) : null}
