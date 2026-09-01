@@ -21,138 +21,216 @@
     <link rel="stylesheet" href="css/style.css">
 
     <style>
+        /* Forza de Contraste en Hero Banner */
         .hero-banner {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3d4ed8 100%);
-            padding: 140px 0 100px;
-            color: #ffffff;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%) !important;
+            padding: 140px 0 100px !important;
+            color: #ffffff !important;
         }
-        .hero-title {
-            font-weight: 800;
-            font-size: 2.8rem;
-            line-height: 1.2;
-            margin-bottom: 20px;
+        .hero-title, h1.hero-title {
+            font-weight: 800 !important;
+            font-size: 2.8rem !important;
+            line-height: 1.25 !important;
+            margin-bottom: 20px !important;
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
         }
-        .hero-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 30px;
-            line-height: 1.6;
+        .hero-subtitle, p.hero-subtitle {
+            font-size: 1.2rem !important;
+            opacity: 0.95 !important;
+            margin-bottom: 30px !important;
+            line-height: 1.6 !important;
+            color: #f1f5f9 !important;
+        }
+        .hero-card-title, h4.hero-card-title {
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            margin-bottom: 10px !important;
+        }
+        .hero-card-text, p.hero-card-text {
+            font-size: 0.95rem !important;
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+            margin: 0 !important;
         }
         .btn-rubric-primary {
-            background-color: #4f46e5;
+            background-color: #4f46e5 !important;
             color: #ffffff !important;
-            font-weight: 700;
-            padding: 14px 32px;
-            border-radius: 6px;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
-            border: none;
-            transition: all 0.3s ease;
+            font-weight: 700 !important;
+            padding: 14px 32px !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4) !important;
+            border: none !important;
+            transition: all 0.3s ease !important;
         }
         .btn-rubric-primary:hover {
-            background-color: #4338ca;
+            background-color: #4338ca !important;
             transform: translateY(-2px);
         }
         .btn-rubric-outline {
-            background-color: transparent;
+            background-color: transparent !important;
             color: #ffffff !important;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            font-weight: 700;
-            padding: 12px 28px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.5) !important;
+            font-weight: 700 !important;
+            padding: 12px 28px !important;
+            border-radius: 6px !important;
+            transition: all 0.3s ease !important;
         }
         .btn-rubric-outline:hover {
-            border-color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.15) !important;
         }
         .trust-bar {
-            background: #ffffff;
-            padding: 25px 0;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background: #ffffff !important;
+            padding: 25px 0 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
         }
         .trust-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-weight: 600;
-            color: #334155;
-            font-size: 0.95rem;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            font-weight: 600 !important;
+            color: #334155 !important;
+            font-size: 0.95rem !important;
         }
         .trust-badge i {
-            font-size: 1.4rem;
-            color: #3d4ed8;
+            font-size: 1.4rem !important;
+            color: #3d4ed8 !important;
         }
         .pricing-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 35px 25px;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 12px !important;
+            padding: 35px 25px !important;
+            text-align: center !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
         }
         .pricing-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12) !important;
+            transform: translateY(-5px) !important;
         }
         .pricing-card.featured {
-            border: 2px solid #3d4ed8;
-            box-shadow: 0 10px 15px -3px rgba(61, 78, 216, 0.15);
+            border: 2px solid #3d4ed8 !important;
+            box-shadow: 0 10px 15px -3px rgba(61, 78, 216, 0.18) !important;
         }
         .pricing-card.featured::before {
-            content: "RECOMENDADO";
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #3d4ed8;
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 4px 16px;
-            border-radius: 20px;
-            letter-spacing: 1px;
+            content: "RECOMENDADO" !important;
+            position: absolute !important;
+            top: -14px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            background: #3d4ed8 !important;
+            color: #ffffff !important;
+            font-size: 0.75rem !important;
+            font-weight: 800 !important;
+            padding: 4px 16px !important;
+            border-radius: 20px !important;
+            letter-spacing: 1px !important;
         }
         .price-amount {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin: 15px 0 5px;
+            font-size: 2.5rem !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            margin: 15px 0 5px !important;
         }
         .price-period {
-            color: #64748b;
-            font-size: 0.9rem;
+            color: #64748b !important;
+            font-size: 0.9rem !important;
         }
+
+        /* Estilos de Botones en Tarjetas de Precios */
+        .btn-rubric-card-outline {
+            background-color: #ffffff !important;
+            color: #3d4ed8 !important;
+            border: 2px solid #3d4ed8 !important;
+            font-weight: 700 !important;
+            padding: 12px 20px !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            margin-top: 25px !important;
+            display: block !important;
+            width: 100% !important;
+        }
+        .btn-rubric-card-outline:hover {
+            background-color: #3d4ed8 !important;
+            color: #ffffff !important;
+        }
+        .btn-rubric-card-solid {
+            background-color: #3d4ed8 !important;
+            color: #ffffff !important;
+            border: none !important;
+            font-weight: 700 !important;
+            padding: 12px 20px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(61, 78, 216, 0.3) !important;
+            transition: all 0.3s ease !important;
+            margin-top: 25px !important;
+            display: block !important;
+            width: 100% !important;
+        }
+        .btn-rubric-card-solid:hover {
+            background-color: #2563eb !important;
+            transform: translateY(-2px) !important;
+        }
+        .btn-rubric-card-dark {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: none !important;
+            font-weight: 700 !important;
+            padding: 12px 20px !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            margin-top: 25px !important;
+            display: block !important;
+            width: 100% !important;
+        }
+        .btn-rubric-card-dark:hover {
+            background-color: #1e293b !important;
+        }
+
         .feature-icon-box {
-            background: #f8fafc;
-            border: 1px solid #f1f5f9;
-            border-radius: 10px;
-            padding: 30px 20px;
-            height: 100%;
-            transition: all 0.3s ease;
+            background: #f8fafc !important;
+            border: 1px solid #f1f5f9 !important;
+            border-radius: 10px !important;
+            padding: 30px 20px !important;
+            height: 100% !important;
+            transition: all 0.3s ease !important;
         }
         .feature-icon-box:hover {
-            background: #ffffff;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
-            transform: translateY(-3px);
+            background: #ffffff !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08) !important;
+            transform: translateY(-3px) !important;
         }
         .feature-icon-box i {
-            font-size: 2.2rem;
-            color: #3d4ed8;
-            margin-bottom: 15px;
-            display: inline-block;
+            font-size: 2.2rem !important;
+            color: #3d4ed8 !important;
+            margin-bottom: 15px !important;
+            display: inline-block !important;
         }
         .modal-header-custom {
-            background: #3d4ed8;
-            color: #ffffff;
-            border-radius: 6px 6px 0 0;
-            padding: 20px 25px;
+            background: #3d4ed8 !important;
+            color: #ffffff !important;
+            border-radius: 6px 6px 0 0 !important;
+            padding: 20px 25px !important;
         }
         .modal-header-custom .close {
-            color: #ffffff;
-            opacity: 0.9;
+            color: #ffffff !important;
+            opacity: 0.9 !important;
+        }
+
+        /* Estilos Mejorados para el Footer */
+        footer p {
+            font-size: 1.05rem !important;
+            color: #cbd5e1 !important;
+            line-height: 1.6 !important;
+        }
+        footer .copyright-text {
+            font-size: 0.95rem !important;
+            color: #94a3b8 !important;
+            margin-top: 15px !important;
         }
     </style>
 </head>
@@ -222,15 +300,15 @@
                     </div>
                 </div>
                 <div class="col-md-5 text-center" style="margin-top: 30px;">
-                    <div style="background: rgba(255,255,255,0.08); padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                    <div style="background: rgba(255,255,255,0.08); padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
                         <svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 15px;">
                             <circle cx="50" cy="50" r="45" fill="#3D4ED8" fill-opacity="0.3" stroke="#ffffff" stroke-width="2"/>
                             <path d="M30 40H70V45H30V40ZM30 50H70V55H30V50ZM30 60H55V65H30V60Z" fill="white"/>
                             <circle cx="70" cy="70" r="16" fill="#10B981"/>
                             <path d="M64 70L68 74L76 66" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <h4 style="font-weight: 700; color: #ffffff; margin-bottom: 10px;">Validez Jurídica Garantizada</h4>
-                        <p style="font-size: 0.95rem; opacity: 0.85; margin: 0;">
+                        <h4 class="hero-card-title">Validez Jurídica Garantizada</h4>
+                        <p class="hero-card-text">
                             Estampado de tiempo y constancia de conservación NOM-151 respaldada por la Secretaría de Economía de México.
                         </p>
                     </div>
@@ -380,7 +458,7 @@
                             <li>✓ Editor Nube OnlyOffice</li>
                             <li>✓ Herramientas PDF</li>
                         </ul>
-                        <button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#registerModal" style="margin-top: 25px; font-weight: 700;">
+                        <button type="button" class="btn btn-rubric-card-outline" data-toggle="modal" data-target="#registerModal">
                             Probar Gratis
                         </button>
                     </div>
@@ -401,7 +479,7 @@
                             <li>✓ Editor Nube OnlyOffice</li>
                             <li>✓ Herramientas PDF Ilimitadas</li>
                         </ul>
-                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#registerModal" style="margin-top: 25px; font-weight: 700; background-color: #3d4ed8;">
+                        <button type="button" class="btn btn-rubric-card-solid" data-toggle="modal" data-target="#registerModal">
                             Elegir Estándar
                         </button>
                     </div>
@@ -422,7 +500,7 @@
                             <li>✓ Marca de Agua Personalizada</li>
                             <li>✓ Soporte Prioritario</li>
                         </ul>
-                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#registerModal" style="margin-top: 25px; font-weight: 700; background-color: #3d4ed8;">
+                        <button type="button" class="btn btn-rubric-card-solid" data-toggle="modal" data-target="#registerModal">
                             Comenzar Pro
                         </button>
                     </div>
@@ -443,7 +521,7 @@
                             <li>✓ Marca Blanca Personalizada</li>
                             <li>✓ Soporte Dedicado 24/7</li>
                         </ul>
-                        <button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#registerModal" style="margin-top: 25px; font-weight: 700;">
+                        <button type="button" class="btn btn-rubric-card-dark" data-toggle="modal" data-target="#registerModal">
                             Contactar Ventas
                         </button>
                     </div>
@@ -513,13 +591,13 @@
     </section>
 
     <!-- FOOTER -->
-    <footer style="background: #0f172a; color: #94a3b8; padding: 50px 0 30px;">
+    <footer style="background: #0f172a; color: #cbd5e1; padding: 65px 0 35px;">
         <div class="container text-center">
-            <h3 style="color: #ffffff; font-weight: 800; margin-bottom: 15px;">RÚBRICALO</h3>
-            <p style="font-size: 0.9rem; max-width: 600px; margin: 0 auto 25px;">
+            <h2 style="color: #ffffff; font-weight: 800; margin-bottom: 20px; font-size: 2rem; letter-spacing: 1px;">RÚBRICALO</h2>
+            <p style="font-size: 1.1rem; max-width: 680px; margin: 0 auto 25px; color: #cbd5e1; line-height: 1.6;">
                 Plataforma empresarial de gestión documental, edición en la nube y firma digital legal conforme a la NOM-151-SCFI-2016 en México.
             </p>
-            <p style="font-size: 0.85rem;">© 2026 Rúbricalo México. Todos los derechos reservados.</p>
+            <p class="copyright-text">© 2026 Rúbricalo México. Todos los derechos reservados.</p>
         </div>
     </footer>
 
