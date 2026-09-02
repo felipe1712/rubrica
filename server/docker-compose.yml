@@ -1,5 +1,3 @@
-version: '3.8'
-
 # ══════════════════════════════════════════════════════════════════
 #  RÚBRICA — docker-compose.yml
 #  Dominio: rubrica.com.mx  |  Ruta: /opt/rubrica/server/
