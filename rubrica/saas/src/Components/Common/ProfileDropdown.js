@@ -1,35 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-//import images
-import avatar1 from "../../assets/images/users/avatar-1.jpg";
-import { createSelector } from 'reselect';
 
 const ProfileDropdown = () => {
-
-    const selectDashboardData = createSelector(
-        (state) => state.Profile,
-        (user) => user.user
-      );
-      
-    // Inside your component
-    const user = useSelector(selectDashboardData);
-
-    const [userName, setUserName] = useState("Admin");
+    const [userName, setUserName] = useState("Usuario");
+    const [userRole, setUserRole] = useState("Administrador");
+    const [isProfileDropdown, setIsProfileDropdown] = useState(false);
 
     useEffect(() => {
-
-        if (sessionStorage.getItem("authUser")) {
-            const obj = JSON.parse(sessionStorage.getItem("authUser"));
-            setUserName(process.env.REACT_APP_DEFAULTAUTH === "fake" ? obj.username === undefined ? user.first_name ? user.first_name : obj.data.first_name : "Admin" || "Admin" :
-                process.env.REACT_APP_DEFAULTAUTH === "firebase" ? obj.providerData[0].email : "Admin"
-            );
+        const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+        if (raw) {
+            try {
+                const obj = JSON.parse(raw);
+                if (obj.user) {
+                    setUserName(obj.user.name || obj.user.email || "Usuario");
+                    setUserRole(obj.user.role === "SUPERADMIN" ? "SuperAdmin" : (obj.tenant?.name || "Administrador"));
+                } else if (obj.name) {
+                    setUserName(obj.name);
+                }
+            } catch (e) {}
         }
-    }, [userName, user]);
+    }, []);
 
-    //Dropdown Toggle
-    const [isProfileDropdown, setIsProfileDropdown] = useState(false);
     const toggleProfileDropdown = () => {
         setIsProfileDropdown(!isProfileDropdown);
     };
@@ -37,70 +29,47 @@ const ProfileDropdown = () => {
     return (
         <React.Fragment>
             <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="ms-sm-3 header-item topbar-user">
-                <DropdownToggle tag="button" type="button" className="btn">
+                <DropdownToggle tag="button" type="button" className="btn border-0 bg-transparent p-1">
                     <span className="d-flex align-items-center">
-                        <img className="rounded-circle header-profile-user" src={avatar1}
-                            alt="Header Avatar" />
-                        <span className="text-start ms-xl-2">
-                            <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{userName}</span>
-                            <span className="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Founder</span>
+                        {/* Foto genérica: silueta de persona en blanco sobre círculo azul oscuro corporativo */}
+                        <div className="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: "36px", height: "36px", backgroundColor: "#3d4ed8", border: "2px solid rgba(255,255,255,0.3)", flexShrink: 0 }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" fill="white"/>
+                                <path d="M12 14C7.58172 14 4 16.6863 4 20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20C20 16.6863 16.4183 14 12 14Z" fill="white"/>
+                            </svg>
+                        </div>
+                        <span className="text-start ms-2">
+                            <span className="d-none d-xl-inline-block ms-1 fw-bold text-white fs-14 user-name-text">{userName}</span>
+                            <span className="d-none d-xl-block ms-1 fs-12 text-white-50 user-name-sub-text">{userRole}</span>
                         </span>
                     </span>
                 </DropdownToggle>
-                <DropdownMenu className="dropdown-menu-end">
-                    <h6 className="dropdown-header">Welcome {userName}!</h6>
+                <DropdownMenu className="dropdown-menu-end shadow-lg border-0 mt-2" style={{ borderRadius: "10px", minWidth: "200px" }}>
+                    <h6 className="dropdown-header text-primary fw-bold" style={{ color: "#3d4ed8" }}>¡Hola, {userName}!</h6>
+                    
+                    {/* 1. Perfil */}
                     <DropdownItem className='p-0'>
-                        <Link to="/profile" className="dropdown-item">
-                            <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
-                            <span className="align-middle">Profile</span>
+                        <Link to="/pages-profile" className="dropdown-item py-2 px-3">
+                            <i className="ri-user-3-line text-muted fs-16 align-middle me-2"></i>
+                            <span className="align-middle fw-medium">Perfil</span>
                         </Link>
                     </DropdownItem>
+
+                    {/* 2. Cambiar Contraseña */}
                     <DropdownItem className='p-0'>
-                        <Link to="/apps-chat" className="dropdown-item">
-                            <i className="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle">Messages</span>
+                        <Link to="/pages-profile-settings" className="dropdown-item py-2 px-3">
+                            <i className="ri-key-2-line text-muted fs-16 align-middle me-2"></i>
+                            <span className="align-middle fw-medium">Cambiar Contraseña</span>
                         </Link>
                     </DropdownItem>
+
+                    <div className="dropdown-divider my-1"></div>
+
+                    {/* 3. Cerrar Sesión */}
                     <DropdownItem className='p-0'>
-                        <Link to="#" className="dropdown-item">
-                            <i className="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle">Taskboard</span>
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem className='p-0'>
-                        <Link to="/pages-faqs" className="dropdown-item">
-                            <i
-                                className="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span
-                                    className="align-middle">Help</span>
-                        </Link>
-                    </DropdownItem>
-                    <div className="dropdown-divider"></div>
-                    <DropdownItem className='p-0'>
-                        <Link to="/pages-profile" className="dropdown-item">
-                            <i
-                                className="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i> <span
-                                    className="align-middle">Balance : <b>$5971.67</b></span>
-                        </Link>
-                    </DropdownItem >
-                    <DropdownItem className='p-0'>
-                        <Link to="/pages-profile-settings" className="dropdown-item">
-                            <span
-                                className="badge bg-success-subtle text-success mt-1 float-end">New</span><i
-                                    className="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
-                                        className="align-middle">Settings</span>
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem className='p-0'>
-                        <Link to="/auth-lockscreen-basic" className="dropdown-item">
-                            <i
-                                className="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Lock screen</span>
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem className='p-0'>
-                        <Link to="/logout" className="dropdown-item">
-                            <i
-                                className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                    className="align-middle" data-key="t-logout">Logout</span>
+                        <Link to="/logout" className="dropdown-item py-2 px-3 text-danger">
+                            <i className="ri-logout-box-r-line fs-16 align-middle me-2 text-danger"></i>
+                            <span className="align-middle fw-bold">Cerrar Sesión</span>
                         </Link>
                     </DropdownItem>
                 </DropdownMenu>

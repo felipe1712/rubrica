@@ -1,14 +1,9 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import ProfileDropdown from "../Components/Common/ProfileDropdown";
 import { changeSidebarVisibility } from "../slices/thunks";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
-
-// Logos � se reemplazaran con los de Rubricalo
-import logoSm   from "../assets/images/logo-sm.png";
-import logoDark from "../assets/images/logo-dark.png";
-import logoLight from "../assets/images/logo-light.png";
 
 const Header = ({ headerClass }) => {
   const dispatch = useDispatch();
@@ -23,8 +18,10 @@ const Header = ({ headerClass }) => {
     const windowSize = document.documentElement.clientWidth;
     dispatch(changeSidebarVisibility("show"));
 
-    if (windowSize > 767)
-      document.querySelector(".hamburger-icon").classList.toggle("open");
+    if (windowSize > 767) {
+      const icon = document.querySelector(".hamburger-icon");
+      if (icon) icon.classList.toggle("open");
+    }
 
     if (document.documentElement.getAttribute("data-layout") === "horizontal") {
       document.body.classList.contains("menu")
@@ -62,47 +59,49 @@ const Header = ({ headerClass }) => {
 
   return (
     <React.Fragment>
-      <header id="page-topbar" className={headerClass}>
+      <header
+        id="page-topbar"
+        className={headerClass}
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%)",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.25)",
+          borderBottom: "1px solid rgba(255,255,255,0.1)"
+        }}
+      >
         <div className="layout-width">
-          <div className="navbar-header">
+          <div className="navbar-header d-flex align-items-center justify-content-between">
 
-            {/* LOGO */}
-            <div className="d-flex align-items-center">
-              <div className="navbar-brand-box horizontal-logo">
-                <Link to="/" className="logo logo-dark">
-                  <span className="logo-sm">
-                    <img src={logoSm} alt="Rubricalo" height="22" />
-                  </span>
-                  <span className="logo-lg">
-                    <img src={logoDark} alt="Rubricalo" height="22" />
-                  </span>
-                </Link>
-                <Link to="/" className="logo logo-light">
-                  <span className="logo-sm">
-                    <img src={logoSm} alt="Rubricalo" height="22" />
-                  </span>
-                  <span className="logo-lg">
-                    <img src={logoLight} alt="Rubricalo" height="22" />
+            {/* LOGO CORPORATIVO RUBRICALO & HAMBURGER */}
+            <div className="d-flex align-items-center gap-3">
+              <div className="navbar-brand-box horizontal-logo bg-transparent p-0 border-0">
+                <Link to="/dashboard" className="d-inline-flex align-items-center gap-2 text-decoration-none py-1">
+                  <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="8" fill="#3D4ED8"/>
+                    <path d="M12 14H28V17H12V14ZM12 20H28V23H12V20ZM12 26H22V29H12V26Z" fill="white"/>
+                  </svg>
+                  <span style={{ fontSize: "1.4rem", fontWeigth: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
+                    RUBRÍCALO
                   </span>
                 </Link>
               </div>
 
-              {/* Hamburger */}
+              {/* Boton menu lateral */}
               <button
                 onClick={toogleMenuBtn}
                 type="button"
-                className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger"
+                className="btn btn-sm px-2 fs-16 header-item vertical-menu-btn topnav-hamburger text-white"
                 id="topnav-hamburger-icon"
+                style={{ color: "#ffffff" }}
               >
-                <span className="hamburger-icon">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+                <span className="hamburger-icon open">
+                  <span style={{ backgroundColor: "#ffffff" }}></span>
+                  <span style={{ backgroundColor: "#ffffff" }}></span>
+                  <span style={{ backgroundColor: "#ffffff" }}></span>
                 </span>
               </button>
             </div>
 
-            {/* Solo perfil de usuario */}
+            {/* PERFIL DE USUARIO */}
             <div className="d-flex align-items-center">
               <ProfileDropdown />
             </div>
