@@ -7,9 +7,21 @@ axios.defaults.baseURL = api.API_URL;
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // content type
-const token = JSON.parse(sessionStorage.getItem("authUser")) ? JSON.parse(sessionStorage.getItem("authUser")).token : null;
-if(token)
-axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+const getAuthToken = () => {
+  try {
+    const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed ? (parsed.token || parsed.accessToken || null) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const token = getAuthToken();
+if (token) {
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+}
 
 // intercepting to capture errors
 axios.interceptors.response.use(
@@ -17,9 +29,13 @@ axios.interceptors.response.use(
     return response.data ? response.data : response;
   },
   function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
     let message;
-    switch (error.status) {
+    if (error && error.response && error.response.status === 401) {
+      // Clear invalid session on 401
+      sessionStorage.removeItem("authUser");
+      localStorage.removeItem("authUser");
+    }
+    switch (error.status || (error.response ? error.response.status : null)) {
       case 500:
         message = "Internal Server Error";
         break;
@@ -44,16 +60,8 @@ const setAuthorization = (token) => {
 };
 
 class APIClient {
-  /**
-   * Fetches data from given url
-   */
-
-  //  get = (url, params) => {
-  //   return axios.get(url, params);
-  // };
   get = (url, params) => {
     let response;
-
     let paramKeys = [];
 
     if (params) {
@@ -70,15 +78,11 @@ class APIClient {
 
     return response;
   };
-  /**
-   * post given data to url
-   */
+
   create = (url, data) => {
     return axios.post(url, data);
   };
-  /**
-   * Updates data
-   */
+
   update = (url, data) => {
     return axios.patch(url, data);
   };
@@ -86,19 +90,19 @@ class APIClient {
   put = (url, data) => {
     return axios.put(url, data);
   };
-  /**
-   * Delete
-   */
+
   delete = (url, config) => {
     return axios.delete(url, { ...config });
   };
 }
+
 const getLoggedinUser = () => {
-  const user = sessionStorage.getItem("authUser");
-  if (!user) {
+  try {
+    const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
     return null;
-  } else {
-    return JSON.parse(user);
   }
 };
 
