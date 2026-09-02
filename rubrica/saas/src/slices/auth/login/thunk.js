@@ -28,14 +28,10 @@ export const loginUser = (user, history) => async (dispatch) => {
 export const logoutUser = () => async (dispatch) => {
   try {
     sessionStorage.removeItem("authUser");
-    let fireBaseBackend = getFirebaseBackend();
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const response = fireBaseBackend.logout;
-      dispatch(logoutUserSuccess(response));
-    } else {
-      dispatch(logoutUserSuccess(true));
-    }
-
+    localStorage.removeItem("authUser");
+    sessionStorage.clear();
+    localStorage.clear();
+    dispatch(logoutUserSuccess(true));
   } catch (error) {
     dispatch(apiError(error));
   }
