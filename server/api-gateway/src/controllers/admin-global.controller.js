@@ -196,3 +196,76 @@ exports.updateNufiConfig = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar configuración de Nufi.' });
   }
 };
+
+// GET /admin/global/tenants — Empresas registradas con número de usuarios
+exports.getTenants = async (req, res) => {
+  try {
+    const tenants = await Tenant.findAll({
+      order: [sequelize.literal('created_at DESC')]
+    });
+
+    const tenantsWithCounts = await Promise.all(tenants.map(async (t) => {
+      const userCount = await User.count({ where: { tenantId: t.id } }).catch(() => 0);
+      const docCount = await Document.count({ where: { tenantId: t.id } }).catch(() => 0);
+      return {
+        ...t.toJSON(),
+        userCount,
+        docCount
+      };
+    }));
+
+    res.json(tenantsWithCounts);
+  } catch (error) {
+    console.error('Error al listar empresas:', error);
+    res.status(500).json({ error: 'Error al listar empresas.' });
+  }
+};
+
+// PUT /admin/global/tenants/:id — Modificar plan o bloquear empresa
+exports.updateTenant = async (req, res) => {
+  try {
+    const tenant = await Tenant.findByPk(req.params.id);
+    if (!tenant) return res.status(404).json({ error: 'Empresa no encontrada.' });
+
+    const { plan, status, name, email } = req.body;
+    if (plan) tenant.plan = plan;
+    if (status) tenant.status = status;
+    if (name) tenant.name = name;
+    if (email) tenant.email = email;
+
+    await tenant.save();
+    res.json({ message: 'Empresa actualizada correctamente.', tenant });
+  } catch (error) {
+    console.error('Error actualizando empresa:', error);
+    res.status(500).json({ error: 'Error al actualizar empresa.' });
+  }
+};
+
+// DELETE /admin/global/users/:id — Eliminar usuario
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+    await user.destroy();
+    res.json({ message: 'Usuario eliminado correctamente.' });
+  } catch (error) {
+    console.error('Error eliminando usuario:', error);
+    res.status(500).json({ error: 'Error al eliminar usuario.' });
+  }
+};
+
+// GET /admin/global/signatures — Listado de firmas y constancias NOM-151
+exports.getSignatures = async (req, res) => {
+  try {
+    const docs = await Document.findAll({
+      where: { status: 'signed' },
+      order: [sequelize.literal('updated_at DESC')],
+      limit: 100
+    });
+    res.json(docs || []);
+  } catch (error) {
+    console.error('Error listando firmas:', error);
+    res.status(500).json({ error: 'Error al obtener firmas.' });
+  }
+};

@@ -17,6 +17,14 @@ router.get('/stats', authenticateUser, verifyAdminAccess, adminGlobalController.
 // 2. Usuarios y Licencias
 router.get('/users', authenticateUser, verifyAdminAccess, adminGlobalController.getUsers);
 router.put('/users/:id/license', authenticateUser, verifyAdminAccess, adminGlobalController.updateUserLicense);
+router.delete('/users/:id', authenticateUser, verifyAdminAccess, adminGlobalController.deleteUser);
+
+// 3. Empresas Registradas (Tenants)
+router.get('/tenants', authenticateUser, verifyAdminAccess, adminGlobalController.getTenants);
+router.put('/tenants/:id', authenticateUser, verifyAdminAccess, adminGlobalController.updateTenant);
+
+// 4. Firmas y Constancias NOM-151
+router.get('/signatures', authenticateUser, verifyAdminAccess, adminGlobalController.getSignatures);
 
 // 3. Configuración de Correo Brevo
 router.get('/email-config', authenticateUser, verifyAdminAccess, adminGlobalController.getEmailConfig);

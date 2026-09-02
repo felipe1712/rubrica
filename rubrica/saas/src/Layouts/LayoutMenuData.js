@@ -6,7 +6,7 @@ const Navdata = () => {
 
   const [isDocumentos, setIsDocumentos] = useState(false);
   const [isSoporte, setIsSoporte] = useState(false);
-  const [iscurrentState, setIscurrentState] = useState("Dashboard");
+  const [iscurrentState, setIscurrentState] = useState("AdminGlobal");
 
   function updateIconSidebar(e) {
     if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -47,6 +47,25 @@ const Navdata = () => {
     } catch (e) {}
   }
 
+  // SI ES SUPERADMINISTRADOR: El menú superior contiene ÚNICAMENTE la opción "Administración Global"
+  if (isSuperAdmin) {
+    const adminMenuItem = [
+      {
+        id: "admin-global",
+        label: "Administración Global",
+        icon: "ri-shield-keyhole-line",
+        link: "/admin/global",
+        click: function (e) {
+          e.preventDefault();
+          setIscurrentState("AdminGlobal");
+        },
+        stateVariables: iscurrentState === "AdminGlobal",
+      }
+    ];
+    return <React.Fragment>{adminMenuItem}</React.Fragment>;
+  }
+
+  // PARA USUARIOS REGULARES DE LA PLATAFORMA:
   const menuItems = [
     {
       label: "Menu",
@@ -115,7 +134,7 @@ const Navdata = () => {
     },
   ];
 
-  // Si NO es paquete gratis (es decir, paquete de pago), agregar Facturación
+  // Si el usuario tiene un paquete de pago, se agrega la opción "Facturación"
   if (!isFreePlan) {
     menuItems.push({
       id: "facturas",
@@ -127,21 +146,6 @@ const Navdata = () => {
         setIscurrentState("Facturas");
       },
       stateVariables: iscurrentState === "Facturas",
-    });
-  }
-
-  // Si ES SuperAdmin, agregar la opción "Administración Global" directamente al menú principal sin submenú
-  if (isSuperAdmin) {
-    menuItems.push({
-      id: "admin-global",
-      label: "Administración Global",
-      icon: "ri-shield-keyhole-line",
-      link: "/admin/global",
-      click: function (e) {
-        e.preventDefault();
-        setIscurrentState("AdminGlobal");
-      },
-      stateVariables: iscurrentState === "AdminGlobal",
     });
   }
 
