@@ -25,6 +25,7 @@ import TicketsDetails from "../pages/SupportTickets/TicketsDetails";
 // Equipo y Plataforma SuperAdmin
 import Usuarios from "../pages/Usuarios";
 import AdminDashboard from "../pages/AdminDashboard";
+import AdminGlobalDashboard from "../pages/AdminGlobalDashboard";
 
 // Pages
 import Settings from "../pages/Pages/Profile/Settings/Settings";
@@ -55,6 +56,7 @@ const authProtectedRoutes = [
   // SuperAdmin Dashboard (Plataforma)
   { path: "/admin",               component: <AdminDashboard /> },
   { path: "/admin/dashboard",     component: <AdminDashboard /> },
+  { path: "/admin/global",        component: <AdminGlobalDashboard /> },
 
   // Soporte
   { path: "/soporte",     component: <ListView /> },
