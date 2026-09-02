@@ -15,13 +15,18 @@ const Editor = () => {
   const scriptLoaded = useRef(false);
 
   const getToken = () => {
-    const authUser = sessionStorage.getItem("authUser");
-    if (!authUser) return null;
-    return JSON.parse(authUser).token;
+    const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed.token || parsed.accessToken || null;
+    } catch (e) {
+      return null;
+    }
   };
 
   useEffect(() => {
-    document.title = `Editor | Rubricalo`;
+    document.title = `Editor | Rubrícalo`;
 
     const initEditor = async () => {
       try {
@@ -32,7 +37,7 @@ const Editor = () => {
         if (!res.ok) throw new Error("No se pudo cargar la configuración del editor.");
         const { config } = await res.json();
         setDocName(config.document.title);
-        document.title = `${config.document.title} | Rubricalo`;
+        document.title = `${config.document.title} | Rubrícalo`;
 
         // 2. Cargar el script de OnlyOffice si no está cargado
         if (!scriptLoaded.current && !window.DocsAPI) {
@@ -83,7 +88,7 @@ const Editor = () => {
 
   if (error) {
     return (
-      <div className="page-content">
+      <div className="page-content" style={{ paddingTop: "140px" }}>
         <Container fluid>
           <Alert color="danger" className="mt-4">
             <i className="ri-error-warning-line me-2"></i>{error}
@@ -97,36 +102,38 @@ const Editor = () => {
   }
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      {/* Barra superior mínima */}
+    <div className="page-content" style={{ paddingTop: "140px", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      {/* Barra superior del documento */}
       <div
         style={{
-          background: "#1a1d21",
+          background: "#1e293b",
           color: "#fff",
-          padding: "8px 16px",
+          padding: "10px 20px",
           display: "flex",
           alignItems: "center",
           gap: 12,
           flexShrink: 0,
+          borderRadius: "8px 8px 0 0",
           zIndex: 10
         }}
       >
         <button
           onClick={() => navigate(`/documentos/${id}`)}
           style={{
-            background: "rgba(255,255,255,0.1)",
+            background: "#3d4ed8",
             border: "none",
             color: "#fff",
             borderRadius: 6,
-            padding: "4px 12px",
+            padding: "5px 14px",
             cursor: "pointer",
-            fontSize: 13
+            fontSize: 13,
+            fontWeight: 600
           }}
         >
           ← Volver
         </button>
-        <span style={{ fontSize: 14, opacity: 0.85 }}>
-          <i className="ri-file-edit-line me-1"></i>
+        <span style={{ fontSize: 14, fontWeight: 600 }}>
+          <i className="ri-file-word-line me-1"></i>
           {docName}
         </span>
         {loading && (
@@ -134,21 +141,23 @@ const Editor = () => {
         )}
       </div>
 
-      {/* Contenedor del editor */}
-      {loading && (
-        <div style={{
-          position: "absolute", top: "50%", left: "50%",
-          transform: "translate(-50%,-50%)", textAlign: "center", zIndex: 5
-        }}>
-          <Spinner color="primary" style={{ width: 48, height: 48 }} />
-          <p className="mt-3 text-muted">Cargando editor...</p>
-        </div>
-      )}
-      <div
-        id="onlyoffice-editor"
-        ref={editorRef}
-        style={{ flex: 1, overflow: "hidden" }}
-      />
+      {/* Contenedor del editor OnlyOffice con espacio superior adecuado */}
+      <div style={{ position: "relative", flex: 1, minHeight: "calc(100vh - 210px)", marginTop: "0" }}>
+        {loading && (
+          <div style={{
+            position: "absolute", top: "50%", left: "50%",
+            transform: "translate(-50%,-50%)", textAlign: "center", zIndex: 5
+          }}>
+            <Spinner color="primary" style={{ width: 48, height: 48 }} />
+            <p className="mt-3 text-muted">Cargando editor...</p>
+          </div>
+        )}
+        <div
+          id="onlyoffice-editor"
+          ref={editorRef}
+          style={{ width: "100%", height: "100%", minHeight: "calc(100vh - 210px)", borderRadius: "0 0 8px 8px", overflow: "hidden" }}
+        />
+      </div>
     </div>
   );
 };

@@ -28,12 +28,33 @@ const ProfileDropdown = () => {
 
     return (
         <React.Fragment>
-            <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="ms-sm-3 header-item topbar-user">
-                <DropdownToggle tag="button" type="button" className="btn border-0 bg-transparent p-1">
+            <Dropdown isOpen={isProfileDropdown} toggle={toggleProfileDropdown} className="ms-sm-3 header-item topbar-user bg-transparent">
+                <DropdownToggle
+                    tag="button"
+                    type="button"
+                    className="btn border-0 d-flex align-items-center py-1 px-3"
+                    style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.12)",
+                        border: "1px solid rgba(255, 255, 255, 0.25)",
+                        borderRadius: "10px",
+                        backdropFilter: "blur(8px)",
+                        WebkitBackdropFilter: "blur(8px)",
+                        transition: "all 0.3s ease"
+                    }}
+                >
                     <span className="d-flex align-items-center">
-                        {/* Foto genérica: silueta de persona en blanco sobre círculo azul oscuro corporativo */}
-                        <div className="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: "36px", height: "36px", backgroundColor: "#3d4ed8", border: "2px solid rgba(255,255,255,0.3)", flexShrink: 0 }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* Foto genérica: silueta de persona en blanco sobre círculo azul corporativo */}
+                        <div
+                            className="rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                            style={{
+                                width: "34px",
+                                height: "34px",
+                                backgroundColor: "#3d4ed8",
+                                border: "2px solid rgba(255,255,255,0.4)",
+                                flexShrink: 0
+                            }}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" fill="white"/>
                                 <path d="M12 14C7.58172 14 4 16.6863 4 20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20C20 16.6863 16.4183 14 12 14Z" fill="white"/>
                             </svg>

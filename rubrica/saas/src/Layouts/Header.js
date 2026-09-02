@@ -59,6 +59,21 @@ const Header = ({ headerClass }) => {
 
   return (
     <React.Fragment>
+      <style>{`
+        .topbar-user {
+          background-color: transparent !important;
+          background: transparent !important;
+        }
+        .topbar-user .btn {
+          background-color: rgba(255, 255, 255, 0.12) !important;
+          border: 1px solid rgba(255, 255, 255, 0.25) !important;
+          border-radius: 10px !important;
+        }
+        .topbar-user .btn:hover {
+          background-color: rgba(255, 255, 255, 0.22) !important;
+          border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+      `}</style>
       <header
         id="page-topbar"
         className={headerClass}
@@ -79,7 +94,7 @@ const Header = ({ headerClass }) => {
                     <rect width="40" height="40" rx="8" fill="#3D4ED8"/>
                     <path d="M12 14H28V17H12V14ZM12 20H28V23H12V20ZM12 26H22V29H12V26Z" fill="white"/>
                   </svg>
-                  <span style={{ fontSize: "1.4rem", fontWeigth: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
+                  <span style={{ fontSize: "1.4rem", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
                     RUBRÍCALO
                   </span>
                 </Link>
