@@ -60,9 +60,13 @@ const authProtectedRoutes = [
   { path: "/soporte",     component: <ListView /> },
   { path: "/soporte/:id", component: <TicketsDetails /> },
 
-  // Perfil y configuracion
-  { path: "/profile",  component: <UserProfile /> },
-  { path: "/settings", component: <Settings /> },
+  // Perfil y configuracion (Cambiar contraseña)
+  { path: "/profile",                 component: <UserProfile /> },
+  { path: "/pages-profile",           component: <UserProfile /> },
+  { path: "/perfil",                  component: <UserProfile /> },
+  { path: "/settings",                component: <Settings /> },
+  { path: "/pages-profile-settings",  component: <Settings /> },
+  { path: "/cambiar-password",        component: <Settings /> },
 
   // Catch-all -> dashboard
   { path: "/", exact: true, component: <Navigate to="/dashboard" /> },
