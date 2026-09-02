@@ -110,6 +110,28 @@ const DetalleDocumento = () => {
     }
   };
 
+  const handleCheckNufiStatus = async () => {
+    setNufiLoading(true);
+    setNufiMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/documents/${id}/nufi-status`, {
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al consultar estado en Nufi.");
+      if (data.document?.status === "signed") {
+        setDoc(data.document);
+        setNufiMsg("¡Constancia NOM-151 generada y guardada exitosamente!");
+      } else {
+        setNufiMsg(`Estado en Nufi: ${data.nufiData?.message || data.nufiData?.status || 'En procesamiento'}`);
+      }
+    } catch (e) {
+      setNufiMsg(`Error: ${e.message}`);
+    } finally {
+      setNufiLoading(false);
+    }
+  };
+
   const handleDownload = async () => {
     const authUser = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
     const parsed = JSON.parse(authUser || "{}");
@@ -245,11 +267,17 @@ const DetalleDocumento = () => {
 
                   {nufiMsg && <Alert color="info" className="mb-0 py-2 text-center fs-12">{nufiMsg}</Alert>}
 
-                  {doc.status === "pending_signature" && (
-                    <Alert color="warning" className="mb-0 py-2 text-center">
-                      <i className="ri-mail-send-line me-1"></i>
-                      Firma enviada a <strong>{doc.signerEmail}</strong>
-                    </Alert>
+                  {doc.status === "pending_signature" && doc.nufiTransactionId && (
+                    <Button
+                      color="secondary"
+                      outline
+                      disabled={nufiLoading}
+                      onClick={handleCheckNufiStatus}
+                      className="w-100"
+                    >
+                      {nufiLoading ? <Spinner size="sm" className="me-1" /> : <i className="ri-refresh-line me-1"></i>}
+                      Consultar Estado Nufi (UUID: {doc.nufiTransactionId.substring(0, 8)}...)
+                    </Button>
                   )}
 
                   {doc.status === "signed" && (

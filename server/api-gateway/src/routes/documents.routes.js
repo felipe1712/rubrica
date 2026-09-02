@@ -51,6 +51,7 @@ router.get('/:id/download', docsCtrl.downloadDocument);
 router.post('/upload',    upload.single('file'), docsCtrl.uploadDocument);
 router.post('/:id/send-for-signature', docsCtrl.sendForSignature);
 router.post('/:id/send-to-nufi',          docsCtrl.sendToNufi);
+router.get('/:id/nufi-status',           docsCtrl.checkNufiStatus);
 router.delete('/:id',     docsCtrl.deleteDocument);
 
 module.exports = router;

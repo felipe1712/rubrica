@@ -28,7 +28,11 @@ router.get('/containers', authenticateUser, verifyAdminAccess, adminGlobalContro
 // 5. Integración con Stripe
 router.get('/stripe-config', authenticateUser, verifyAdminAccess, adminGlobalController.getStripeConfig);
 
-// 6. Documentos Legales (Términos y Privacidad)
+// 6. Configuración de Firma Digital Nufi
+router.get('/nufi-config', authenticateUser, verifyAdminAccess, adminGlobalController.getNufiConfig);
+router.post('/nufi-config', authenticateUser, verifyAdminAccess, adminGlobalController.updateNufiConfig);
+
+// 7. Documentos Legales (Términos y Privacidad)
 router.put('/legal', authenticateUser, verifyAdminAccess, adminGlobalController.updateLegalTerms);
 
 module.exports = router;

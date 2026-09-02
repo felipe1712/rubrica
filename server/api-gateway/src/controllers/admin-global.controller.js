@@ -6,6 +6,9 @@ let globalConfig = {
   brevoApiKey: process.env.BREVO_API_KEY || 'xkeysib-mock-api-key',
   brevoSenderEmail: process.env.BREVO_SENDER_EMAIL || 'soporte@rubricalo.com',
   brevoSenderName: process.env.BREVO_SENDER_NAME || 'Rubrícalo México',
+  nufiApiKey: process.env.NUFI_API_KEY || process.env.NUFI_SUBSCRIPTION_KEY || '',
+  nufiApiUrl: process.env.NUFI_API_URL || 'https://nufi.azure-api.net',
+  nufiWebhookUrl: process.env.NUFI_WEBHOOK_URL || 'https://api.rubricalo.com/webhooks/nufi',
   stripeMode: process.env.STRIPE_MODE || 'test',
   stripePublishableKey: process.env.STRIPE_PUBLIC_KEY || 'pk_test_rubricalo_sample',
   stripeWebhookStatus: 'active',
@@ -161,4 +164,35 @@ exports.updateLegalTerms = async (req, res) => {
     terms: globalConfig.legalTermsText,
     privacy: globalConfig.legalPrivacyText
   });
+};
+
+// GET /admin/global/nufi-config — Configuración de Nufi
+exports.getNufiConfig = async (req, res) => {
+  res.json({
+    apiKey: globalConfig.nufiApiKey ? `${globalConfig.nufiApiKey.substring(0, 8)}...` : '',
+    apiUrl: globalConfig.nufiApiUrl,
+    webhookUrl: globalConfig.nufiWebhookUrl,
+    status: globalConfig.nufiApiKey ? 'Configurado' : 'Pendiente de API Key'
+  });
+};
+
+// POST /admin/global/nufi-config — Actualizar configuración Nufi
+exports.updateNufiConfig = async (req, res) => {
+  try {
+    const { apiKey, apiUrl, webhookUrl } = req.body;
+
+    if (apiKey) globalConfig.nufiApiKey = apiKey;
+    if (apiUrl) globalConfig.nufiApiUrl = apiUrl;
+    if (webhookUrl) globalConfig.nufiWebhookUrl = webhookUrl;
+
+    process.env.NUFI_API_KEY = globalConfig.nufiApiKey;
+    process.env.NUFI_SUBSCRIPTION_KEY = globalConfig.nufiApiKey;
+    process.env.NUFI_API_URL = globalConfig.nufiApiUrl;
+    process.env.NUFI_WEBHOOK_URL = globalConfig.nufiWebhookUrl;
+
+    res.json({ message: 'Configuración de Nufi actualizada correctamente.', config: globalConfig });
+  } catch (error) {
+    console.error('Error actualizando configuración de Nufi:', error);
+    res.status(500).json({ error: 'Error al actualizar configuración de Nufi.' });
+  }
 };

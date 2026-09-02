@@ -319,3 +319,44 @@ exports.sendToNufi = async (req, res) => {
     res.status(500).json({ error: error.message || 'Error al conectar con la API de Nufi.' });
   }
 };
+
+// GET /documents/:id/nufi-status — Consultar estado por UUID en Nufi
+exports.checkNufiStatus = async (req, res) => {
+  try {
+    const doc = await findDocById(req.params.id, req);
+    if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
+
+    if (!doc.nufiTransactionId) {
+      return res.status(400).json({ error: 'Este documento no ha sido registrado en Nufi.' });
+    }
+
+    const nufiData = await nufiService.consultarPorUuid(doc.nufiTransactionId);
+
+    // Si Nufi responde con la constancia firmada en base64
+    const dataObj = nufiData.data || nufiData;
+    const constanciaPdfBase64 = dataObj.constancia_pdf || dataObj.base64_archivo || dataObj.signed_pdf_base64;
+
+    if (constanciaPdfBase64) {
+      const cleanBase64 = constanciaPdfBase64.replace(/^data:application\/pdf;base64,/, '');
+      const buffer = Buffer.from(cleanBase64, 'base64');
+      const signedFilePath = path.join(UPLOADS_DIR, `nufi-signed-${doc.id}.pdf`);
+      fs.writeFileSync(signedFilePath, buffer);
+
+      await doc.update({
+        status: 'signed',
+        nufiStatus: 'completed',
+        filePath: signedFilePath,
+        signedAt: new Date()
+      });
+    }
+
+    res.json({
+      message: 'Consulta de estado Nufi realizada con éxito.',
+      nufiData,
+      document: doc
+    });
+  } catch (error) {
+    console.error('Error al consultar estado en Nufi:', error);
+    res.status(500).json({ error: error.message || 'Error al consultar estado en Nufi.' });
+  }
+};

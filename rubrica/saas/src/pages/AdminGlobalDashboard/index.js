@@ -32,6 +32,13 @@ const AdminGlobalDashboard = () => {
   const [emailMsg, setEmailMsg] = useState(null);
   const [emailLoading, setEmailLoading] = useState(false);
 
+  // Configuración Nufi
+  const [nufiApiKey, setNufiApiKey] = useState("");
+  const [nufiApiUrl, setNufiApiUrl] = useState("https://nufi.azure-api.net");
+  const [nufiWebhookUrl, setNufiWebhookUrl] = useState("https://api.rubricalo.com/webhooks/nufi");
+  const [nufiMsg, setNufiMsg] = useState(null);
+  const [nufiLoading, setNufiLoading] = useState(false);
+
   // Configuración Stripe
   const [stripeConfig, setStripeConfig] = useState({
     mode: "live",
@@ -66,11 +73,12 @@ const AdminGlobalDashboard = () => {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      const [resStats, resUsers, resContainers, resEmail] = await Promise.all([
+      const [resStats, resUsers, resContainers, resEmail, resNufi] = await Promise.all([
         fetch(`${API_URL}/admin/global/stats`, { headers }),
         fetch(`${API_URL}/admin/global/users`, { headers }),
         fetch(`${API_URL}/admin/global/containers`, { headers }),
-        fetch(`${API_URL}/admin/global/email-config`, { headers })
+        fetch(`${API_URL}/admin/global/email-config`, { headers }),
+        fetch(`${API_URL}/admin/global/nufi-config`, { headers })
       ]);
 
       if (resStats.ok) setStats(await resStats.json());
@@ -83,6 +91,11 @@ const AdminGlobalDashboard = () => {
         const data = await resEmail.json();
         setBrevoSenderEmail(data.senderEmail || "soporte@rubricalo.com");
         setBrevoSenderName(data.senderName || "Rubrícalo México");
+      }
+      if (resNufi.ok) {
+        const data = await resNufi.json();
+        setNufiApiUrl(data.apiUrl || "https://nufi.azure-api.net");
+        setNufiWebhookUrl(data.webhookUrl || "https://api.rubricalo.com/webhooks/nufi");
       }
     } catch (e) {
       console.error("Error al cargar datos de administración global:", e);
@@ -122,6 +135,34 @@ const AdminGlobalDashboard = () => {
       setEmailMsg(`Error: ${err.message}`);
     } finally {
       setEmailLoading(false);
+    }
+  };
+
+  const handleUpdateNufiConfig = async (e) => {
+    e.preventDefault();
+    setNufiLoading(true);
+    setNufiMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/admin/global/nufi-config`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify({
+          apiKey: nufiApiKey,
+          apiUrl: nufiApiUrl,
+          webhookUrl: nufiWebhookUrl
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al guardar parámetros de Nufi.");
+      setNufiMsg("¡Parámetros de Firma Digital (Nufi) guardados correctamente!");
+    } catch (err) {
+      setNufiMsg(`Error: ${err.message}`);
+    } finally {
+      setNufiLoading(false);
     }
   };
 
@@ -255,11 +296,16 @@ const AdminGlobalDashboard = () => {
                 </NavItem>
                 <NavItem>
                   <NavLink className={classnames({ active: activeTab === "4" }, "fw-bold")} onClick={() => setActiveTab("4")} style={{ cursor: "pointer" }}>
-                    <i className="ri-cpu-line me-2"></i> Estado de Contenedores
+                    <i className="ri-shield-flash-line me-2"></i> Firma Digital (Nufi)
                   </NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink className={classnames({ active: activeTab === "5" }, "fw-bold")} onClick={() => setActiveTab("5")} style={{ cursor: "pointer" }}>
+                    <i className="ri-cpu-line me-2"></i> Estado de Contenedores
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink className={classnames({ active: activeTab === "6" }, "fw-bold")} onClick={() => setActiveTab("6")} style={{ cursor: "pointer" }}>
                     <i className="ri-file-shield-2-line me-2"></i> Legal & Privacidad
                   </NavLink>
                 </NavItem>
@@ -405,8 +451,53 @@ const AdminGlobalDashboard = () => {
                     </Form>
                   </TabPane>
 
-                  {/* 4. ESTADO DE CONTENEDORES DOCKER */}
+                  {/* 4. FIRMA DIGITAL NUFI */}
                   <TabPane tabId="4">
+                    <h5 className="fw-bold mb-3">Parámetros de Integración con Nufi (Firma Digital & NOM-151)</h5>
+                    <p className="text-muted fs-13 mb-4">
+                      Configura aquí las credenciales para la emisión de constancias de conservación NOM-151-SCFI-2016 y firma digital con la API de Nufi.
+                    </p>
+                    {nufiMsg && <Alert color="info">{nufiMsg}</Alert>}
+                    <Form onSubmit={handleUpdateNufiConfig}>
+                      <Row>
+                        <Col lg={12} className="mb-3">
+                          <Label className="form-label fw-bold">NUFI-API-KEY (Llave de API / Suscripción Azure)</Label>
+                          <Input
+                            type="password"
+                            placeholder="Ingresa tu NUFI-API-KEY"
+                            value={nufiApiKey}
+                            onChange={(e) => setNufiApiKey(e.target.value)}
+                          />
+                          <small className="text-muted">Esta llave se enviará en las cabeceras HTTP <code>NUFI-API-KEY</code> y <code>Ocp-Apim-Subscription-Key</code>.</small>
+                        </Col>
+                        <Col lg={6} className="mb-3">
+                          <Label className="form-label fw-bold">URL Base API Nufi</Label>
+                          <Input
+                            type="text"
+                            value={nufiApiUrl}
+                            onChange={(e) => setNufiApiUrl(e.target.value)}
+                          />
+                        </Col>
+                        <Col lg={6} className="mb-3">
+                          <Label className="form-label fw-bold">URL Webhook Recepción Constancias</Label>
+                          <Input
+                            type="text"
+                            value={nufiWebhookUrl}
+                            onChange={(e) => setNufiWebhookUrl(e.target.value)}
+                          />
+                        </Col>
+                        <Col lg={12} className="text-end">
+                          <Button type="submit" style={{ backgroundColor: "#3d4ed8", borderColor: "#3d4ed8" }} disabled={nufiLoading} className="fw-bold">
+                            {nufiLoading ? <Spinner size="sm" className="me-2"> Guardando... </Spinner> : null}
+                            Guardar Parámetros de Nufi
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                  </TabPane>
+
+                  {/* 5. ESTADO DE CONTENEDORES DOCKER */}
+                  <TabPane tabId="5">
                     <h5 className="fw-bold mb-3">Telemetría y Salud de los 7 Contenedores Docker</h5>
                     <Row>
                       {containers.map((c, idx) => (
@@ -428,8 +519,8 @@ const AdminGlobalDashboard = () => {
                     </Row>
                   </TabPane>
 
-                  {/* 5. LEGAL & PRIVACIDAD */}
-                  <TabPane tabId="5">
+                  {/* 6. LEGAL & PRIVACIDAD */}
+                  <TabPane tabId="6">
                     <h5 className="fw-bold mb-3">Administración de Documentos Legales y Privacidad Global</h5>
                     {legalMsg && <Alert color="success">{legalMsg}</Alert>}
                     <Form onSubmit={handleSaveLegal}>
