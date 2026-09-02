@@ -68,6 +68,14 @@ const Document = sequelize.define('Document', {
   expiresAt: {
     type: DataTypes.DATE,
     field: 'expires_at'
+  },
+  nufiTransactionId: {
+    type: DataTypes.STRING,
+    field: 'nufi_transaction_id'
+  },
+  nufiStatus: {
+    type: DataTypes.STRING,
+    field: 'nufi_status'
   }
 }, {
   tableName: 'documents',

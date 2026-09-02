@@ -39,6 +39,8 @@ const DetalleDocumento = () => {
   const [sending, setSending]     = useState(false);
   const [sendError, setSendError] = useState(null);
   const [sendSuccess, setSendSuccess] = useState(false);
+  const [nufiLoading, setNufiLoading] = useState(false);
+  const [nufiMsg, setNufiMsg] = useState(null);
 
   const getAuthHeaders = () => {
     try {
@@ -86,6 +88,25 @@ const DetalleDocumento = () => {
       setSendError(e.message);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleSendToNufi = async () => {
+    setNufiLoading(true);
+    setNufiMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/documents/${id}/send-to-nufi`, {
+        method: "POST",
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al enviar a Nufi.");
+      setDoc(prev => ({ ...prev, status: "pending_signature", nufiStatus: "processing", nufiTransactionId: data.transactionId }));
+      setNufiMsg("¡Documento registrado en Nufi! Se generará la constancia NOM-151.");
+    } catch (e) {
+      setNufiMsg(`Error: ${e.message}`);
+    } finally {
+      setNufiLoading(false);
     }
   };
 
@@ -206,10 +227,23 @@ const DetalleDocumento = () => {
                   </Button>
 
                   {doc.status === "uploaded" && (
-                    <Button color="success" onClick={() => setModal(true)}>
-                      <i className="ri-pen-nib-line me-1"></i> Enviar para Firma
-                    </Button>
+                    <>
+                      <Button color="success" onClick={() => setModal(true)}>
+                        <i className="ri-pen-nib-line me-1"></i> Enviar para Firma (DocuSeal)
+                      </Button>
+                      <Button
+                        style={{ backgroundColor: "#3d4ed8", borderColor: "#3d4ed8" }}
+                        className="text-white fw-bold"
+                        disabled={nufiLoading}
+                        onClick={handleSendToNufi}
+                      >
+                        {nufiLoading ? <Spinner size="sm" className="me-1" /> : <i className="ri-shield-flash-line me-1"></i>}
+                        Alta de Constancia NOM-151 (Nufi)
+                      </Button>
+                    </>
                   )}
+
+                  {nufiMsg && <Alert color="info" className="mb-0 py-2 text-center fs-12">{nufiMsg}</Alert>}
 
                   {doc.status === "pending_signature" && (
                     <Alert color="warning" className="mb-0 py-2 text-center">

@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { Document, User, Tenant, sequelize } = require('../models');
 const docusealService = require('../services/docuseal.service');
+const nufiService = require('../services/nufi.service');
 const { verifyFileType } = require('../services/magika.service');
 
 const UPLOADS_DIR = process.env.UPLOADS_DIR || '/app/uploads';
@@ -270,5 +271,51 @@ exports.downloadDocument = async (req, res) => {
   } catch (error) {
     console.error('Error descargando documento:', error);
     res.status(500).json({ error: 'Error al descargar el documento.' });
+  }
+};
+
+// POST /documents/:id/send-to-nufi — alta_constancia_pdf en Nufi para firma y NOM-151
+exports.sendToNufi = async (req, res) => {
+  try {
+    const doc = await findDocById(req.params.id, req);
+    if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
+
+    if (!fs.existsSync(doc.filePath)) {
+      return res.status(404).json({ error: 'El archivo físico no está disponible en disco.' });
+    }
+
+    // Convertir el PDF a Base64
+    const fileBuffer = fs.readFileSync(doc.filePath);
+    const base64File = fileBuffer.toString('base64');
+
+    // Construir la URL del webhook
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.headers['x-forwarded-host'] || req.get('host') || 'api.rubricalo.com';
+    const webhookUrl = `${protocol}://${host}/webhooks/nufi`;
+
+    // Llamar al servicio de Nufi alta_constancia_pdf
+    const nufiResponse = await nufiService.altaConstanciaPdf({
+      base64File,
+      webhookUrl
+    });
+
+    const transactionId = nufiResponse.id || nufiResponse.transaccion_id || nufiResponse.data?.id || `nufi-${Date.now()}`;
+
+    // Actualizar el documento en base de datos
+    await doc.update({
+      status: 'pending_signature',
+      nufiTransactionId: String(transactionId),
+      nufiStatus: 'processing'
+    });
+
+    res.json({
+      message: 'Documento enviado a Nufi para firma y generación de constancia NOM-151.',
+      transactionId,
+      nufiResponse,
+      document: doc
+    });
+  } catch (error) {
+    console.error('Error al enviar a Nufi:', error);
+    res.status(500).json({ error: error.message || 'Error al conectar con la API de Nufi.' });
   }
 };
