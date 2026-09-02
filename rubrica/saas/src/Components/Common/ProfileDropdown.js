@@ -68,25 +68,17 @@ const ProfileDropdown = () => {
                 <DropdownMenu className="dropdown-menu-end shadow-lg border-0 mt-2" style={{ borderRadius: "10px", minWidth: "200px" }}>
                     <h6 className="dropdown-header text-primary fw-bold" style={{ color: "#3d4ed8" }}>¡Hola, {userName}!</h6>
                     
-                    {/* 1. Perfil */}
+                    {/* 1. Perfil (Unificado con Ajustes de Cuenta y Cambio de Contraseña) */}
                     <DropdownItem className='p-0'>
-                        <Link to="/pages-profile" className="dropdown-item py-2 px-3">
+                        <Link to="/pages-profile-settings" className="dropdown-item py-2 px-3">
                             <i className="ri-user-3-line text-muted fs-16 align-middle me-2"></i>
                             <span className="align-middle fw-medium">Perfil</span>
                         </Link>
                     </DropdownItem>
 
-                    {/* 2. Cambiar Contraseña */}
-                    <DropdownItem className='p-0'>
-                        <Link to="/pages-profile-settings" className="dropdown-item py-2 px-3">
-                            <i className="ri-key-2-line text-muted fs-16 align-middle me-2"></i>
-                            <span className="align-middle fw-medium">Cambiar Contraseña</span>
-                        </Link>
-                    </DropdownItem>
-
                     <div className="dropdown-divider my-1"></div>
 
-                    {/* 3. Cerrar Sesión */}
+                    {/* 2. Cerrar Sesión */}
                     <DropdownItem className='p-0'>
                         <Link to="/logout" className="dropdown-item py-2 px-3 text-danger">
                             <i className="ri-logout-box-r-line fs-16 align-middle me-2 text-danger"></i>
