@@ -53,8 +53,8 @@ const Login = (props) => {
     const validation = useFormik({
         enableReinitialize: true,
         initialValues: {
-            email: userLogin.email || "demo@rubricalo.com",
-            password: userLogin.password || "rubricalo123",
+            email: userLogin.email || "",
+            password: userLogin.password || "",
         },
         validationSchema: Yup.object({
             email: Yup.string().required("Ingresa tu correo electrónico"),
@@ -136,7 +136,7 @@ const Login = (props) => {
                                                     <Input
                                                         name="email"
                                                         className="form-control form-control-lg"
-                                                        placeholder="ej. demo@rubricalo.com"
+                                                        placeholder="ej. usuario@empresa.com"
                                                         type="email"
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
