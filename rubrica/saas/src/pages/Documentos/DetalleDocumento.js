@@ -42,7 +42,7 @@ const DetalleDocumento = () => {
 
   const getAuthHeaders = () => {
     try {
-      const authUser = sessionStorage.getItem("authUser");
+      const authUser = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
       if (!authUser) return {};
       const parsed = JSON.parse(authUser);
       const token = parsed.token || parsed.accessToken;
@@ -90,8 +90,9 @@ const DetalleDocumento = () => {
   };
 
   const handleDownload = async () => {
-    const authUser = sessionStorage.getItem("authUser");
-    const { token } = JSON.parse(authUser || "{}");
+    const authUser = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+    const parsed = JSON.parse(authUser || "{}");
+    const token = parsed.token || parsed.accessToken;
     const res = await fetch(`${API_URL}/documents/${id}/download`, {
       headers: { Authorization: `Bearer ${token}` }
     });

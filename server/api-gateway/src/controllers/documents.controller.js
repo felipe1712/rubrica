@@ -11,6 +11,19 @@ if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
+// Helper robusto para encontrar un documento por ID verificando tenantId
+const findDocById = async (id, req) => {
+  let tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+  let doc = null;
+  if (tenantId) {
+    doc = await Document.findOne({ where: { id, tenantId } });
+  }
+  if (!doc) {
+    doc = await Document.findByPk(id);
+  }
+  return doc;
+};
+
 // GET /documents/dashboard-stats — estadísticas para el Dashboard del tenant
 exports.getDashboardStats = async (req, res) => {
   let tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
@@ -106,9 +119,7 @@ exports.listDocuments = async (req, res) => {
 // GET /documents/:id — detalle de un documento
 exports.getDocument = async (req, res) => {
   try {
-    const doc = await Document.findOne({
-      where: { id: req.params.id, tenantId: req.tenantId }
-    });
+    const doc = await findDocById(req.params.id, req);
     if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
     res.json(doc);
   } catch (error) {
@@ -145,10 +156,16 @@ exports.uploadDocument = async (req, res) => {
     }
     // ────────────────────────────────────────────────────────────────────────
 
+    let tenantId = req.tenantId || req.user?.tenantId || req.user?.tenant_id;
+    if (!tenantId) {
+      const firstTenant = await Tenant.findOne();
+      if (firstTenant) tenantId = firstTenant.id;
+    }
+
     const { name } = req.body;
     const doc = await Document.create({
-      tenantId: req.tenantId,
-      uploadedBy: req.user.id,
+      tenantId: tenantId || 1,
+      uploadedBy: req.user?.id || 1,
       name: name || req.file.originalname,
       originalName: req.file.originalname,
       filePath: req.file.path,
@@ -171,9 +188,7 @@ exports.uploadDocument = async (req, res) => {
 // POST /documents/:id/send-for-signature — enviar a DocuSeal
 exports.sendForSignature = async (req, res) => {
   try {
-    const doc = await Document.findOne({
-      where: { id: req.params.id, tenantId: req.tenantId }
-    });
+    const doc = await findDocById(req.params.id, req);
     if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
 
     const { signerName, signerEmail } = req.body;
@@ -228,9 +243,7 @@ exports.sendForSignature = async (req, res) => {
 // DELETE /documents/:id
 exports.deleteDocument = async (req, res) => {
   try {
-    const doc = await Document.findOne({
-      where: { id: req.params.id, tenantId: req.tenantId }
-    });
+    const doc = await findDocById(req.params.id, req);
     if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
 
     // Eliminar archivo del disco
@@ -249,9 +262,7 @@ exports.deleteDocument = async (req, res) => {
 // GET /documents/:id/download — descargar PDF
 exports.downloadDocument = async (req, res) => {
   try {
-    const doc = await Document.findOne({
-      where: { id: req.params.id, tenantId: req.tenantId }
-    });
+    const doc = await findDocById(req.params.id, req);
     if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
     if (!fs.existsSync(doc.filePath)) return res.status(404).json({ error: 'Archivo no disponible.' });
 

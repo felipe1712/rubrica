@@ -23,7 +23,7 @@ const NuevoDocumento = () => {
 
   const getAuthHeaders = () => {
     try {
-      const authUser = sessionStorage.getItem("authUser");
+      const authUser = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
       if (!authUser) return {};
       const parsed = JSON.parse(authUser);
       const token = parsed.token || parsed.accessToken;
