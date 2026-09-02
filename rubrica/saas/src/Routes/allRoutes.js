@@ -28,6 +28,7 @@ import AdminDashboard from "../pages/AdminDashboard";
 import AdminGlobalDashboard from "../pages/AdminGlobalDashboard";
 
 // Pages
+import Facturas from "../pages/Facturas";
 import Settings from "../pages/Pages/Profile/Settings/Settings";
 import Basic404 from "../pages/AuthenticationInner/Errors/Basic404";
 import Error500 from "../pages/AuthenticationInner/Errors/Error500";
@@ -57,6 +58,9 @@ const authProtectedRoutes = [
   { path: "/admin",               component: <AdminDashboard /> },
   { path: "/admin/dashboard",     component: <AdminDashboard /> },
   { path: "/admin/global",        component: <AdminGlobalDashboard /> },
+
+  // Facturación
+  { path: "/facturas", component: <Facturas /> },
 
   // Soporte
   { path: "/soporte",     component: <ListView /> },

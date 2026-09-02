@@ -23,6 +23,30 @@ const Navdata = () => {
     if (iscurrentState !== "Soporte")    setIsSoporte(false);
   }, [history, iscurrentState, isDocumentos, isSoporte]);
 
+  // Verificar rol y plan del usuario autenticado
+  const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+  let isSuperAdmin = false;
+  let isFreePlan = false;
+
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      const user = parsed.user || parsed;
+      const tenant = parsed.tenant || user.tenant;
+
+      if (user.role === 'SUPERADMIN' || user.isSuperAdmin || parsed.isSuperAdmin) {
+        isSuperAdmin = true;
+      }
+
+      const planName = (tenant?.plan || user.plan || "").toLowerCase();
+      if (!planName || planName === 'free' || planName === 'gratis' || planName === 'trial') {
+        if (planName !== 'standard' && planName !== 'pro' && planName !== 'enterprise') {
+          isFreePlan = true;
+        }
+      }
+    } catch (e) {}
+  }
+
   const menuItems = [
     {
       label: "Menu",
@@ -89,9 +113,13 @@ const Navdata = () => {
       },
       stateVariables: iscurrentState === "Analytics",
     },
-    {
+  ];
+
+  // Si NO es paquete gratis (es decir, paquete de pago), agregar Facturación
+  if (!isFreePlan) {
+    menuItems.push({
       id: "facturas",
-      label: "Facturacion",
+      label: "Facturación",
       icon: "ri-bill-line",
       link: "/facturas",
       click: function (e) {
@@ -99,8 +127,12 @@ const Navdata = () => {
         setIscurrentState("Facturas");
       },
       stateVariables: iscurrentState === "Facturas",
-    },
-    {
+    });
+  }
+
+  // Si ES SuperAdmin, agregar la opción "Administración Global" directamente al menú principal sin submenú
+  if (isSuperAdmin) {
+    menuItems.push({
       id: "admin-global",
       label: "Administración Global",
       icon: "ri-shield-keyhole-line",
@@ -110,50 +142,8 @@ const Navdata = () => {
         setIscurrentState("AdminGlobal");
       },
       stateVariables: iscurrentState === "AdminGlobal",
-    },
-    {
-      label: "Cuenta",
-      isHeader: true,
-    },
-    {
-      id: "soporte",
-      label: "Soporte",
-      icon: "ri-customer-service-2-line",
-      link: "/soporte",
-      click: function (e) {
-        e.preventDefault();
-        setIsSoporte(!isSoporte);
-        setIscurrentState("Soporte");
-        updateIconSidebar(e);
-      },
-      stateVariables: isSoporte,
-      subItems: [
-        { id: "tickets-list", label: "Mis Tickets", link: "/soporte", parentId: "soporte" },
-      ],
-    },
-    {
-      id: "configuracion",
-      label: "Configuracion",
-      icon: "ri-settings-3-line",
-      link: "/settings",
-      click: function (e) {
-        e.preventDefault();
-        setIscurrentState("Configuracion");
-      },
-      stateVariables: iscurrentState === "Configuracion",
-    },
-    {
-      id: "perfil",
-      label: "Mi Perfil",
-      icon: "ri-user-3-line",
-      link: "/profile",
-      click: function (e) {
-        e.preventDefault();
-        setIscurrentState("Perfil");
-      },
-      stateVariables: iscurrentState === "Perfil",
-    },
-  ];
+    });
+  }
 
   return <React.Fragment>{menuItems}</React.Fragment>;
 };

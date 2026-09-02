@@ -9,26 +9,8 @@ import navdata from "../LayoutMenuData";
 import { withTranslation } from "react-i18next";
 
 const HorizontalLayout = (props) => {
-    const [isMoreMenu, setIsMoreMenu] = useState(false);
     const navData = navdata().props.children;
-    let menuItems = [];
-    let splitMenuItems = [];
-    let menuSplitContainer = 6;
-    navData.forEach(function (value, key) {
-        if (value['isHeader']) {
-            menuSplitContainer++;
-        }
-        if (key >= menuSplitContainer) {
-            let val = value;
-            val.childItems = value.subItems;
-            val.isChildItem = (value.subItems) ? true : false;
-            delete val.subItems;
-            splitMenuItems.push(val);
-        } else {
-            menuItems.push(value);
-        }
-    });
-    menuItems.push({ id: 'more', label: 'More', icon: 'ri-briefcase-2-line', link: "/#", stateVariables: isMoreMenu, subItems: splitMenuItems, click: function (e) { e.preventDefault(); setIsMoreMenu(!isMoreMenu); }, });
+    let menuItems = navData.filter(item => !item.isHeader);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
