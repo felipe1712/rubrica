@@ -102,18 +102,6 @@ const DashboardEcommerce = () => {
   }, []);
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const u = parsed.user || {};
-        if (u.role === 'SUPERADMIN' || u.isSuperAdmin || window.location.hostname.startsWith('admin')) {
-          window.location.href = "/";
-          return;
-        }
-      }
-    } catch (e) {}
-
     fetchDashboardStats();
   }, [fetchDashboardStats]);
 

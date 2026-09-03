@@ -35,41 +35,47 @@ import Error500 from "../pages/AuthenticationInner/Errors/Error500";
 import Maintenance from "../pages/Pages/Maintenance/Maintenance";
 import ComingSoon from "../pages/Pages/ComingSoon/ComingSoon";
 
-const isSuperAdminSession = () => {
+export const isSuperAdminSession = () => {
   if (typeof window === "undefined") return false;
   if (window.location.hostname.startsWith("admin")) return true;
   try {
     const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
     if (raw) {
       const parsed = JSON.parse(raw);
-      const user = parsed.user || parsed;
-      if (user.role === 'SUPERADMIN' || user.isSuperAdmin) return true;
+      const user = parsed.user || parsed.admin || parsed;
+      if (user.role === 'SUPERADMIN' || user.isSuperAdmin || parsed.isSuperAdmin) return true;
     }
   } catch (e) {}
   return false;
 };
 
-const isSuperAdmin = isSuperAdminSession();
+// Componente inteligente de redirección raíz (se evalúa en tiempo de renderizado de React)
+const RootRedirect = () => {
+  if (isSuperAdminSession()) {
+    return <AdminGlobalDashboard />;
+  }
+  return <Navigate to="/dashboard" replace />;
+};
 
-const authProtectedRoutes = isSuperAdmin ? [
-  // SuperAdmin Principal (Acceso Directo en Dominio admin.rubricalo.com)
-  { path: "/", exact: true,        component: <AdminGlobalDashboard /> },
-  { path: "/admin/global",        component: <AdminGlobalDashboard /> },
+const DashboardOrAdmin = () => {
+  if (isSuperAdminSession()) {
+    return <AdminGlobalDashboard />;
+  }
+  return <DashboardEcommerce />;
+};
+
+const authProtectedRoutes = [
+  // Ruta raíz inteligente
+  { path: "/", exact: true, component: <RootRedirect /> },
+
+  // Dashboard (SuperAdmin ve AdminGlobalDashboard, cliente ve DashboardEcommerce)
+  { path: "/dashboard", component: <DashboardOrAdmin /> },
+  { path: "/index",     component: <DashboardOrAdmin /> },
+
+  // SuperAdmin Dashboard (Plataforma)
   { path: "/admin",               component: <AdminGlobalDashboard /> },
-  { path: "/dashboard",           component: <AdminGlobalDashboard /> },
-
-  // Perfil y configuracion
-  { path: "/settings",                component: <Settings /> },
-  { path: "/profile",                 component: <UserProfile /> },
-  { path: "/perfil",                  component: <UserProfile /> },
-  { path: "/cambiar-password",        component: <Settings /> },
-
-  // Catch-all para SuperAdmin -> AdminGlobalDashboard
-  { path: "*",                        component: <AdminGlobalDashboard /> },
-] : [
-  // Dashboard principal clientes
-  { path: "/dashboard", component: <DashboardEcommerce /> },
-  { path: "/index",     component: <DashboardEcommerce /> },
+  { path: "/admin/dashboard",     component: <AdminGlobalDashboard /> },
+  { path: "/admin/global",        component: <AdminGlobalDashboard /> },
 
   // Documentos
   { path: "/documentos",          component: <Documentos /> },
@@ -85,11 +91,6 @@ const authProtectedRoutes = isSuperAdmin ? [
   // Usuarios del Equipo (Tenant)
   { path: "/usuarios",            component: <Usuarios /> },
 
-  // SuperAdmin Dashboard (Plataforma)
-  { path: "/admin",               component: <AdminGlobalDashboard /> },
-  { path: "/admin/dashboard",     component: <AdminGlobalDashboard /> },
-  { path: "/admin/global",        component: <AdminGlobalDashboard /> },
-
   // Facturación
   { path: "/facturas", component: <Facturas /> },
 
@@ -97,7 +98,7 @@ const authProtectedRoutes = isSuperAdmin ? [
   { path: "/soporte",     component: <ListView /> },
   { path: "/soporte/:id", component: <TicketsDetails /> },
 
-  // Perfil y configuracion (Cambiar contraseña)
+  // Perfil y configuracion
   { path: "/profile",                 component: <UserProfile /> },
   { path: "/pages-profile",           component: <UserProfile /> },
   { path: "/perfil",                  component: <UserProfile /> },
@@ -105,9 +106,8 @@ const authProtectedRoutes = isSuperAdmin ? [
   { path: "/pages-profile-settings",  component: <Settings /> },
   { path: "/cambiar-password",        component: <Settings /> },
 
-  // Catch-all clientes -> dashboard
-  { path: "/", exact: true, component: <Navigate to="/dashboard" /> },
-  { path: "*",              component: <Navigate to="/dashboard" /> },
+  // Catch-all
+  { path: "*", component: <RootRedirect /> }
 ];
 
 const publicRoutes = [
