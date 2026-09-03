@@ -163,6 +163,39 @@ exports.uploadDocument = async (req, res) => {
       if (firstTenant) tenantId = firstTenant.id;
     }
 
+    // ── Verificación de límites de documentos mensuales según el Plan ──────────────
+    const tenantObj = await Tenant.findByPk(tenantId);
+    const planName = (tenantObj?.plan || 'free').toLowerCase();
+
+    const PLAN_DOC_LIMITS = {
+      free: 3,
+      gratis: 3,
+      standard: 50,
+      pro: 250,
+      enterprise: Infinity
+    };
+
+    const maxDocsAllowed = PLAN_DOC_LIMITS[planName] ?? 3;
+    if (maxDocsAllowed !== Infinity) {
+      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const docsThisMonth = await Document.count({
+        where: {
+          tenantId,
+          createdAt: { [sequelize.Sequelize.Op.gte]: startOfMonth }
+        }
+      });
+
+      if (docsThisMonth >= maxDocsAllowed) {
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        return res.status(403).json({
+          error: `Has alcanzado el límite mensual de ${maxDocsAllowed} documento(s) para tu Plan ${planName.toUpperCase()}. Actualiza tu membresía en Configuración > Cuenta para continuar subiendo documentos.`
+        });
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+
     const { name } = req.body;
     const doc = await Document.create({
       tenantId: tenantId || 1,

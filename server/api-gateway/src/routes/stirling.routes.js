@@ -11,12 +11,12 @@ router.use(authenticateUser);
 
 // Middleware to check plan-specific features (e.g. OCR is Pro/Enterprise only)
 const checkPdfPlanLimits = (req, res, next) => {
-  const plan = req.user.Tenant.plan;
+  const plan = (req.user?.Tenant?.plan || 'free').toLowerCase();
   const path = req.path;
 
-  // Block OCR for Esencial plan
-  if (path.includes('/ocr') && plan === 'esencial') {
-    return res.status(403).json({ error: 'La función OCR (Reconocimiento Óptico de Caracteres) no está incluida en su plan. Actualice a Profesional o Empresarial.' });
+  // Bloquear OCR en planes Gratuito y Estándar
+  if (path.includes('/ocr') && (plan === 'free' || plan === 'gratis' || plan === 'standard')) {
+    return res.status(403).json({ error: 'La función OCR (Reconocimiento Óptico de Caracteres) está disponible a partir del Plan PRO o ENTERPRISE. Actualice su membresía en Configuración > Cuenta.' });
   }
 
   next();

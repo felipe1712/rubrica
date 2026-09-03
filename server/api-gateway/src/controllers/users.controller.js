@@ -29,6 +29,27 @@ exports.createUser = async (req, res) => {
     const { name, email, password, role } = req.body;
     if (!email) return res.status(400).json({ error: 'El correo electrónico es obligatorio.' });
 
+    // Verificar límites de usuarios según el plan del Tenant
+    const tenant = await Tenant.findByPk(tenantId);
+    const planName = (tenant?.plan || 'free').toLowerCase();
+    
+    const PLAN_USER_LIMITS = {
+      free: 1,
+      gratis: 1,
+      standard: 3,
+      pro: 10,
+      enterprise: Infinity
+    };
+
+    const maxUsersAllowed = PLAN_USER_LIMITS[planName] ?? 1;
+    const currentUsersCount = await User.count({ where: { tenantId } });
+
+    if (currentUsersCount >= maxUsersAllowed) {
+      return res.status(403).json({
+        error: `Has alcanzado el límite de ${maxUsersAllowed} usuario(s) permitidos en tu Plan ${planName.toUpperCase()}. Actualiza tu membresía en Configuración > Cuenta para invitar a más colaboradores.`
+      });
+    }
+
     // Verificar si ya existe en el tenant
     const existing = await User.findOne({ where: { tenantId, email } });
     if (existing) {
