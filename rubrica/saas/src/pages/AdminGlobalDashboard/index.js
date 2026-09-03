@@ -47,7 +47,9 @@ const AdminGlobalDashboard = () => {
     webhookStatus: "Activo (200 OK)"
   });
   const [stripeLinkStandard, setStripeLinkStandard] = useState("https://buy.stripe.com/test_standard_199");
+  const [stripeLinkStandardAnnual, setStripeLinkStandardAnnual] = useState("https://buy.stripe.com/test_standard_annual_1990");
   const [stripeLinkPro, setStripeLinkPro] = useState("https://buy.stripe.com/test_pro_499");
+  const [stripeLinkProAnnual, setStripeLinkProAnnual] = useState("https://buy.stripe.com/test_pro_annual_4990");
   const [stripeLinkEnterprise, setStripeLinkEnterprise] = useState("https://rubricalo.com/#contacto");
   const [stripeMsg, setStripeMsg] = useState(null);
   const [stripeLoading, setStripeLoading] = useState(false);
