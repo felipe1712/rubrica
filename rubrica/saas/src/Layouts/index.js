@@ -112,7 +112,8 @@ const {
     // class add remove in header
     useEffect(() => {
         window.addEventListener("scroll", scrollNavigation, true);
-    });
+        return () => window.removeEventListener("scroll", scrollNavigation, true);
+    }, []);
     function scrollNavigation() {
         var scrollup = document.documentElement.scrollTop;
         if (scrollup > 50) {
@@ -123,10 +124,13 @@ const {
     }
 
     useEffect(() => {
-        if (sidebarVisibilitytype === 'show' || layoutType === "vertical" || layoutType === "twocolumn") {
-            document.querySelector(".hamburger-icon").classList.remove('open');
-        } else {
-            document.querySelector(".hamburger-icon").classList.add('open');
+        const btn = document.querySelector(".hamburger-icon");
+        if (btn) {
+            if (sidebarVisibilitytype === 'show' || layoutType === "vertical" || layoutType === "twocolumn") {
+                btn.classList.remove('open');
+            } else {
+                btn.classList.add('open');
+            }
         }
     }, [sidebarVisibilitytype, layoutType]);
 

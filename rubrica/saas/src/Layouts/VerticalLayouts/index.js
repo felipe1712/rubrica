@@ -86,7 +86,9 @@ const VerticalLayout = (props) => {
         const initMenu = () => {
             const pathName = process.env.PUBLIC_URL + props.router.location.pathname;
             const ul = document.getElementById("navbar-nav");
+            if (!ul) return;
             const items = ul.getElementsByTagName("a");
+            if (!items) return;
             let itemsArray = [...items]; // converts NodeList to Array
             removeActivation(itemsArray);
             let matchingMenuItem = itemsArray.find((x) => {

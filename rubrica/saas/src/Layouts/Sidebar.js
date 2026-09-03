@@ -16,12 +16,17 @@ const Sidebar = ({ layoutType }) => {
 
   useEffect(() => {
     var verticalOverlay = document.getElementsByClassName("vertical-overlay");
-    if (verticalOverlay) {
-      verticalOverlay[0].addEventListener("click", function () {
+    if (verticalOverlay && verticalOverlay.length > 0 && verticalOverlay[0]) {
+      const handleOverlayClick = () => {
         document.body.classList.remove("vertical-sidebar-enable");
-      });
+      };
+      const el = verticalOverlay[0];
+      el.addEventListener("click", handleOverlayClick);
+      return () => {
+        el.removeEventListener("click", handleOverlayClick);
+      };
     }
-  });
+  }, []);
 
   const addEventListenerOnSmHoverMenu = () => {
     // add listener Sidebar Hover icon on change layout from setting
