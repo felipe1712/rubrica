@@ -368,7 +368,7 @@ const Settings = () => {
                                                     </div>
                                                     <div className="text-end">
                                                         <div className="fs-24 fw-bold">$0 MXN</div>
-                                                        <div className="fs-12 text-white-50">Renovación mensual automática</div>
+                                                        <div className="fs-12 text-white-50">Gratis para siempre</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -381,9 +381,9 @@ const Settings = () => {
                                                         <CardBody className="p-4 d-flex flex-column justify-content-between">
                                                             <div>
                                                                 <h4 className="fw-bold">Estándar</h4>
-                                                                <div className="fs-22 fw-extrabold text-primary my-2">$499 <small className="fs-12 text-muted">MXN / mes</small></div>
+                                                                <div className="fs-22 fw-extrabold text-primary my-2">$199 <small className="fs-12 text-muted">MXN / mes</small></div>
                                                                 <ul className="list-unstyled text-start fs-13 text-muted my-3 line-height-lg">
-                                                                    <li>✓ <strong>50 Documentos</strong> / mes</li>
+                                                                    <li>✓ <strong>15 Documentos</strong> / mes</li>
                                                                     <li>✓ Hasta 3 Usuarios</li>
                                                                     <li>✓ Firma NOM-151 legal</li>
                                                                     <li>✓ Editor OnlyOffice Nube</li>
@@ -392,9 +392,9 @@ const Settings = () => {
                                                             <Button
                                                                 color="primary"
                                                                 className="w-100 fw-bold mt-3"
-                                                                onClick={() => handleStripeCheckout("Estándar", "price_standard_499")}
+                                                                onClick={() => handleStripeCheckout("standard")}
                                                             >
-                                                                Contratar con Stripe
+                                                                Contratar Estándar ($199)
                                                             </Button>
                                                         </CardBody>
                                                     </Card>
@@ -407,9 +407,9 @@ const Settings = () => {
                                                         <CardBody className="p-4 d-flex flex-column justify-content-between mt-2">
                                                             <div>
                                                                 <h4 className="fw-bold text-primary">Pro</h4>
-                                                                <div className="fs-22 fw-extrabold text-primary my-2">$1,299 <small className="fs-12 text-muted">MXN / mes</small></div>
+                                                                <div className="fs-22 fw-extrabold text-primary my-2">$499 <small className="fs-12 text-muted">MXN / mes</small></div>
                                                                 <ul className="list-unstyled text-start fs-13 text-muted my-3 line-height-lg">
-                                                                    <li>✓ <strong>250 Documentos</strong> / mes</li>
+                                                                    <li>✓ <strong>70 Documentos</strong> / mes</li>
                                                                     <li>✓ Hasta 10 Usuarios</li>
                                                                     <li>✓ Marca de agua propia</li>
                                                                     <li>✓ Soporte prioritario 24/7</li>
@@ -418,9 +418,9 @@ const Settings = () => {
                                                             <Button
                                                                 style={{ backgroundColor: "#3d4ed8", borderColor: "#3d4ed8" }}
                                                                 className="w-100 fw-bold mt-3 text-white"
-                                                                onClick={() => handleStripeCheckout("Pro", "price_pro_1299")}
+                                                                onClick={() => handleStripeCheckout("pro")}
                                                             >
-                                                                Upgrade a Pro con Stripe
+                                                                Upgrade a Pro ($499)
                                                             </Button>
                                                         </CardBody>
                                                     </Card>
@@ -432,7 +432,7 @@ const Settings = () => {
                                                         <CardBody className="p-4 d-flex flex-column justify-content-between">
                                                             <div>
                                                                 <h4 className="fw-bold">Enterprise</h4>
-                                                                <div className="fs-22 fw-extrabold text-dark my-2">$2,999 <small className="fs-12 text-muted">MXN / mes</small></div>
+                                                                <div className="fs-20 fw-extrabold text-dark my-2">Contáctanos</div>
                                                                 <ul className="list-unstyled text-start fs-13 text-muted my-3 line-height-lg">
                                                                     <li>✓ <strong>Docs e Ilimitados</strong></li>
                                                                     <li>✓ Usuarios Ilimitados</li>
@@ -443,9 +443,9 @@ const Settings = () => {
                                                             <Button
                                                                 color="dark"
                                                                 className="w-100 fw-bold mt-3"
-                                                                onClick={() => handleStripeCheckout("Enterprise", "price_enterprise_2999")}
+                                                                onClick={() => handleStripeCheckout("enterprise")}
                                                             >
-                                                                Contratar Enterprise
+                                                                Contactar Ventas
                                                             </Button>
                                                         </CardBody>
                                                     </Card>

@@ -40,12 +40,17 @@ const AdminGlobalDashboard = () => {
   const [nufiMsg, setNufiMsg] = useState(null);
   const [nufiLoading, setNufiLoading] = useState(false);
 
-  // Configuración Stripe
+  // Configuración Stripe & Enlaces de Pago
   const [stripeConfig, setStripeConfig] = useState({
     mode: "live",
     publishableKey: "pk_live_sample",
     webhookStatus: "Activo (200 OK)"
   });
+  const [stripeLinkStandard, setStripeLinkStandard] = useState("https://buy.stripe.com/test_standard_199");
+  const [stripeLinkPro, setStripeLinkPro] = useState("https://buy.stripe.com/test_pro_499");
+  const [stripeLinkEnterprise, setStripeLinkEnterprise] = useState("https://rubricalo.com/#contacto");
+  const [stripeMsg, setStripeMsg] = useState(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
 
   // Documentos Legales
   const [termsText, setTermsText] = useState("Términos y Condiciones de Uso de Rubrícalo México.");
@@ -75,14 +80,15 @@ const AdminGlobalDashboard = () => {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      const [resStats, resUsers, resTenants, resSignatures, resContainers, resEmail, resNufi] = await Promise.all([
+      const [resStats, resUsers, resTenants, resSignatures, resContainers, resEmail, resNufi, resStripe] = await Promise.all([
         fetch(`${API_URL}/admin/global/stats`, { headers }),
         fetch(`${API_URL}/admin/global/users`, { headers }),
         fetch(`${API_URL}/admin/global/tenants`, { headers }),
         fetch(`${API_URL}/admin/global/signatures`, { headers }),
         fetch(`${API_URL}/admin/global/containers`, { headers }),
         fetch(`${API_URL}/admin/global/email-config`, { headers }),
-        fetch(`${API_URL}/admin/global/nufi-config`, { headers })
+        fetch(`${API_URL}/admin/global/nufi-config`, { headers }),
+        fetch(`${API_URL}/admin/global/stripe-config`, { headers })
       ]);
 
       if (resStats.ok) setStats(await resStats.json());
@@ -102,6 +108,12 @@ const AdminGlobalDashboard = () => {
         const data = await resNufi.json();
         setNufiApiUrl(data.apiUrl || "https://nufi.azure-api.net");
         setNufiWebhookUrl(data.webhookUrl || "https://api.rubricalo.com/webhooks/nufi");
+      }
+      if (resStripe.ok) {
+        const data = await resStripe.json();
+        setStripeLinkStandard(data.stripeLinkStandard || "https://buy.stripe.com/test_standard_199");
+        setStripeLinkPro(data.stripeLinkPro || "https://buy.stripe.com/test_pro_499");
+        setStripeLinkEnterprise(data.stripeLinkEnterprise || "https://rubricalo.com/#contacto");
       }
     } catch (e) {
       console.error("Error al cargar datos de administración global:", e);
@@ -169,6 +181,33 @@ const AdminGlobalDashboard = () => {
       setNufiMsg(`Error: ${err.message}`);
     } finally {
       setNufiLoading(false);
+    }
+  };
+
+  const handleUpdateStripeConfig = async (e) => {
+    e.preventDefault();
+    setStripeLoading(true);
+    setStripeMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/admin/global/stripe-config`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify({
+          stripeLinkStandard,
+          stripeLinkPro,
+          stripeLinkEnterprise
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al actualizar enlaces de Stripe.");
+      setStripeMsg("¡Enlaces de cobro de Stripe guardados correctamente!");
+    } catch (err) {
+      setStripeMsg(`Error: ${err.message}`);
+    } finally {
+      setStripeLoading(false);
     }
   };
 
@@ -427,7 +466,7 @@ const AdminGlobalDashboard = () => {
                                   </Badge>
                                 </td>
                                 <td className="fw-bold">
-                                  ${t.plan === "enterprise" ? "2,999" : t.plan === "pro" ? "1,299" : "499"} MXN / mes
+                                  ${t.plan === "enterprise" ? "Contactar" : t.plan === "pro" ? "499" : "199"} MXN / mes
                                 </td>
                                 <td><Badge color="success">Al día (Stripe)</Badge></td>
                               </tr>
@@ -617,6 +656,52 @@ const AdminGlobalDashboard = () => {
                         </Card>
                       </Col>
                     </Row>
+
+                    <h6 className="fw-bold text-dark mb-3">Enlaces de Pago / Botones de Compra de Stripe por Paquete</h6>
+                    {stripeMsg && <Alert color="info">{stripeMsg}</Alert>}
+                    <Form onSubmit={handleUpdateStripeConfig}>
+                      <Row>
+                        <Col lg={4} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Estándar ($199 MXN / mes)</Label>
+                          <Input
+                            type="text"
+                            placeholder="https://buy.stripe.com/..."
+                            value={stripeLinkStandard}
+                            onChange={(e) => setStripeLinkStandard(e.target.value)}
+                          />
+                          <small className="text-muted">15 documentos / mes, hasta 3 usuarios.</small>
+                        </Col>
+
+                        <Col lg={4} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Pro ($499 MXN / mes)</Label>
+                          <Input
+                            type="text"
+                            placeholder="https://buy.stripe.com/..."
+                            value={stripeLinkPro}
+                            onChange={(e) => setStripeLinkPro(e.target.value)}
+                          />
+                          <small className="text-muted">70 documentos / mes, hasta 10 usuarios.</small>
+                        </Col>
+
+                        <Col lg={4} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Enterprise (Contáctanos)</Label>
+                          <Input
+                            type="text"
+                            placeholder="https://rubricalo.com/#contacto"
+                            value={stripeLinkEnterprise}
+                            onChange={(e) => setStripeLinkEnterprise(e.target.value)}
+                          />
+                          <small className="text-muted">Documentos e usuarios ilimitados.</small>
+                        </Col>
+
+                        <Col lg={12} className="text-end">
+                          <Button type="submit" style={{ backgroundColor: "#3d4ed8", borderColor: "#3d4ed8" }} disabled={stripeLoading} className="fw-bold">
+                            {stripeLoading ? <Spinner size="sm" className="me-2"> Guardando... </Spinner> : null}
+                            Guardar Enlaces de Cobro de Stripe
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
                   </TabPane>
 
                   {/* 6. FIRMA DIGITAL */}
@@ -733,10 +818,10 @@ const AdminGlobalDashboard = () => {
           <div className="mb-3">
             <Label className="form-label fw-bold">Plan / Membresía</Label>
             <Input type="select" value={newPlan} onChange={(e) => setNewPlan(e.target.value)}>
-              <option value="free">Gratuito ($0 MXN)</option>
-              <option value="standard">Estándar ($499 MXN / mes)</option>
-              <option value="pro">Pro ($1,299 MXN / mes)</option>
-              <option value="enterprise">Enterprise ($2,999 MXN / mes)</option>
+              <option value="free">Gratuito ($0 MXN - 3 docs/mes)</option>
+              <option value="standard">Estándar ($199 MXN / mes - 15 docs/mes)</option>
+              <option value="pro">Pro ($499 MXN / mes - 70 docs/mes)</option>
+              <option value="enterprise">Enterprise (Contáctanos - Ilimitado)</option>
             </Input>
           </div>
           <div className="mb-3">

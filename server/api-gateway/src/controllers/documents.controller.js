@@ -170,8 +170,8 @@ exports.uploadDocument = async (req, res) => {
     const PLAN_DOC_LIMITS = {
       free: 3,
       gratis: 3,
-      standard: 50,
-      pro: 250,
+      standard: 15,
+      pro: 70,
       enterprise: Infinity
     };
 

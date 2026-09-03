@@ -9,9 +9,12 @@ let globalConfig = {
   nufiApiKey: process.env.NUFI_API_KEY || process.env.NUFI_SUBSCRIPTION_KEY || '',
   nufiApiUrl: process.env.NUFI_API_URL || 'https://nufi.azure-api.net',
   nufiWebhookUrl: process.env.NUFI_WEBHOOK_URL || 'https://api.rubricalo.com/webhooks/nufi',
-  stripeMode: process.env.STRIPE_MODE || 'test',
-  stripePublishableKey: process.env.STRIPE_PUBLIC_KEY || 'pk_test_rubricalo_sample',
+  stripeMode: process.env.STRIPE_MODE || 'live',
+  stripePublishableKey: process.env.STRIPE_PUBLIC_KEY || 'pk_live_sample',
   stripeWebhookStatus: 'active',
+  stripeLinkStandard: process.env.STRIPE_LINK_STANDARD || 'https://buy.stripe.com/test_standard_199',
+  stripeLinkPro: process.env.STRIPE_LINK_PRO || 'https://buy.stripe.com/test_pro_499',
+  stripeLinkEnterprise: process.env.STRIPE_LINK_ENTERPRISE || 'https://rubricalo.com/#contacto',
   legalTermsText: 'Términos y Condiciones de Uso de Rubrícalo México. Última actualización: Septiembre 2026.',
   legalPrivacyText: 'Aviso de Privacidad y Confidencialidad de Datos Personales. En cumplimiento con la LFPDPPP.'
 };
@@ -30,8 +33,8 @@ exports.getStats = async (req, res) => {
     const proTenants = await Tenant.count({ where: { plan: 'pro' } }).catch(() => 0);
     const enterpriseTenants = await Tenant.count({ where: { plan: 'enterprise' } }).catch(() => 0);
 
-    // Estimación de MRR (Ingreso Mensual Recurrente)
-    const mrr = (standardTenants * 499) + (proTenants * 1299) + (enterpriseTenants * 2999);
+    // Estimación de MRR (Ingreso Mensual Recurrente con nuevos precios: Estándar $199, Pro $499)
+    const mrr = (standardTenants * 199) + (proTenants * 499);
 
     res.json({
       mrr,
@@ -143,14 +146,39 @@ exports.getContainers = async (req, res) => {
   res.json({ containers, total: containers.length, healthyCount: containers.length });
 };
 
-// GET /admin/global/stripe-config — Estado de conexión Stripe
+// GET /admin/global/stripe-config — Estado de conexión Stripe y enlaces de pago
 exports.getStripeConfig = async (req, res) => {
   res.json({
     mode: globalConfig.stripeMode,
     publishableKey: globalConfig.stripePublishableKey,
     webhookEndpoint: 'https://api.rubricalo.com/webhooks/stripe',
-    webhookStatus: globalConfig.stripeWebhookStatus
+    webhookStatus: globalConfig.stripeWebhookStatus,
+    stripeLinkStandard: globalConfig.stripeLinkStandard,
+    stripeLinkPro: globalConfig.stripeLinkPro,
+    stripeLinkEnterprise: globalConfig.stripeLinkEnterprise
   });
+};
+
+// POST /admin/global/stripe-config — Actualizar enlaces de pago de Stripe
+exports.updateStripeConfig = async (req, res) => {
+  try {
+    const { publishableKey, stripeLinkStandard, stripeLinkPro, stripeLinkEnterprise } = req.body;
+
+    if (publishableKey) globalConfig.stripePublishableKey = publishableKey;
+    if (stripeLinkStandard) globalConfig.stripeLinkStandard = stripeLinkStandard;
+    if (stripeLinkPro) globalConfig.stripeLinkPro = stripeLinkPro;
+    if (stripeLinkEnterprise) globalConfig.stripeLinkEnterprise = stripeLinkEnterprise;
+
+    process.env.STRIPE_PUBLIC_KEY = globalConfig.stripePublishableKey;
+    process.env.STRIPE_LINK_STANDARD = globalConfig.stripeLinkStandard;
+    process.env.STRIPE_LINK_PRO = globalConfig.stripeLinkPro;
+    process.env.STRIPE_LINK_ENTERPRISE = globalConfig.stripeLinkEnterprise;
+
+    res.json({ message: 'Enlaces de cobro de Stripe actualizados correctamente.', config: globalConfig });
+  } catch (error) {
+    console.error('Error actualizando configuración de Stripe:', error);
+    res.status(500).json({ error: 'Error al actualizar Stripe.' });
+  }
 };
 
 // PUT /admin/global/legal — Actualizar documentos legales (Términos y Privacidad)

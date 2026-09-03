@@ -35,6 +35,7 @@ router.get('/containers', authenticateUser, verifyAdminAccess, adminGlobalContro
 
 // 5. Integración con Stripe
 router.get('/stripe-config', authenticateUser, verifyAdminAccess, adminGlobalController.getStripeConfig);
+router.post('/stripe-config', authenticateUser, verifyAdminAccess, adminGlobalController.updateStripeConfig);
 
 // 6. Configuración de Firma Digital Nufi
 router.get('/nufi-config', authenticateUser, verifyAdminAccess, adminGlobalController.getNufiConfig);
