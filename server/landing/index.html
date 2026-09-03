@@ -481,9 +481,18 @@
     <!-- PRECIOS Y PLANES -->
     <section id="precios" style="padding: 90px 0; background: #ffffff;">
         <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
+            <div class="text-center" style="margin-bottom: 40px;">
                 <h2 style="font-weight: 800; color: #0f172a;">Planes transparentes para cada etapa de tu empresa</h2>
-                <p style="color: #64748b; font-size: 1.1rem;">Comienza gratis y escala conforme crezca tu volumen documental.</p>
+                <p style="color: #64748b; font-size: 1.1rem; margin-bottom: 25px;">Comienza gratis y escala conforme crezca tu volumen documental.</p>
+                
+                <!-- TOGGLE PAGO MENSUAL / ANUAL -->
+                <div style="display: inline-flex; align-items: center; background: #f1f5f9; padding: 6px 18px; border-radius: 30px; border: 1px solid #cbd5e1; gap: 12px;">
+                    <span id="btnMonthly" style="font-weight: 700; color: #3d4ed8; cursor: pointer; font-size: 0.95rem;">Pago Mensual</span>
+                    <input type="checkbox" id="pricingToggle" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span id="btnAnnual" style="font-weight: 700; color: #64748b; cursor: pointer; font-size: 0.95rem;">
+                        Pago Anual <span style="background: #dcfce7; color: #15803d; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; margin-left: 4px;">2 Meses Gratis 🎉</span>
+                    </span>
+                </div>
             </div>
 
             <div class="row">
@@ -513,8 +522,8 @@
                     <div class="pricing-card">
                         <h3 style="font-weight: 700;">Estándar</h3>
                         <p style="color: #64748b; font-size: 0.9rem;">Para profesionales y PyMEs</p>
-                        <div class="price-amount">$199</div>
-                        <div class="price-period">MXN / mes</div>
+                        <div class="price-amount" id="priceStandard">$199</div>
+                        <div class="price-period" id="pricePeriodStandard">MXN / mes</div>
                         <hr style="margin: 20px 0;" />
                         <ul style="list-style: none; padding: 0; text-align: left; line-height: 2.2; font-size: 0.95rem; color: #334155;">
                             <li>✓ <strong>15 Documentos</strong> / mes</li>
@@ -534,8 +543,8 @@
                     <div class="pricing-card featured">
                         <h3 style="font-weight: 700;">Pro</h3>
                         <p style="color: #64748b; font-size: 0.9rem;">Empresas en crecimiento</p>
-                        <div class="price-amount">$499</div>
-                        <div class="price-period">MXN / mes</div>
+                        <div class="price-amount" id="pricePro">$499</div>
+                        <div class="price-period" id="pricePeriodPro">MXN / mes</div>
                         <hr style="margin: 20px 0;" />
                         <ul style="list-style: none; padding: 0; text-align: left; line-height: 2.2; font-size: 0.95rem; color: #334155;">
                             <li>✓ <strong>70 Documentos</strong> / mes</li>
@@ -706,6 +715,25 @@
         }
         $(window).on('scroll load resize', checkScroll);
         checkScroll();
+
+        $('#pricingToggle').on('change', function() {
+            var isAnnual = $(this).is(':checked');
+            if (isAnnual) {
+                $('#btnMonthly').css('color', '#64748b');
+                $('#btnAnnual').css('color', '#3d4ed8');
+                $('#priceStandard').html('$1,990');
+                $('#pricePeriodStandard').html('MXN / año <small style="display:block; color:#10b981; font-weight:bold; font-size:0.8rem;">($165 MXN/mes)</small>');
+                $('#pricePro').html('$4,990');
+                $('#pricePeriodPro').html('MXN / año <small style="display:block; color:#10b981; font-weight:bold; font-size:0.8rem;">($415 MXN/mes)</small>');
+            } else {
+                $('#btnMonthly').css('color', '#3d4ed8');
+                $('#btnAnnual').css('color', '#64748b');
+                $('#priceStandard').html('$199');
+                $('#pricePeriodStandard').html('MXN / mes');
+                $('#pricePro').html('$499');
+                $('#pricePeriodPro').html('MXN / mes');
+            }
+        });
 
         $('#registerForm').on('submit', function(e) {
             e.preventDefault();

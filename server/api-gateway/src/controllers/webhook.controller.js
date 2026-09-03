@@ -155,11 +155,14 @@ exports.handleStripeWebhook = async (req, res) => {
       case 'invoice.payment_succeeded': {
         const amountPaidCents = dataObject.amount_paid || dataObject.amount_total || 0;
         const amountPaidMxn = amountPaidCents / 100;
+        const isAnnualPaid = amountPaidMxn >= 1500;
 
         let detectedPlan = 'standard';
-        if (amountPaidMxn >= 400 || (dataObject.lines?.data?.[0]?.description || '').toLowerCase().includes('pro')) {
+        if (amountPaidMxn >= 4500 || (dataObject.lines?.data?.[0]?.description || '').toLowerCase().includes('pro annual')) {
           detectedPlan = 'pro';
-        } else if (amountPaidMxn >= 2000 || (dataObject.lines?.data?.[0]?.description || '').toLowerCase().includes('enterprise')) {
+        } else if (amountPaidMxn >= 400 && amountPaidMxn < 1500) {
+          detectedPlan = 'pro';
+        } else if (amountPaidMxn >= 8000) {
           detectedPlan = 'enterprise';
         }
 
@@ -174,9 +177,9 @@ exports.handleStripeWebhook = async (req, res) => {
             to: customerEmail,
             name: user?.name || tenant.name,
             companyName: tenant.name,
-            planName: detectedPlan,
-            amount: amountPaidMxn > 0 ? amountPaidMxn : (detectedPlan === 'pro' ? 499 : 199),
-            nextBillingDate: 'En 30 días'
+            planName: `${detectedPlan} ${isAnnualPaid ? '(ANUAL)' : '(MENSUAL)'}`,
+            amount: amountPaidMxn > 0 ? amountPaidMxn : (detectedPlan === 'pro' ? (isAnnualPaid ? 4990 : 499) : (isAnnualPaid ? 1990 : 199)),
+            nextBillingDate: isAnnualPaid ? 'En 1 año (Facturación Anual)' : 'En 30 días (Facturación Mensual)'
           }).catch(e => console.error('Error enviando correo de pago:', e));
         }
         break;

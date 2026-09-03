@@ -32,6 +32,16 @@ const Settings = () => {
     const [twoFACode, setTwoFACode] = useState("");
     const [twoFAMsg, setTwoFAMsg] = useState(null);
 
+    // Conmutador de Pago Anual vs Mensual
+    const [isAnnual, setIsAnnual] = useState(false);
+    const [stripeLinks, setStripeLinks] = useState({
+        standard: "https://buy.stripe.com/test_standard_199",
+        standardAnnual: "https://buy.stripe.com/test_standard_annual_1990",
+        pro: "https://buy.stripe.com/test_pro_499",
+        proAnnual: "https://buy.stripe.com/test_pro_annual_4990",
+        enterprise: "https://rubricalo.com/#contacto"
+    });
+
     useEffect(() => {
         const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
         if (raw) {
@@ -47,6 +57,23 @@ const Settings = () => {
                 }
             } catch (e) {}
         }
+
+        const fetchStripeConfig = async () => {
+            try {
+                const res = await fetch(`${API_URL}/admin/global/stripe-config`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setStripeLinks({
+                        standard: data.stripeLinkStandard || "https://buy.stripe.com/test_standard_199",
+                        standardAnnual: data.stripeLinkStandardAnnual || "https://buy.stripe.com/test_standard_annual_1990",
+                        pro: data.stripeLinkPro || "https://buy.stripe.com/test_pro_499",
+                        proAnnual: data.stripeLinkProAnnual || "https://buy.stripe.com/test_pro_annual_4990",
+                        enterprise: data.stripeLinkEnterprise || "https://rubricalo.com/#contacto"
+                    });
+                }
+            } catch (e) {}
+        };
+        fetchStripeConfig();
     }, []);
 
     const tabChange = (tab) => {
@@ -113,8 +140,12 @@ const Settings = () => {
     };
 
     // Links de pago de Stripe
-    const handleStripeCheckout = (planName, priceId) => {
-        window.open(`https://checkout.stripe.com/pay/${priceId}?prefilled_email=${encodeURIComponent(email)}`, '_blank');
+    const handleStripeCheckout = (planKey) => {
+        let url = stripeLinks[planKey];
+        if (isAnnual && planKey === 'standard') url = stripeLinks.standardAnnual || url;
+        if (isAnnual && planKey === 'pro') url = stripeLinks.proAnnual || url;
+
+        window.open(url || "https://rubricalo.com/#precios", '_blank');
     };
 
     return (
@@ -373,7 +404,30 @@ const Settings = () => {
                                                 </div>
                                             </div>
 
-                                            <h5 className="fw-bold text-dark mb-3">Cambiar de Plan (Cobros Recurrentes vía Stripe)</h5>
+                                            <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                                                <div>
+                                                    <h5 className="fw-bold text-dark mb-1">Cambiar de Plan (Cobros Recurrentes vía Stripe)</h5>
+                                                    <p className="text-muted fs-13 mb-0">Selecciona la frecuencia de cobro preferida para tu empresa.</p>
+                                                </div>
+                                                <div className="d-flex align-items-center gap-2 bg-light p-2 rounded border">
+                                                    <span className={`fs-13 fw-bold ${!isAnnual ? 'text-primary' : 'text-muted'}`}>Pago Mensual</span>
+                                                    <div className="form-check form-switch m-0" style={{ minHeight: 'auto' }}>
+                                                        <input
+                                                            className="form-check-input cursor-pointer"
+                                                            type="checkbox"
+                                                            role="switch"
+                                                            id="billingPeriodToggle"
+                                                            checked={isAnnual}
+                                                            onChange={(e) => setIsAnnual(e.target.checked)}
+                                                            style={{ width: '2.4em', height: '1.2em', cursor: 'pointer' }}
+                                                        />
+                                                    </div>
+                                                    <span className={`fs-13 fw-bold ${isAnnual ? 'text-success' : 'text-muted'}`}>
+                                                        Pago Anual <span className="badge bg-success-subtle text-success ms-1">2 Meses Gratis 🎉</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
                                             <Row>
                                                 {/* Plan Estándar */}
                                                 <Col lg={4} className="mb-3">
@@ -381,7 +435,10 @@ const Settings = () => {
                                                         <CardBody className="p-4 d-flex flex-column justify-content-between">
                                                             <div>
                                                                 <h4 className="fw-bold">Estándar</h4>
-                                                                <div className="fs-22 fw-extrabold text-primary my-2">$199 <small className="fs-12 text-muted">MXN / mes</small></div>
+                                                                <div className="fs-22 fw-extrabold text-primary my-2">
+                                                                    {isAnnual ? "$1,990" : "$199"} <small className="fs-12 text-muted">{isAnnual ? "MXN / año" : "MXN / mes"}</small>
+                                                                </div>
+                                                                {isAnnual && <div className="fs-12 text-success fw-bold mb-2">Equivalente a $165 MXN / mes</div>}
                                                                 <ul className="list-unstyled text-start fs-13 text-muted my-3 line-height-lg">
                                                                     <li>✓ <strong>15 Documentos</strong> / mes</li>
                                                                     <li>✓ Hasta 3 Usuarios</li>
@@ -394,7 +451,7 @@ const Settings = () => {
                                                                 className="w-100 fw-bold mt-3"
                                                                 onClick={() => handleStripeCheckout("standard")}
                                                             >
-                                                                Contratar Estándar ($199)
+                                                                {isAnnual ? "Contratar Estándar Anual ($1,990)" : "Contratar Estándar Mensual ($199)"}
                                                             </Button>
                                                         </CardBody>
                                                     </Card>
@@ -407,7 +464,10 @@ const Settings = () => {
                                                         <CardBody className="p-4 d-flex flex-column justify-content-between mt-2">
                                                             <div>
                                                                 <h4 className="fw-bold text-primary">Pro</h4>
-                                                                <div className="fs-22 fw-extrabold text-primary my-2">$499 <small className="fs-12 text-muted">MXN / mes</small></div>
+                                                                <div className="fs-22 fw-extrabold text-primary my-2">
+                                                                    {isAnnual ? "$4,990" : "$499"} <small className="fs-12 text-muted">{isAnnual ? "MXN / año" : "MXN / mes"}</small>
+                                                                </div>
+                                                                {isAnnual && <div className="fs-12 text-success fw-bold mb-2">Equivalente a $415 MXN / mes</div>}
                                                                 <ul className="list-unstyled text-start fs-13 text-muted my-3 line-height-lg">
                                                                     <li>✓ <strong>70 Documentos</strong> / mes</li>
                                                                     <li>✓ Hasta 10 Usuarios</li>
@@ -420,7 +480,7 @@ const Settings = () => {
                                                                 className="w-100 fw-bold mt-3 text-white"
                                                                 onClick={() => handleStripeCheckout("pro")}
                                                             >
-                                                                Upgrade a Pro ($499)
+                                                                {isAnnual ? "Upgrade a Pro Anual ($4,990)" : "Upgrade a Pro Mensual ($499)"}
                                                             </Button>
                                                         </CardBody>
                                                     </Card>

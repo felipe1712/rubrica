@@ -112,7 +112,9 @@ const AdminGlobalDashboard = () => {
       if (resStripe.ok) {
         const data = await resStripe.json();
         setStripeLinkStandard(data.stripeLinkStandard || "https://buy.stripe.com/test_standard_199");
+        setStripeLinkStandardAnnual(data.stripeLinkStandardAnnual || "https://buy.stripe.com/test_standard_annual_1990");
         setStripeLinkPro(data.stripeLinkPro || "https://buy.stripe.com/test_pro_499");
+        setStripeLinkProAnnual(data.stripeLinkProAnnual || "https://buy.stripe.com/test_pro_annual_4990");
         setStripeLinkEnterprise(data.stripeLinkEnterprise || "https://rubricalo.com/#contacto");
       }
     } catch (e) {
@@ -197,7 +199,9 @@ const AdminGlobalDashboard = () => {
         },
         body: JSON.stringify({
           stripeLinkStandard,
+          stripeLinkStandardAnnual,
           stripeLinkPro,
+          stripeLinkProAnnual,
           stripeLinkEnterprise
         })
       });
@@ -657,33 +661,55 @@ const AdminGlobalDashboard = () => {
                       </Col>
                     </Row>
 
-                    <h6 className="fw-bold text-dark mb-3">Enlaces de Pago / Botones de Compra de Stripe por Paquete</h6>
+                    <h6 className="fw-bold text-dark mb-3">Enlaces de Pago / Botones de Compra de Stripe por Paquete (Mensual y Anual)</h6>
                     {stripeMsg && <Alert color="info">{stripeMsg}</Alert>}
                     <Form onSubmit={handleUpdateStripeConfig}>
                       <Row>
-                        <Col lg={4} className="mb-3">
-                          <Label className="form-label fw-bold">Plan Estándar ($199 MXN / mes)</Label>
+                        <Col lg={6} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Estándar — Mensual ($199 MXN / mes)</Label>
                           <Input
                             type="text"
                             placeholder="https://buy.stripe.com/..."
                             value={stripeLinkStandard}
                             onChange={(e) => setStripeLinkStandard(e.target.value)}
                           />
-                          <small className="text-muted">15 documentos / mes, hasta 3 usuarios.</small>
+                          <small className="text-muted">15 docs / mes, hasta 3 usuarios (cobro mensual).</small>
                         </Col>
 
-                        <Col lg={4} className="mb-3">
-                          <Label className="form-label fw-bold">Plan Pro ($499 MXN / mes)</Label>
+                        <Col lg={6} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Estándar — Anual ($1,990 MXN / año)</Label>
+                          <Input
+                            type="text"
+                            placeholder="https://buy.stripe.com/..."
+                            value={stripeLinkStandardAnnual}
+                            onChange={(e) => setStripeLinkStandardAnnual(e.target.value)}
+                          />
+                          <small className="text-muted">15 docs / mes (cobro anual con 2 meses gratis).</small>
+                        </Col>
+
+                        <Col lg={6} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Pro — Mensual ($499 MXN / mes)</Label>
                           <Input
                             type="text"
                             placeholder="https://buy.stripe.com/..."
                             value={stripeLinkPro}
                             onChange={(e) => setStripeLinkPro(e.target.value)}
                           />
-                          <small className="text-muted">70 documentos / mes, hasta 10 usuarios.</small>
+                          <small className="text-muted">70 docs / mes, hasta 10 usuarios (cobro mensual).</small>
                         </Col>
 
-                        <Col lg={4} className="mb-3">
+                        <Col lg={6} className="mb-3">
+                          <Label className="form-label fw-bold">Plan Pro — Anual ($4,990 MXN / año)</Label>
+                          <Input
+                            type="text"
+                            placeholder="https://buy.stripe.com/..."
+                            value={stripeLinkProAnnual}
+                            onChange={(e) => setStripeLinkProAnnual(e.target.value)}
+                          />
+                          <small className="text-muted">70 docs / mes (cobro anual con 2 meses gratis).</small>
+                        </Col>
+
+                        <Col lg={12} className="mb-3">
                           <Label className="form-label fw-bold">Plan Enterprise (Contáctanos)</Label>
                           <Input
                             type="text"
@@ -691,7 +717,7 @@ const AdminGlobalDashboard = () => {
                             value={stripeLinkEnterprise}
                             onChange={(e) => setStripeLinkEnterprise(e.target.value)}
                           />
-                          <small className="text-muted">Documentos e usuarios ilimitados.</small>
+                          <small className="text-muted">Documentos e usuarios ilimitados (personalizado).</small>
                         </Col>
 
                         <Col lg={12} className="text-end">

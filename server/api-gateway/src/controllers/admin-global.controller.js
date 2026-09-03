@@ -13,7 +13,9 @@ let globalConfig = {
   stripePublishableKey: process.env.STRIPE_PUBLIC_KEY || 'pk_live_sample',
   stripeWebhookStatus: 'active',
   stripeLinkStandard: process.env.STRIPE_LINK_STANDARD || 'https://buy.stripe.com/test_standard_199',
+  stripeLinkStandardAnnual: process.env.STRIPE_LINK_STANDARD_ANNUAL || 'https://buy.stripe.com/test_standard_annual_1990',
   stripeLinkPro: process.env.STRIPE_LINK_PRO || 'https://buy.stripe.com/test_pro_499',
+  stripeLinkProAnnual: process.env.STRIPE_LINK_PRO_ANNUAL || 'https://buy.stripe.com/test_pro_annual_4990',
   stripeLinkEnterprise: process.env.STRIPE_LINK_ENTERPRISE || 'https://rubricalo.com/#contacto',
   legalTermsText: 'Términos y Condiciones de Uso de Rubrícalo México. Última actualización: Septiembre 2026.',
   legalPrivacyText: 'Aviso de Privacidad y Confidencialidad de Datos Personales. En cumplimiento con la LFPDPPP.'
@@ -154,7 +156,9 @@ exports.getStripeConfig = async (req, res) => {
     webhookEndpoint: 'https://api.rubricalo.com/webhooks/stripe',
     webhookStatus: globalConfig.stripeWebhookStatus,
     stripeLinkStandard: globalConfig.stripeLinkStandard,
+    stripeLinkStandardAnnual: globalConfig.stripeLinkStandardAnnual,
     stripeLinkPro: globalConfig.stripeLinkPro,
+    stripeLinkProAnnual: globalConfig.stripeLinkProAnnual,
     stripeLinkEnterprise: globalConfig.stripeLinkEnterprise
   });
 };
@@ -162,16 +166,27 @@ exports.getStripeConfig = async (req, res) => {
 // POST /admin/global/stripe-config — Actualizar enlaces de pago de Stripe
 exports.updateStripeConfig = async (req, res) => {
   try {
-    const { publishableKey, stripeLinkStandard, stripeLinkPro, stripeLinkEnterprise } = req.body;
+    const {
+      publishableKey,
+      stripeLinkStandard,
+      stripeLinkStandardAnnual,
+      stripeLinkPro,
+      stripeLinkProAnnual,
+      stripeLinkEnterprise
+    } = req.body;
 
     if (publishableKey) globalConfig.stripePublishableKey = publishableKey;
     if (stripeLinkStandard) globalConfig.stripeLinkStandard = stripeLinkStandard;
+    if (stripeLinkStandardAnnual) globalConfig.stripeLinkStandardAnnual = stripeLinkStandardAnnual;
     if (stripeLinkPro) globalConfig.stripeLinkPro = stripeLinkPro;
+    if (stripeLinkProAnnual) globalConfig.stripeLinkProAnnual = stripeLinkProAnnual;
     if (stripeLinkEnterprise) globalConfig.stripeLinkEnterprise = stripeLinkEnterprise;
 
     process.env.STRIPE_PUBLIC_KEY = globalConfig.stripePublishableKey;
     process.env.STRIPE_LINK_STANDARD = globalConfig.stripeLinkStandard;
+    process.env.STRIPE_LINK_STANDARD_ANNUAL = globalConfig.stripeLinkStandardAnnual;
     process.env.STRIPE_LINK_PRO = globalConfig.stripeLinkPro;
+    process.env.STRIPE_LINK_PRO_ANNUAL = globalConfig.stripeLinkProAnnual;
     process.env.STRIPE_LINK_ENTERPRISE = globalConfig.stripeLinkEnterprise;
 
     res.json({ message: 'Enlaces de cobro de Stripe actualizados correctamente.', config: globalConfig });
