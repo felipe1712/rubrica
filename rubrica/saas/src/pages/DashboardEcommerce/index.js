@@ -107,8 +107,8 @@ const DashboardEcommerce = () => {
       if (raw) {
         const parsed = JSON.parse(raw);
         const u = parsed.user || {};
-        if (u.role === 'SUPERADMIN' || u.isSuperAdmin) {
-          window.location.href = "/admin/global";
+        if (u.role === 'SUPERADMIN' || u.isSuperAdmin || window.location.hostname.startsWith('admin')) {
+          window.location.href = "/";
           return;
         }
       }

@@ -35,8 +35,39 @@ import Error500 from "../pages/AuthenticationInner/Errors/Error500";
 import Maintenance from "../pages/Pages/Maintenance/Maintenance";
 import ComingSoon from "../pages/Pages/ComingSoon/ComingSoon";
 
-const authProtectedRoutes = [
-  // Dashboard principal
+const isSuperAdminSession = () => {
+  if (typeof window === "undefined") return false;
+  if (window.location.hostname.startsWith("admin")) return true;
+  try {
+    const raw = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const user = parsed.user || parsed;
+      if (user.role === 'SUPERADMIN' || user.isSuperAdmin) return true;
+    }
+  } catch (e) {}
+  return false;
+};
+
+const isSuperAdmin = isSuperAdminSession();
+
+const authProtectedRoutes = isSuperAdmin ? [
+  // SuperAdmin Principal (Acceso Directo en Dominio admin.rubricalo.com)
+  { path: "/", exact: true,        component: <AdminGlobalDashboard /> },
+  { path: "/admin/global",        component: <AdminGlobalDashboard /> },
+  { path: "/admin",               component: <AdminGlobalDashboard /> },
+  { path: "/dashboard",           component: <AdminGlobalDashboard /> },
+
+  // Perfil y configuracion
+  { path: "/settings",                component: <Settings /> },
+  { path: "/profile",                 component: <UserProfile /> },
+  { path: "/perfil",                  component: <UserProfile /> },
+  { path: "/cambiar-password",        component: <Settings /> },
+
+  // Catch-all para SuperAdmin -> AdminGlobalDashboard
+  { path: "*",                        component: <AdminGlobalDashboard /> },
+] : [
+  // Dashboard principal clientes
   { path: "/dashboard", component: <DashboardEcommerce /> },
   { path: "/index",     component: <DashboardEcommerce /> },
 
@@ -55,8 +86,8 @@ const authProtectedRoutes = [
   { path: "/usuarios",            component: <Usuarios /> },
 
   // SuperAdmin Dashboard (Plataforma)
-  { path: "/admin",               component: <AdminDashboard /> },
-  { path: "/admin/dashboard",     component: <AdminDashboard /> },
+  { path: "/admin",               component: <AdminGlobalDashboard /> },
+  { path: "/admin/dashboard",     component: <AdminGlobalDashboard /> },
   { path: "/admin/global",        component: <AdminGlobalDashboard /> },
 
   // Facturación
@@ -74,7 +105,7 @@ const authProtectedRoutes = [
   { path: "/pages-profile-settings",  component: <Settings /> },
   { path: "/cambiar-password",        component: <Settings /> },
 
-  // Catch-all -> dashboard
+  // Catch-all clientes -> dashboard
   { path: "/", exact: true, component: <Navigate to="/dashboard" /> },
   { path: "*",              component: <Navigate to="/dashboard" /> },
 ];

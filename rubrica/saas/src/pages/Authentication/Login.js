@@ -37,8 +37,8 @@ const Login = (props) => {
     const checkRedirect = (usr) => {
         if (!usr) return;
         const u = usr.user || usr;
-        const isSA = u.role === 'SUPERADMIN' || u.isSuperAdmin;
-        window.location.href = isSA ? "/admin/global" : "/dashboard";
+        const isSA = u.role === 'SUPERADMIN' || u.isSuperAdmin || window.location.hostname.startsWith('admin');
+        window.location.href = isSA ? "/" : "/dashboard";
     };
 
     useEffect(() => {
