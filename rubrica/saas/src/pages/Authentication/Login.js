@@ -34,9 +34,16 @@ const Login = (props) => {
     const [passwordShow, setPasswordShow] = useState(false);
     const [loginError, setLoginError] = useState(null);
 
+    const checkRedirect = (usr) => {
+        if (!usr) return;
+        const u = usr.user || usr;
+        const isSA = u.role === 'SUPERADMIN' || u.isSuperAdmin;
+        window.location.href = isSA ? "/admin/global" : "/dashboard";
+    };
+
     useEffect(() => {
         if (user && (user.token || user.user)) {
-            window.location.href = "/dashboard";
+            checkRedirect(user);
             return;
         }
         const authUser = sessionStorage.getItem("authUser") || localStorage.getItem("authUser");
@@ -44,7 +51,7 @@ const Login = (props) => {
             try {
                 const parsed = JSON.parse(authUser);
                 if (parsed && (parsed.token || parsed.user)) {
-                    window.location.href = "/dashboard";
+                    checkRedirect(parsed);
                 }
             } catch (e) {}
         }
@@ -73,7 +80,7 @@ const Login = (props) => {
                 if (res.ok && data.token) {
                     sessionStorage.setItem("authUser", JSON.stringify(data));
                     localStorage.setItem("authUser", JSON.stringify(data));
-                    window.location.href = "/dashboard";
+                    checkRedirect(data);
                 } else {
                     setLoginError(data.error || "Credenciales inválidas");
                     dispatch(apiError(data.error || "Credenciales inválidas"));

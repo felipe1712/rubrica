@@ -55,10 +55,6 @@ const Navdata = () => {
         label: "Administración Global",
         icon: "ri-shield-keyhole-line",
         link: "/admin/global",
-        click: function (e) {
-          e.preventDefault();
-          setIscurrentState("AdminGlobal");
-        },
         stateVariables: iscurrentState === "AdminGlobal",
       }
     ];
