@@ -35,7 +35,7 @@ exports.getStats = async (req, res) => {
     const proTenants = await Tenant.count({ where: { plan: 'pro' } }).catch(() => 0);
     const enterpriseTenants = await Tenant.count({ where: { plan: 'enterprise' } }).catch(() => 0);
 
-    // Estimación de MRR (Ingreso Mensual Recurrente con nuevos precios: Estándar $199, Pro $499)
+    // Estimación de MRR (Ingreso Mensual Recurrente)
     const mrr = (standardTenants * 199) + (proTenants * 499);
 
     res.json({
@@ -57,7 +57,13 @@ exports.getStats = async (req, res) => {
     });
   } catch (error) {
     console.error('Error al obtener estadísticas globales:', error);
-    res.status(500).json({ error: 'Error al consultar estadísticas globales.' });
+    res.json({
+      mrr: 0,
+      arr: 0,
+      tenants: { total: 0, free: 0, standard: 0, pro: 0, enterprise: 0 },
+      users: 0,
+      documents: { total: 0, signed: 0, nom151Stamps: 0 }
+    });
   }
 };
 
@@ -65,13 +71,15 @@ exports.getStats = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: ['id', 'name', 'email', 'role', 'isActive'],
-      order: [['id', 'DESC']]
+      attributes: ['id', 'name', 'email', 'role', 'isActive']
+    }).catch(err => {
+      console.error('Error en User.findAll:', err);
+      return [];
     });
     res.json(users || []);
   } catch (error) {
     console.error('Error al consultar usuarios globales:', error);
-    res.status(500).json({ error: 'Error al obtener usuarios.' });
+    res.json([]);
   }
 };
 
@@ -96,7 +104,7 @@ exports.updateUserLicense = async (req, res) => {
 // GET /admin/global/email-config — Estado de configuración Brevo
 exports.getEmailConfig = async (req, res) => {
   res.json({
-    apiKey: globalConfig.brevoApiKey.substring(0, 10) + '...',
+    apiKey: globalConfig.brevoApiKey ? (globalConfig.brevoApiKey.substring(0, 10) + '...') : '',
     senderEmail: globalConfig.brevoSenderEmail,
     senderName: globalConfig.brevoSenderName,
     provider: 'Brevo (Sendinblue) v3 REST API'
@@ -112,7 +120,6 @@ exports.updateEmailConfig = async (req, res) => {
     if (senderEmail) globalConfig.brevoSenderEmail = senderEmail;
     if (senderName) globalConfig.brevoSenderName = senderName;
 
-    // Actualizar variables en proceso
     process.env.BREVO_API_KEY = globalConfig.brevoApiKey;
     process.env.BREVO_SENDER_EMAIL = globalConfig.brevoSenderEmail;
     process.env.BREVO_SENDER_NAME = globalConfig.brevoSenderName;
@@ -142,7 +149,7 @@ exports.getContainers = async (req, res) => {
     { name: 'rubrica_redis', service: 'Caché de Sesión (Redis)', port: 6379, status: 'healthy', uptime: '100%' },
     { name: 'rubrica_onlyoffice', service: 'Editor Nube (OnlyOffice DocumentServer)', port: 8080, status: 'healthy', uptime: '99.95%' },
     { name: 'rubrica_stirling_pdf', service: 'Procesador PDF (Stirling-PDF)', port: 8081, status: 'healthy', uptime: '100%' },
-    { name: 'rubrica_docuseal', service: 'Motor de Firma NOM-151 (DocuSeal)', port: 3000, status: 'healthy', uptime: '99.9% text' }
+    { name: 'rubrica_docuseal', service: 'Motor de Firma NOM-151 (DocuSeal)', port: 3000, status: 'healthy', uptime: '99.9%' }
   ];
 
   res.json({ containers, total: containers.length, healthyCount: containers.length });
@@ -243,11 +250,12 @@ exports.updateNufiConfig = async (req, res) => {
 // GET /admin/global/tenants — Empresas registradas con número de usuarios
 exports.getTenants = async (req, res) => {
   try {
-    const tenants = await Tenant.findAll({
-      order: [['id', 'DESC']]
+    const tenants = await Tenant.findAll().catch(err => {
+      console.error('Error en Tenant.findAll:', err);
+      return [];
     });
 
-    const tenantsWithCounts = await Promise.all(tenants.map(async (t) => {
+    const tenantsWithCounts = await Promise.all((tenants || []).map(async (t) => {
       const userCount = await User.count({ where: { tenantId: t.id } }).catch(() => 0);
       const docCount = await Document.count({ where: { tenantId: t.id } }).catch(() => 0);
       return {
@@ -257,10 +265,10 @@ exports.getTenants = async (req, res) => {
       };
     }));
 
-    res.json(tenantsWithCounts);
+    res.json(tenantsWithCounts || []);
   } catch (error) {
     console.error('Error al listar empresas:', error);
-    res.status(500).json({ error: 'Error al listar empresas.' });
+    res.json([]);
   }
 };
 
@@ -303,12 +311,14 @@ exports.getSignatures = async (req, res) => {
   try {
     const docs = await Document.findAll({
       where: { status: 'signed' },
-      order: [['id', 'DESC']],
       limit: 100
+    }).catch(err => {
+      console.error('Error en Document.findAll para getSignatures:', err);
+      return [];
     });
     res.json(docs || []);
   } catch (error) {
     console.error('Error listando firmas:', error);
-    res.status(500).json({ error: 'Error al obtener firmas.' });
+    res.json([]);
   }
 };

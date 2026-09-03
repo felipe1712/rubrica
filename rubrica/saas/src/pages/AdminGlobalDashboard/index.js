@@ -81,51 +81,51 @@ const AdminGlobalDashboard = () => {
 
     try {
       const [resStats, resUsers, resTenants, resSignatures, resContainers, resEmail, resNufi, resStripe] = await Promise.all([
-        fetch(`${API_URL}/admin/global/stats`, { headers }),
-        fetch(`${API_URL}/admin/global/users`, { headers }),
-        fetch(`${API_URL}/admin/global/tenants`, { headers }),
-        fetch(`${API_URL}/admin/global/signatures`, { headers }),
-        fetch(`${API_URL}/admin/global/containers`, { headers }),
-        fetch(`${API_URL}/admin/global/email-config`, { headers }),
-        fetch(`${API_URL}/admin/global/nufi-config`, { headers }),
-        fetch(`${API_URL}/admin/global/stripe-config`, { headers })
+        fetch(`${API_URL}/admin/global/stats`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/users`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/tenants`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/signatures`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/containers`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/email-config`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/nufi-config`, { headers }).catch(() => null),
+        fetch(`${API_URL}/admin/global/stripe-config`, { headers }).catch(() => null)
       ]);
 
-      if (resStats.ok) {
+      if (resStats && resStats.ok) {
         const d = await resStats.json().catch(() => null);
         if (d) setStats(d);
       }
-      if (resUsers.ok) {
+      if (resUsers && resUsers.ok) {
         const d = await resUsers.json().catch(() => null);
         if (Array.isArray(d)) setUsers(d);
       }
-      if (resTenants.ok) {
+      if (resTenants && resTenants.ok) {
         const d = await resTenants.json().catch(() => null);
         if (Array.isArray(d)) setTenants(d);
       }
-      if (resSignatures.ok) {
+      if (resSignatures && resSignatures.ok) {
         const d = await resSignatures.json().catch(() => null);
         if (Array.isArray(d)) setSignatures(d);
       }
-      if (resContainers.ok) {
+      if (resContainers && resContainers.ok) {
         const data = await resContainers.json().catch(() => null);
         if (data && Array.isArray(data.containers)) setContainers(data.containers);
       }
-      if (resEmail.ok) {
+      if (resEmail && resEmail.ok) {
         const data = await resEmail.json().catch(() => null);
         if (data) {
           setBrevoSenderEmail(data.senderEmail || "soporte@rubricalo.com");
           setBrevoSenderName(data.senderName || "Rubrícalo México");
         }
       }
-      if (resNufi.ok) {
+      if (resNufi && resNufi.ok) {
         const data = await resNufi.json().catch(() => null);
         if (data) {
           setNufiApiUrl(data.apiUrl || "https://nufi.azure-api.net");
           setNufiWebhookUrl(data.webhookUrl || "https://api.rubricalo.com/webhooks/nufi");
         }
       }
-      if (resStripe.ok) {
+      if (resStripe && resStripe.ok) {
         const data = await resStripe.json().catch(() => null);
         if (data) {
           setStripeLinkStandard(data.stripeLinkStandard || "https://buy.stripe.com/test_standard_199");
