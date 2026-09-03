@@ -514,25 +514,27 @@ const AdminGlobalDashboard = () => {
                             <th>Empresa / Organización</th>
                             <th>Correo de Contacto</th>
                             <th>Plan / Membresía</th>
-                            <th>Usuarios Registrados</th>
+                            <th>Usuarios</th>
+                            <th>Documentos</th>
                             <th>Estado</th>
                             <th className="text-end">Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {tenants.map((t) => (
+                          {safeTenants.map((t) => (
                             <tr key={t.id}>
                               <td className="fw-bold text-dark">{t.name}</td>
-                              <td>{t.email}</td>
+                              <td>{t.email || "—"}</td>
                               <td>
                                 <Badge color={t.plan === "enterprise" ? "dark" : t.plan === "pro" ? "primary" : t.plan === "standard" ? "info" : "secondary"}>
-                                  {t.plan ? t.plan.toUpperCase() : "GRATIS"}
+                                  {(t.plan || "free").toUpperCase()}
                                 </Badge>
                               </td>
-                              <td><Badge color="light" className="text-dark fs-12">{t.userCount || 0} usuarios</Badge></td>
+                              <td><span className="badge bg-light text-dark">{t.userCount || 0} usuarios</span></td>
+                              <td><span className="badge bg-light text-dark">{t.docCount || 0} docs</span></td>
                               <td>
                                 <Badge color={t.status === "active" ? "success" : "danger"}>
-                                  {t.status === "active" ? "Activa" : "Bloqueada / Suspendida"}
+                                  {t.status === "active" ? "ACTIVA" : "BLOQUEADA"}
                                 </Badge>
                               </td>
                               <td className="text-end">
@@ -543,27 +545,19 @@ const AdminGlobalDashboard = () => {
                                   className="me-2"
                                   onClick={() => {
                                     setSelectedTenant(t);
-                              <td className="fw-bold">{t.name}</td>
-                              <td>{t.email || "—"}</td>
-                              <td>
-                                <Badge color={t.plan === 'pro' ? 'primary' : t.plan === 'standard' ? 'info' : t.plan === 'enterprise' ? 'dark' : 'secondary'}>
-                                  {(t.plan || 'free').toUpperCase()}
-                                </Badge>
-                              </td>
-                              <td><span className="badge bg-light text-dark">{t.userCount || 0} usuarios</span></td>
-                              <td><span className="badge bg-light text-dark">{t.docCount || 0} docs</span></td>
-                              <td>
-                                <Badge color={t.status === 'active' ? 'success' : 'danger'}>
-                                  {t.status === 'active' ? 'ACTIVA' : 'BLOQUEADA'}
-                                </Badge>
-                              </td>
-                              <td>
+                                    setNewPlan(t.plan || "standard");
+                                    setNewTenantStatus(t.status || "active");
+                                    setModalTenantOpen(true);
+                                  }}
+                                >
+                                  <i className="ri-edit-line me-1"></i> Editar
+                                </Button>
                                 <Button
                                   size="sm"
-                                  color={t.status === 'active' ? 'warning' : 'success'}
+                                  color={t.status === "active" ? "warning" : "success"}
                                   onClick={() => handleToggleTenantStatus(t)}
                                 >
-                                  {t.status === 'active' ? 'Bloquear' : 'Desbloquear'}
+                                  {t.status === "active" ? "Bloquear" : "Desbloquear"}
                                 </Button>
                               </td>
                             </tr>
