@@ -65,8 +65,8 @@ exports.getStats = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: ['id', 'name', 'email', 'role', 'isActive', 'created_at'],
-      order: [sequelize.literal('created_at DESC')]
+      attributes: ['id', 'name', 'email', 'role', 'isActive'],
+      order: [['id', 'DESC']]
     });
     res.json(users || []);
   } catch (error) {
@@ -244,7 +244,7 @@ exports.updateNufiConfig = async (req, res) => {
 exports.getTenants = async (req, res) => {
   try {
     const tenants = await Tenant.findAll({
-      order: [sequelize.literal('created_at DESC')]
+      order: [['id', 'DESC']]
     });
 
     const tenantsWithCounts = await Promise.all(tenants.map(async (t) => {
@@ -303,7 +303,7 @@ exports.getSignatures = async (req, res) => {
   try {
     const docs = await Document.findAll({
       where: { status: 'signed' },
-      order: [sequelize.literal('updated_at DESC')],
+      order: [['id', 'DESC']],
       limit: 100
     });
     res.json(docs || []);

@@ -91,31 +91,49 @@ const AdminGlobalDashboard = () => {
         fetch(`${API_URL}/admin/global/stripe-config`, { headers })
       ]);
 
-      if (resStats.ok) setStats(await resStats.json());
-      if (resUsers.ok) setUsers(await resUsers.json());
-      if (resTenants.ok) setTenants(await resTenants.json());
-      if (resSignatures.ok) setSignatures(await resSignatures.json());
+      if (resStats.ok) {
+        const d = await resStats.json().catch(() => null);
+        if (d) setStats(d);
+      }
+      if (resUsers.ok) {
+        const d = await resUsers.json().catch(() => null);
+        if (Array.isArray(d)) setUsers(d);
+      }
+      if (resTenants.ok) {
+        const d = await resTenants.json().catch(() => null);
+        if (Array.isArray(d)) setTenants(d);
+      }
+      if (resSignatures.ok) {
+        const d = await resSignatures.json().catch(() => null);
+        if (Array.isArray(d)) setSignatures(d);
+      }
       if (resContainers.ok) {
-        const data = await resContainers.json();
-        setContainers(data.containers || []);
+        const data = await resContainers.json().catch(() => null);
+        if (data && Array.isArray(data.containers)) setContainers(data.containers);
       }
       if (resEmail.ok) {
-        const data = await resEmail.json();
-        setBrevoSenderEmail(data.senderEmail || "soporte@rubricalo.com");
-        setBrevoSenderName(data.senderName || "Rubrícalo México");
+        const data = await resEmail.json().catch(() => null);
+        if (data) {
+          setBrevoSenderEmail(data.senderEmail || "soporte@rubricalo.com");
+          setBrevoSenderName(data.senderName || "Rubrícalo México");
+        }
       }
       if (resNufi.ok) {
-        const data = await resNufi.json();
-        setNufiApiUrl(data.apiUrl || "https://nufi.azure-api.net");
-        setNufiWebhookUrl(data.webhookUrl || "https://api.rubricalo.com/webhooks/nufi");
+        const data = await resNufi.json().catch(() => null);
+        if (data) {
+          setNufiApiUrl(data.apiUrl || "https://nufi.azure-api.net");
+          setNufiWebhookUrl(data.webhookUrl || "https://api.rubricalo.com/webhooks/nufi");
+        }
       }
       if (resStripe.ok) {
-        const data = await resStripe.json();
-        setStripeLinkStandard(data.stripeLinkStandard || "https://buy.stripe.com/test_standard_199");
-        setStripeLinkStandardAnnual(data.stripeLinkStandardAnnual || "https://buy.stripe.com/test_standard_annual_1990");
-        setStripeLinkPro(data.stripeLinkPro || "https://buy.stripe.com/test_pro_499");
-        setStripeLinkProAnnual(data.stripeLinkProAnnual || "https://buy.stripe.com/test_pro_annual_4990");
-        setStripeLinkEnterprise(data.stripeLinkEnterprise || "https://rubricalo.com/#contacto");
+        const data = await resStripe.json().catch(() => null);
+        if (data) {
+          setStripeLinkStandard(data.stripeLinkStandard || "https://buy.stripe.com/test_standard_199");
+          setStripeLinkStandardAnnual(data.stripeLinkStandardAnnual || "https://buy.stripe.com/test_standard_annual_1990");
+          setStripeLinkPro(data.stripeLinkPro || "https://buy.stripe.com/test_pro_499");
+          setStripeLinkProAnnual(data.stripeLinkProAnnual || "https://buy.stripe.com/test_pro_annual_4990");
+          setStripeLinkEnterprise(data.stripeLinkEnterprise || "https://rubricalo.com/#contacto");
+        }
       }
     } catch (e) {
       console.error("Error al cargar datos de administración global:", e);
@@ -285,14 +303,19 @@ const AdminGlobalDashboard = () => {
     }
   };
 
-  const paidTenants = tenants.filter(t => t.plan === 'standard' || t.plan === 'pro' || t.plan === 'enterprise');
+  const safeTenants = Array.isArray(tenants) ? tenants : [];
+  const safeUsers = Array.isArray(users) ? users : [];
+  const safeSignatures = Array.isArray(signatures) ? signatures : [];
+  const safeContainers = Array.isArray(containers) ? containers : [];
+
+  const paidTenants = safeTenants.filter(t => t.plan === 'standard' || t.plan === 'pro' || t.plan === 'enterprise');
 
   // Configuración de los 8 Recuadros de Navegación (Grid Cards) en el orden solicitado
   const navCards = [
     {
       id: "ingresos",
       label: "Ingresos",
-      value: `$${stats.mrr ? stats.mrr.toLocaleString() : 0} MXN`,
+      value: `$${stats && stats.mrr ? stats.mrr.toLocaleString() : 0} MXN`,
       subtitle: "Desglose de empresas de paga",
       icon: "ri-money-dollar-circle-line",
       badgeColor: "bg-primary text-white"
@@ -300,7 +323,7 @@ const AdminGlobalDashboard = () => {
     {
       id: "empresas",
       label: "Empresas Registradas",
-      value: `${tenants.length || 0} Registradas`,
+      value: `${safeTenants.length} Registradas`,
       subtitle: "Control y modificación de planes",
       icon: "ri-building-line",
       badgeColor: "bg-info-subtle text-info"
@@ -308,7 +331,7 @@ const AdminGlobalDashboard = () => {
     {
       id: "usuarios",
       label: "Usuarios",
-      value: `${users.length || 0} Usuarios`,
+      value: `${safeUsers.length} Usuarios`,
       subtitle: "Gestión, bloqueo y eliminación",
       icon: "ri-group-line",
       badgeColor: "bg-warning-subtle text-warning"
@@ -316,7 +339,7 @@ const AdminGlobalDashboard = () => {
     {
       id: "firmas",
       label: "Firmas NOM-151",
-      value: `${signatures.length || 0} Emitidas`,
+      value: `${safeSignatures.length} Emitidas`,
       subtitle: "Historial por empresa y usuario",
       icon: "ri-shield-check-line",
       badgeColor: "bg-success-subtle text-success"
@@ -520,20 +543,27 @@ const AdminGlobalDashboard = () => {
                                   className="me-2"
                                   onClick={() => {
                                     setSelectedTenant(t);
-                                    setNewPlan(t.plan || "standard");
-                                    setNewTenantStatus(t.status || "active");
-                                    setModalTenantOpen(true);
-                                  }}
-                                >
-                                  <i className="ri-edit-line me-1"></i> Editar Membresía
-                                </Button>
-
+                              <td className="fw-bold">{t.name}</td>
+                              <td>{t.email || "—"}</td>
+                              <td>
+                                <Badge color={t.plan === 'pro' ? 'primary' : t.plan === 'standard' ? 'info' : t.plan === 'enterprise' ? 'dark' : 'secondary'}>
+                                  {(t.plan || 'free').toUpperCase()}
+                                </Badge>
+                              </td>
+                              <td><span className="badge bg-light text-dark">{t.userCount || 0} usuarios</span></td>
+                              <td><span className="badge bg-light text-dark">{t.docCount || 0} docs</span></td>
+                              <td>
+                                <Badge color={t.status === 'active' ? 'success' : 'danger'}>
+                                  {t.status === 'active' ? 'ACTIVA' : 'BLOQUEADA'}
+                                </Badge>
+                              </td>
+                              <td>
                                 <Button
                                   size="sm"
-                                  color={t.status === "active" ? "danger" : "success"}
+                                  color={t.status === 'active' ? 'warning' : 'success'}
                                   onClick={() => handleToggleTenantStatus(t)}
                                 >
-                                  {t.status === "active" ? "Bloquear" : "Desbloquear"}
+                                  {t.status === 'active' ? 'Bloquear' : 'Desbloquear'}
                                 </Button>
                               </td>
                             </tr>
@@ -547,46 +577,39 @@ const AdminGlobalDashboard = () => {
                   <TabPane tabId="usuarios">
                     <h5 className="fw-bold mb-3">Listado Maestro de Usuarios por Empresa</h5>
                     <div className="table-responsive">
-                      <Table className="table-hover align-middle mb-0">
+                      <Table responsive align="middle" className="table-nowrap mb-0">
                         <thead className="table-light">
                           <tr>
-                            <th>Usuario</th>
-                            <th>Correo Electrónico</th>
-                            <th>Rol / Permiso</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
                             <th>Estado</th>
-                            <th className="text-end">Acciones</th>
+                            <th>Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {users.map((u) => (
+                          {safeUsers.map((u) => (
                             <tr key={u.id}>
-                              <td className="fw-bold">{u.name || "Usuario"}</td>
+                              <td className="fw-bold">{u.name}</td>
                               <td>{u.email}</td>
                               <td>
-                                <Badge color={u.role === "SUPERADMIN" ? "danger" : "primary"}>
-                                  {u.role === "SUPERADMIN" ? "SuperAdmin" : "Administrador"}
+                                <Badge color={u.role === 'SUPERADMIN' ? 'danger' : 'primary'}>
+                                  {u.role || 'USER'}
                                 </Badge>
                               </td>
                               <td>
-                                <Badge color={u.isActive ? "success" : "danger"}>
-                                  {u.isActive ? "Activo" : "Bloqueado"}
+                                <Badge color={u.isActive !== false ? 'success' : 'secondary'}>
+                                  {u.isActive !== false ? 'ACTIVO' : 'INACTIVO'}
                                 </Badge>
                               </td>
-                              <td className="text-end">
-                                <Button
-                                  size="sm"
-                                  color={u.isActive ? "warning" : "success"}
-                                  className="me-2"
-                                  onClick={() => handleToggleUserStatus(u)}
-                                >
-                                  {u.isActive ? "Bloquear" : "Desbloquear"}
-                                </Button>
+                              <td>
                                 <Button
                                   size="sm"
                                   color="danger"
+                                  outline
                                   onClick={() => handleDeleteUser(u.id)}
                                 >
-                                  <i className="ri-delete-bin-line me-1"></i> Eliminar
+                                  Eliminar
                                 </Button>
                               </td>
                             </tr>
@@ -600,23 +623,23 @@ const AdminGlobalDashboard = () => {
                   <TabPane tabId="firmas">
                     <h5 className="fw-bold mb-3">Registro Maestro de Firmas y Constancias NOM-151</h5>
                     <div className="table-responsive">
-                      <Table className="table-hover align-middle mb-0">
+                      <Table responsive align="middle" className="table-nowrap mb-0">
                         <thead className="table-light">
                           <tr>
                             <th>Documento</th>
-                            <th>Empresa / Tenant</th>
+                            <th>Empresa ID</th>
                             <th>Folio / Hash NOM-151</th>
                             <th>Proveedor</th>
                             <th>Estado</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {signatures.length === 0 ? (
+                          {safeSignatures.length === 0 ? (
                             <tr>
                               <td colSpan={5} className="text-center text-muted py-4">No se han emitido firmas digitales aún.</td>
                             </tr>
                           ) : (
-                            signatures.map((s) => (
+                            safeSignatures.map((s) => (
                               <tr key={s.id}>
                                 <td className="fw-bold">{s.name || s.originalName}</td>
                                 <td>{s.tenantId}</td>
