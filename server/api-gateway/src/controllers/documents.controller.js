@@ -196,7 +196,7 @@ exports.uploadDocument = async (req, res) => {
     }
     // ─────────────────────────────────────────────────────────────────────────────
 
-    const { name } = req.body;
+    const { name, signers: signersRaw } = req.body;
     const doc = await Document.create({
       tenantId: tenantId || 1,
       uploadedBy: req.user?.id || 1,
@@ -208,7 +208,36 @@ exports.uploadDocument = async (req, res) => {
       status: 'uploaded'
     });
 
-    res.status(201).json(doc);
+    // Guardar firmantes si fueron incluidos en la carga
+    const { DocumentSigner } = require('../models');
+    let createdSigners = [];
+    if (signersRaw && DocumentSigner) {
+      try {
+        const parsedSigners = typeof signersRaw === 'string' ? JSON.parse(signersRaw) : signersRaw;
+        if (Array.isArray(parsedSigners)) {
+          const crypto = require('crypto');
+          for (let i = 0; i < parsedSigners.length; i++) {
+            const s = parsedSigners[i];
+            if (s.email) {
+              const signer = await DocumentSigner.create({
+                documentId: doc.id,
+                name: s.name || s.email,
+                email: s.email,
+                role: s.role || `Firmante ${i + 1}`,
+                signingOrder: i + 1,
+                signingToken: crypto.randomBytes(16).toString('hex'),
+                status: 'pending'
+              });
+              createdSigners.push(signer);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error parseando firmantes en upload:', e);
+      }
+    }
+
+    res.status(201).json({ ...doc.toJSON(), signers: createdSigners });
   } catch (error) {
     // Si quedó un archivo huérfano, limpiarlo
     if (req.file?.path && fs.existsSync(req.file.path)) {
@@ -216,6 +245,109 @@ exports.uploadDocument = async (req, res) => {
     }
     console.error('Error subiendo documento:', error);
     res.status(500).json({ error: 'Error al subir el documento.' });
+  }
+};
+
+// GET /documents/:id/signers — listar firmantes del documento
+exports.getSigners = async (req, res) => {
+  try {
+    const { DocumentSigner } = require('../models');
+    const signers = await DocumentSigner.findAll({
+      where: { documentId: req.params.id },
+      order: [['signingOrder', 'ASC']]
+    });
+    res.json(signers || []);
+  } catch (error) {
+    console.error('Error obteniendo firmantes:', error);
+    res.status(500).json({ error: 'Error al obtener firmantes.' });
+  }
+};
+
+// POST /documents/:id/signers — agregar/actualizar firmantes del documento
+exports.addSigners = async (req, res) => {
+  try {
+    const doc = await findDocById(req.params.id, req);
+    if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
+
+    const { signers } = req.body;
+    if (!Array.isArray(signers) || signers.length === 0) {
+      return res.status(400).json({ error: 'Se requiere una lista de firmantes válidos.' });
+    }
+
+    const { DocumentSigner } = require('../models');
+    const crypto = require('crypto');
+    const createdSigners = [];
+
+    for (let i = 0; i < signers.length; i++) {
+      const s = signers[i];
+      if (s.email) {
+        const signer = await DocumentSigner.create({
+          documentId: doc.id,
+          name: s.name || s.email,
+          email: s.email,
+          role: s.role || `Firmante ${i + 1}`,
+          signingOrder: i + 1,
+          signingToken: crypto.randomBytes(16).toString('hex'),
+          status: 'pending'
+        });
+        createdSigners.push(signer);
+      }
+    }
+
+    res.json({ message: 'Firmantes registrados correctamente.', signers: createdSigners });
+  } catch (error) {
+    console.error('Error registrando firmantes:', error);
+    res.status(500).json({ error: 'Error al registrar los firmantes.' });
+  }
+};
+
+// POST /documents/:id/send-invitations — enviar invitaciones por correo electrónico
+exports.sendInvitations = async (req, res) => {
+  try {
+    const doc = await findDocById(req.params.id, req);
+    if (!doc) return res.status(404).json({ error: 'Documento no encontrado.' });
+
+    const { DocumentSigner } = require('../models');
+    const mailer = require('../utils/mailer');
+    const signers = await DocumentSigner.findAll({ where: { documentId: doc.id } });
+
+    if (!signers || signers.length === 0) {
+      return res.status(400).json({ error: 'El documento no tiene firmantes registrados.' });
+    }
+
+    const appUrl = process.env.APP_URL || 'https://app.rubricalo.com';
+
+    for (const s of signers) {
+      const signUrl = `${appUrl}/firmar/${s.signingToken}`;
+      await mailer.sendEmail({
+        to: s.email,
+        name: s.name,
+        subject: `Solicitud de Firma Electrónica: ${doc.name}`,
+        htmlContent: `
+          <div style="font-family: sans-serif; padding: 24px; color: #0f172a; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px;">
+            <h2 style="color: #3d4ed8; margin-top: 0;">Solicitud de Firma Electrónica</h2>
+            <p>Hola <strong>${s.name}</strong>,</p>
+            <p>Has recibido un documento para tu firma en la plataforma <strong>Rubrícalo México</strong>:</p>
+            <div style="background-color: #f8fafc; padding: 16px; border-left: 4px solid #3d4ed8; margin: 20px 0; border-radius: 4px;">
+              <strong style="font-size: 1.1rem; color: #1e293b;">${doc.name}</strong><br/>
+              <span style="color: #64748b; font-size: 0.9rem;">Rol: ${s.role}</span>
+            </div>
+            <p>Por favor haz clic en el siguiente botón para revisar y firmar el documento de forma segura desde tu celular o computadora:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${signUrl}" style="background-color: #3d4ed8; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Firmar Documento Ahora</a>
+            </div>
+            <p style="font-size: 0.85rem; color: #94a3b8; text-align: center;">No requiere crear cuenta ni contraseña.</p>
+          </div>
+        `
+      }).catch(err => console.error(`Error enviando correo a ${s.email}:`, err));
+    }
+
+    await doc.update({ status: 'pending_signature' });
+
+    res.json({ message: `Se enviaron las invitaciones de firma a ${signers.length} destinatarios.` });
+  } catch (error) {
+    console.error('Error enviando invitaciones:', error);
+    res.status(500).json({ error: 'Error al enviar las invitaciones por correo.' });
   }
 };
 

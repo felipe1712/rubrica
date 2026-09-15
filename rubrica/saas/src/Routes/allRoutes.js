@@ -34,6 +34,7 @@ import Basic404 from "../pages/AuthenticationInner/Errors/Basic404";
 import Error500 from "../pages/AuthenticationInner/Errors/Error500";
 import Maintenance from "../pages/Pages/Maintenance/Maintenance";
 import ComingSoon from "../pages/Pages/ComingSoon/ComingSoon";
+import PublicSign from "../pages/PublicSign";
 
 export const isSuperAdminSession = () => {
   if (typeof window === "undefined") return false;
@@ -111,6 +112,7 @@ const authProtectedRoutes = [
 ];
 
 const publicRoutes = [
+  { path: "/firmar/:token",    component: <PublicSign /> },
   { path: "/login",           component: <Login /> },
   { path: "/logout",          component: <Logout /> },
   { path: "/register",        component: <Register /> },
