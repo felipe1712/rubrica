@@ -11,6 +11,7 @@ const documentsRoutes = require('./documents.routes');
 const onlyofficeRoutes = require('./onlyoffice.routes');
 const publicSignRoutes = require('./public-sign.routes');
 const usersRoutes = require('./users.routes');
+const desktopRoutes = require('./desktop.routes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -23,6 +24,7 @@ router.use('/documents', documentsRoutes);
 router.use('/editor', onlyofficeRoutes);
 router.use('/users', usersRoutes);
 router.use('/public', publicSignRoutes);
+router.use('/desktop', desktopRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

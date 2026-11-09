@@ -1,4 +1,5 @@
 const provisioningService = require('../services/provisioning.service');
+const creditService = require('../services/credit.service');
 const sequelize = require('../config/database');
 const fs = require('fs');
 const path = require('path');
@@ -153,10 +154,34 @@ exports.handleStripeWebhook = async (req, res) => {
       case 'checkout.session.completed':
       case 'invoice.paid':
       case 'invoice.payment_succeeded': {
+        const metadata = dataObject.metadata || {};
         const amountPaidCents = dataObject.amount_paid || dataObject.amount_total || 0;
         const amountPaidMxn = amountPaidCents / 100;
         const isAnnualPaid = amountPaidMxn >= 1500;
 
+        // ─── CASO A: Compra de Paquete de Saldo / Créditos de Firma ───
+        if (metadata.type === 'credits' || metadata.credits || (dataObject.lines?.data?.[0]?.description || '').toLowerCase().includes('pack')) {
+          let creditsToAdd = parseInt(metadata.credits, 10);
+          if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
+            // Detección por precio si no viene en metadata
+            if (amountPaidMxn >= 2000) creditsToAdd = 500;
+            else if (amountPaidMxn >= 700) creditsToAdd = 100;
+            else creditsToAdd = 25;
+          }
+
+          if (tenant) {
+            await creditService.addCredits(
+              tenant.id,
+              creditsToAdd,
+              `pack_purchase_${creditsToAdd}`,
+              dataObject.id || dataObject.payment_intent
+            );
+            console.log(`[STRIPE] Acreditados ${creditsToAdd} créditos al tenant ${tenant.name} (${tenant.id})`);
+          }
+          break;
+        }
+
+        // ─── CASO B: Suscripción de Plan Mensual / Anual ───
         let detectedPlan = 'standard';
         if (amountPaidMxn >= 4500 || (dataObject.lines?.data?.[0]?.description || '').toLowerCase().includes('pro annual')) {
           detectedPlan = 'pro';

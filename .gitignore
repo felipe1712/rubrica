@@ -71,3 +71,8 @@ yarn-error.log*
 *.tmp
 *.temp
 .rubrica-cache/
+
+# Rust / Tauri build artifacts
+rubrica/saas/src-tauri/target/
+src-tauri/target/
+**/target/

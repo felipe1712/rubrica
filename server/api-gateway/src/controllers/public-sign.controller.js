@@ -162,3 +162,31 @@ exports.submitSignature = async (req, res) => {
     res.status(500).json({ error: 'Error al procesar el registro de firma.' });
   }
 };
+
+// POST /public/contact — Formulario de contacto desde la landing pública
+exports.submitContactForm = async (req, res) => {
+  try {
+    const { name, email, phone, company, message } = req.body;
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Por favor proporciona un correo electrónico válido.' });
+    }
+
+    const result = await mailer.sendContactNotificationEmail({
+      senderName: name,
+      senderEmail: email,
+      phone,
+      company,
+      message
+    });
+
+    res.json({
+      success: true,
+      message: '¡Gracias por contactarnos! Tu mensaje ha sido recibido y te responderemos a la brevedad.',
+      mock: result.mock || false
+    });
+  } catch (error) {
+    console.error('Error al procesar formulario de contacto:', error);
+    res.status(500).json({ error: 'Error al enviar el mensaje. Intenta de nuevo más tarde.' });
+  }
+};

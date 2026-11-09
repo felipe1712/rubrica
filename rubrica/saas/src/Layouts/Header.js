@@ -1,12 +1,29 @@
-﻿import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ProfileDropdown from "../Components/Common/ProfileDropdown";
 import { changeSidebarVisibility } from "../slices/thunks";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
+import { fetchCloudBalance, isDesktopApp } from "../helpers/desktop_bridge";
 
 const Header = ({ headerClass }) => {
   const dispatch = useDispatch();
+  const [credits, setCredits] = useState(null);
+
+  useEffect(() => {
+    // Carga de saldo de firmas para usuario web o desktop
+    const loadBalance = async () => {
+      try {
+        const data = await fetchCloudBalance();
+        if (data && data.creditsAvailable !== undefined) {
+          setCredits(data.creditsAvailable);
+        }
+      } catch (e) {
+        // En caso de estar offline o sin sesión activa, mantiene el valor por defecto
+      }
+    };
+    loadBalance();
+  }, []);
 
   const sidebarVisibilityData = createSelector(
     (state) => state.Layout,
@@ -46,7 +63,7 @@ const Header = ({ headerClass }) => {
           : document.documentElement.setAttribute("data-sidebar-size", "lg");
       } else if (windowSize <= 767) {
         document.body.classList.add("vertical-sidebar-enable");
-        document.documentElement.setAttribute("data-sidebar-size", "lg");
+        document.documentElement.getAttribute("data-sidebar-size") === "lg";
       }
     }
 
@@ -116,8 +133,34 @@ const Header = ({ headerClass }) => {
               </button>
             </div>
 
-            {/* PERFIL DE USUARIO */}
-            <div className="d-flex align-items-center">
+            {/* SALDO DE FIRMAS & PERFIL DE USUARIO */}
+            <div className="d-flex align-items-center gap-3">
+              {/* Badge de Saldo de Firmas */}
+              <div className="d-none d-sm-flex align-items-center gap-2">
+                <div
+                  className="badge px-3 py-2 rounded-pill d-flex align-items-center gap-2"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.15)",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    color: "#ffffff"
+                  }}
+                >
+                  <i className="ri-wallet-3-line fs-6 text-warning"></i>
+                  <span className="fw-medium font-size-13">
+                    Saldo: <strong className="text-warning">{credits !== null ? `${credits} firmas` : '5 firmas'}</strong>
+                  </span>
+                </div>
+                <a
+                  href="https://rubrica.com.mx/paquetes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-warning fw-semibold px-2 py-1 text-dark"
+                  style={{ borderRadius: "8px" }}
+                >
+                  <i className="ri-add-line me-1"></i> Recargar
+                </a>
+              </div>
+
               <ProfileDropdown />
             </div>
 

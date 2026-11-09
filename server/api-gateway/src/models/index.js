@@ -9,6 +9,7 @@ const PlanConfig = require('./PlanConfig');
 const TenantTemplate = require('./TenantTemplate');
 const Document = require('./Document');
 const DocumentSigner = require('./DocumentSigner');
+const CreditTransaction = require('./CreditTransaction');
 
 // Relationships
 Tenant.hasMany(User, { foreignKey: 'tenant_id', onDelete: 'CASCADE' });
@@ -31,6 +32,9 @@ Document.belongsTo(User, { foreignKey: 'uploaded_by', as: 'uploader' });
 Document.hasMany(DocumentSigner, { foreignKey: 'document_id', as: 'signers', onDelete: 'CASCADE' });
 DocumentSigner.belongsTo(Document, { foreignKey: 'document_id' });
 
+Tenant.hasMany(CreditTransaction, { foreignKey: 'tenant_id', onDelete: 'CASCADE' });
+CreditTransaction.belongsTo(Tenant, { foreignKey: 'tenant_id' });
+
 module.exports = {
   sequelize,
   Tenant,
@@ -42,5 +46,6 @@ module.exports = {
   PlanConfig,
   TenantTemplate,
   Document,
-  DocumentSigner
+  DocumentSigner,
+  CreditTransaction
 };

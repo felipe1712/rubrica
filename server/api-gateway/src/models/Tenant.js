@@ -57,6 +57,18 @@ const Tenant = sequelize.define('Tenant', {
   docusealOrgId: {
     type: DataTypes.STRING,
     field: 'docuseal_org_id'
+  },
+  signatureCredits: {
+    type: DataTypes.INTEGER,
+    defaultValue: 5,
+    allowNull: false,
+    field: 'signature_credits'
+  },
+  totalCreditsPurchased: {
+    type: DataTypes.INTEGER,
+    defaultValue: 5,
+    allowNull: false,
+    field: 'total_credits_purchased'
   }
 }, {
   tableName: 'tenants',

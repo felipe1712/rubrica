@@ -225,3 +225,56 @@ exports.sendUsageAlertEmail = async ({ to, name, companyName, docsUsed, docsLimi
     htmlContent
   });
 };
+
+/**
+ * 5. Plantilla de Contacto / Prospecto desde el Sitio Web Público
+ */
+exports.sendContactNotificationEmail = async ({ senderName, senderEmail, phone, company, message }) => {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.BREVO_SENDER_EMAIL || 'soporte@rubricalo.com';
+  
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 10px; background-color: #ffffff;">
+      <div style="margin-bottom: 20px;">
+        <h2 style="color: #3d4ed8; margin: 0; font-size: 22px;">📩 Nuevo Mensaje de Contacto</h2>
+        <p style="color: #64748b; font-size: 13px; margin: 5px 0 0;">Recibido desde la landing page de Rubrícalo</p>
+      </div>
+      <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 15px 0;" />
+      
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold; color: #475569; width: 120px;">Nombre:</td>
+          <td style="padding: 8px 0; color: #0f172a;">${senderName || 'No indicado'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold; color: #475569;">Email:</td>
+          <td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${senderEmail}">${senderEmail}</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold; color: #475569;">Teléfono:</td>
+          <td style="padding: 8px 0; color: #0f172a;">${phone || 'No indicado'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold; color: #475569;">Empresa:</td>
+          <td style="padding: 8px 0; color: #0f172a;">${company || 'No indicada'}</td>
+        </tr>
+      </table>
+
+      <div style="background-color: #f8fafc; border-left: 4px solid #3d4ed8; padding: 15px; border-radius: 4px; margin: 20px 0;">
+        <p style="font-weight: bold; color: #334155; margin: 0 0 8px 0;">Mensaje o Consulta:</p>
+        <p style="color: #475569; margin: 0; line-height: 1.6; white-space: pre-wrap;">${message || 'Sin mensaje adicional.'}</p>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 20px 0;" />
+      <p style="color: #94a3b8; font-size: 11px; text-align: center;">
+        Mensaje generado automáticamente por el sistema de contacto de Rubrícalo.
+      </p>
+    </div>
+  `;
+
+  return exports.sendEmail({
+    to: adminEmail,
+    name: 'Administrador Rubrícalo',
+    subject: `📩 [Contacto Web] Mensaje de ${senderName || senderEmail}`,
+    htmlContent
+  });
+};

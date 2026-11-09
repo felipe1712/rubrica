@@ -1,0 +1,114 @@
+# ══════════════════════════════════════════════════════════════════
+#  RÚBRICA — docker-compose.light.yml (Arquitectura Ligera Híbrida)
+#  Dominio: rubrica.com.mx / rubricalo.com
+#
+#  Diseñado para la suite de escritorio:
+#  - Desactiva OnlyOffice (ahorra ~2 GB RAM)
+#  - Desactiva Stirling-PDF (ahorra ~800 MB RAM — reemplazado por Rust)
+#  - Desactiva DocuSeal y MinIO (ahorra ~600 MB RAM)
+#  - Mantiene Postgres, Redis, API Gateway y Frontend
+# ══════════════════════════════════════════════════════════════════
+
+services:
+
+  # ─── POSTGRESQL ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: rubrica_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - rubrica_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── REDIS ──────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: rubrica_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/data:/data
+    networks:
+      - rubrica_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ─── API GATEWAY ────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: rubrica_gateway
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:4000:4000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:4000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── SERVICIO NOM-151 ───────────────────────────────────────────
+  nom151-service:
+    build:
+      context: ./nom151-service
+      dockerfile: Dockerfile
+    container_name: rubrica_nom151
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    env_file: .env
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:4001:4001"
+
+  # ─── FRONTEND (React) ───────────────────────────────────────────
+  frontend:
+    build:
+      context: ../rubrica/saas
+      dockerfile: Dockerfile
+    container_name: rubrica_frontend
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    environment:
+      REACT_APP_API_URL: https://api.rubricalo.com
+      REACT_APP_ENV: production
+      REACT_APP_BRAND_NAME: "Rubricalo"
+    networks:
+      - rubrica_net
+    ports:
+      - "127.0.0.1:3003:80"
+
+networks:
+  rubrica_net:
+    driver: bridge
+
+volumes:
+  uploads_data:

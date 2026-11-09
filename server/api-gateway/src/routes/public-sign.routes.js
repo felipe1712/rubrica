@@ -6,6 +6,7 @@ const fs = require('fs');
 
 router.get('/sign/:token', publicSignCtrl.getSignerData);
 router.post('/sign/:token', publicSignCtrl.submitSignature);
+router.post('/contact', publicSignCtrl.submitContactForm);
 
 // Serve document file publicly for signing portal
 router.get('/documents/:id/file', async (req, res) => {

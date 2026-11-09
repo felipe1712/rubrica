@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rubrícalo — Gestión Documental, Edición Nube y Firma Digital NOM-151</title>
-    <meta name="description" content="Plataforma empresarial multi-tenant de firma digital legal NOM-151, edición de documentos en la nube y procesamiento de PDFs para empresas en México.">
+    <title>Rúbrica Desktop — Suite Local de Documentos y Firma Digital NOM-151</title>
+    <meta name="description" content="Software de escritorio ultra ligero (5.9 MB) con motor PDF nativo en Rust, base local SQLite y despacho de firma digital NOM-151 con saldo prepago sin mensualidades.">
     
     <!-- FAVICON -->
     <link rel="shortcut icon" href="images/favicon.html">
@@ -21,88 +21,146 @@
     <link rel="stylesheet" href="css/style.css">
 
     <style>
+        /* Tipografía y Colores Base */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1e293b;
+            background-color: #f8fafc;
+        }
+
         /* Fuerza de Contraste en Hero Banner */
         .hero-banner {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%) !important;
+            background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #312e81 100%) !important;
             padding: 140px 0 100px !important;
             color: #ffffff !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(165, 180, 252, 0.35);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            color: #c7d2fe;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
         .hero-title, h1.hero-title {
             font-weight: 800 !important;
-            font-size: 2.8rem !important;
-            line-height: 1.25 !important;
-            margin-bottom: 20px !important;
+            font-size: 3rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 22px !important;
             color: #ffffff !important;
+            letter-spacing: -0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
         }
+        .hero-title span {
+            color: #818cf8;
+            background: linear-gradient(135deg, #a5b4fc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
         .hero-subtitle, p.hero-subtitle {
-            font-size: 1.2rem !important;
+            font-size: 1.25rem !important;
             opacity: 0.95 !important;
-            margin-bottom: 30px !important;
-            line-height: 1.6 !important;
+            margin-bottom: 35px !important;
+            line-height: 1.65 !important;
             color: #f1f5f9 !important;
-        }
-        .hero-card-title, h4.hero-card-title {
-            font-weight: 700 !important;
-            color: #ffffff !important;
-            margin-bottom: 10px !important;
-        }
-        .hero-card-text, p.hero-card-text {
-            font-size: 0.95rem !important;
-            color: #e2e8f0 !important;
-            opacity: 1 !important;
-            margin: 0 !important;
+            max-width: 650px;
         }
         .btn-rubric-primary {
             background-color: #4f46e5 !important;
             color: #ffffff !important;
             font-weight: 700 !important;
             padding: 14px 32px !important;
-            border-radius: 6px !important;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45) !important;
             border: none !important;
             transition: all 0.3s ease !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
         }
         .btn-rubric-primary:hover {
             background-color: #4338ca !important;
             transform: translateY(-2px);
+            color: #ffffff !important;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6) !important;
         }
         .btn-rubric-outline {
             background-color: transparent !important;
             color: #ffffff !important;
-            border: 2px solid rgba(255, 255, 255, 0.5) !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
             font-weight: 700 !important;
             padding: 12px 28px !important;
-            border-radius: 6px !important;
+            border-radius: 8px !important;
             transition: all 0.3s ease !important;
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.05rem;
         }
         .btn-rubric-outline:hover {
             border-color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.15) !important;
-        }
-        .trust-bar {
-            background: #ffffff !important;
-            padding: 30px 0 !important;
-            border-bottom: 1px solid #e2e8f0 !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-        }
-        .trust-badge {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 12px !important;
-            font-weight: 700 !important;
-            color: #0f172a !important;
-            font-size: 1.15rem !important;
-        }
-        .trust-badge i {
-            font-size: 1.8rem !important;
-            color: #3d4ed8 !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
         }
 
+        /* Pill Features */
+        .trust-pills {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .trust-pill-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .trust-pill-item i {
+            color: #38bdf8;
+            font-size: 1.1rem;
+        }
+
+        /* Hero App Preview Mockup */
+        .app-preview-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        .app-window-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .window-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .window-dot.red { background: #ef4444; }
+        .window-dot.yellow { background: #f59e0b; }
+        .window-dot.green { background: #10b981; }
+
+        /* Feature Cards */
         .feature-icon-box {
             background: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
+            border: 1px solid #e2e8f0 !important;
             border-radius: 14px !important;
             padding: 35px 25px !important;
             height: 100% !important;
@@ -110,47 +168,80 @@
             transition: all 0.3s ease !important;
         }
         .feature-icon-box:hover {
-            box-shadow: 0 20px 25px -5px rgba(61, 78, 216, 0.15) !important;
-            border-color: #3d4ed8 !important;
+            box-shadow: 0 20px 25px -5px rgba(61, 78, 216, 0.12) !important;
+            border-color: #6366f1 !important;
             transform: translateY(-5px) !important;
         }
-        .feature-icon-box h4, h4.feature-title {
-            font-weight: 800 !important;
-            font-size: 1.3rem !important;
-            color: #0f172a !important;
-            margin: 15px 0 12px !important;
+        .feature-icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: #ede9fe;
+            color: #4f46e5;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
         }
-        .feature-icon-box p, p.feature-desc {
+        .feature-icon-box h4 {
+            font-weight: 800 !important;
+            font-size: 1.25rem !important;
+            color: #0f172a !important;
+            margin-bottom: 12px !important;
+        }
+        .feature-icon-box p {
             color: #475569 !important;
-            font-size: 1.05rem !important;
-            line-height: 1.65 !important;
-            font-weight: 500 !important;
+            font-size: 0.98rem !important;
+            line-height: 1.6 !important;
             margin: 0 !important;
         }
+
+        /* Comparison Table */
+        .comparison-table-wrapper {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 18px 24px;
+            vertical-align: middle;
+        }
+        .comparison-table thead {
+            background: #f1f5f9;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* Pricing Cards */
         .pricing-card {
             background: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
-            border-radius: 12px !important;
-            padding: 35px 25px !important;
+            border-radius: 16px !important;
+            padding: 38px 28px !important;
             text-align: center !important;
             transition: all 0.3s ease !important;
             position: relative !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         .pricing-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12) !important;
-            transform: translateY(-5px) !important;
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-6px) !important;
         }
         .pricing-card.featured {
-            border: 2px solid #3d4ed8 !important;
-            box-shadow: 0 10px 15px -3px rgba(61, 78, 216, 0.18) !important;
+            border: 2px solid #4f46e5 !important;
+            box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.25) !important;
+            background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%) !important;
         }
         .pricing-card.featured::before {
-            content: "RECOMENDADO" !important;
+            content: "MÁS POPULAR" !important;
             position: absolute !important;
             top: -14px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
-            background: #3d4ed8 !important;
+            background: #4f46e5 !important;
             color: #ffffff !important;
             font-size: 0.75rem !important;
             font-weight: 800 !important;
@@ -158,155 +249,124 @@
             border-radius: 20px !important;
             letter-spacing: 1px !important;
         }
+        .pack-badge {
+            display: inline-block;
+            background: #ede9fe;
+            color: #6366f1;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
         .price-amount {
-            font-size: 2.5rem !important;
+            font-size: 2.8rem !important;
             font-weight: 800 !important;
             color: #0f172a !important;
-            margin: 15px 0 5px !important;
+            margin: 12px 0 4px !important;
+            line-height: 1;
         }
-        .price-period {
-            color: #64748b !important;
-            font-size: 0.9rem !important;
+        .price-per-unit {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
         }
-
-        /* Estilos de Botones en Tarjetas de Precios */
-        .btn-rubric-card-outline {
-            background-color: #ffffff !important;
-            color: #3d4ed8 !important;
-            border: 2px solid #3d4ed8 !important;
-            font-weight: 700 !important;
-            padding: 12px 20px !important;
-            border-radius: 8px !important;
-            transition: all 0.3s ease !important;
-            margin-top: 25px !important;
-            display: block !important;
-            width: 100% !important;
-        }
-        .btn-rubric-card-outline:hover {
-            background-color: #3d4ed8 !important;
-            color: #ffffff !important;
+        .price-per-unit strong {
+            color: #10b981;
         }
         .btn-rubric-card-solid {
-            background-color: #3d4ed8 !important;
+            background-color: #4f46e5 !important;
             color: #ffffff !important;
             border: none !important;
             font-weight: 700 !important;
-            padding: 12px 20px !important;
+            padding: 14px 20px !important;
             border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(61, 78, 216, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
             transition: all 0.3s ease !important;
             margin-top: 25px !important;
             display: block !important;
             width: 100% !important;
+            text-decoration: none !important;
+            font-size: 1.05rem !important;
         }
         .btn-rubric-card-solid:hover {
-            background-color: #2563eb !important;
-            transform: translateY(-2px) !important;
-        }
-        .btn-rubric-card-dark {
-            background-color: #0f172a !important;
+            background-color: #4338ca !important;
             color: #ffffff !important;
-            border: none !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.45) !important;
+        }
+        .btn-rubric-card-outline {
+            background-color: #ffffff !important;
+            color: #4f46e5 !important;
+            border: 2px solid #4f46e5 !important;
             font-weight: 700 !important;
-            padding: 12px 20px !important;
+            padding: 13px 20px !important;
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
             margin-top: 25px !important;
             display: block !important;
             width: 100% !important;
-        }
-        .btn-rubric-card-dark:hover {
-            background-color: #1e293b !important;
-        }
-
-        .modal-header-custom {
-            background: #3d4ed8 !important;
-            color: #ffffff !important;
-            border-radius: 6px 6px 0 0 !important;
-            padding: 20px 25px !important;
-        }
-        .modal-header-custom .close {
-            color: #ffffff !important;
-            opacity: 0.9 !important;
-        }
-
-        /* Estilos Mejorados para el Footer */
-        footer p {
+            text-decoration: none !important;
             font-size: 1.05rem !important;
-            color: #cbd5e1 !important;
-            line-height: 1.6 !important;
         }
-        footer .copyright-text {
-            font-size: 0.95rem !important;
-            color: #94a3b8 !important;
-            margin-top: 15px !important;
+        .btn-rubric-card-outline:hover {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            transform: translateY(-2px) !important;
         }
 
-        /* Sticky Header Navbar al hacer scroll */
-        .navbar-fixed-top {
-            transition: all 0.3s ease-in-out !important;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0) 100%) !important;
-            border: none !important;
-            padding: 15px 0 !important;
+        /* Download Section */
+        .download-box {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-radius: 20px;
+            padding: 60px 40px;
+            color: #ffffff;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
         }
-        .navbar-fixed-top.navbar-scrolled {
-            background: rgba(15, 23, 42, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
-            padding: 8px 0 !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-        }
-        .navbar-fixed-top .navbar-nav > li > a {
-            color: #ffffff !important;
-            font-weight: 600 !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
-        }
-        .navbar-fixed-top.navbar-scrolled .navbar-nav > li > a:hover {
-            color: #818cf8 !important;
+
+        /* Contact Form */
+        .contact-form-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
         }
     </style>
 </head>
-<body id="page-top">
+<body>
 
-<div class="body">
+<div class="main-wrapper">
 
-    <!-- HEADER / NAVIGATION -->
-    <header>
-        <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="header-area">
+        <nav class="navbar navbar-default navbar-fixed-top" style="transition: all 0.3s ease; padding: 12px 0;">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav">
-                        <span class="sr-only">Menú</span>
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="/" class="navbar-brand" style="display: flex; align-items: center; gap: 10px; padding-top: 12px;">
-                        <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="40" height="40" rx="8" fill="#3D4ED8"/>
-                            <path d="M12 14H28V17H12V14ZM12 20H28V23H12V20ZM12 26H22V29H12V26Z" fill="white"/>
-                        </svg>
-                        <span style="font-size: 1.5rem; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">RUBRÍCALO</span>
+                    <a class="navbar-brand" href="#hero" style="font-weight: 800; font-size: 1.6rem; color: #4f46e5; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;">
+                        <i class="icon-pencil" style="color: #4f46e5;"></i> RÚBRICA <span style="font-size: 0.75rem; background: #ede9fe; color: #4f46e5; padding: 2px 8px; border-radius: 12px; margin-left: 4px;">DESKTOP</span>
                     </a>
                 </div>
 
-                <div class="collapse navbar-collapse" id="main-nav">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#inicio">Inicio</a></li>
+                <div class="collapse navbar-collapse" id="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right" style="font-weight: 600;">
                         <li><a href="#caracteristicas">Características</a></li>
-                        <li><a href="#proceso">Cómo Funciona</a></li>
-                        <li><a href="#precios">Precios</a></li>
-                        <li><a href="#faq">Preguntas Frecuentes</a></li>
+                        <li><a href="#taller-rust">Motor Rust</a></li>
+                        <li><a href="#comparativa">Privacidad</a></li>
+                        <li><a href="#precios">Paquetes de Firmas</a></li>
+                        <li><a href="#faq">Preguntas</a></li>
+                        <li><a href="#contacto">Contacto</a></li>
                         <li>
-                            <a href="https://app.rubricalo.com/login" class="btn btn-link" style="color: #ffffff; font-weight: 600;">
-                                <i class="icon-unlock2"></i> Iniciar Sesión
+                            <a href="downloads/Rubrica-Desktop-Setup.exe" class="btn btn-primary" style="margin-top: 8px; margin-left: 10px; font-weight: 700; background-color: #4f46e5; border-color: #4f46e5; color: #ffffff !important; border-radius: 6px; padding: 8px 18px;">
+                                <i class="icon-cloud-download"></i> Descargar .exe (5.9 MB)
                             </a>
-                        </li>
-                        <li>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerModal" style="margin-top: 8px; margin-left: 10px; font-weight: 700; background-color: #3d4ed8; border-color: #3d4ed8;">
-                                Prueba Gratis
-                            </button>
                         </li>
                     </ul>
                 </div>
@@ -315,127 +375,141 @@
     </header>
 
     <!-- HERO SECTION -->
-    <section id="inicio" class="hero-banner">
+    <section id="hero" class="hero-banner">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
                 <div class="col-md-7">
-                    <h1 class="hero-title">Gestión Documental, Edición Nube y Firma Digital Legal (NOM-151)</h1>
+                    <div class="hero-badge">
+                        <span>⚡ Suite Local v2.0 · Compilada en Rust · Windows 10/11</span>
+                    </div>
+                    <h1 class="hero-title">
+                        La Suite Documental Local Más Rápida y <span>100% Privada</span>
+                    </h1>
                     <p class="hero-subtitle">
-                        Edita contratos en Word y Excel en la nube, procesa herramientas PDF y firma digitalmente con la máxima validez jurídica conforme a la Secretaría de Economía de México.
+                        Edita, une, divide y organiza contratos en tu propia computadora con tecnología Rust y SQLite. Tus archivos nunca tocan servidores externos. Despacha firmas legales NOM-151 con saldo prepago que nunca caduca.
                     </p>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <button type="button" class="btn btn-rubric-primary" data-toggle="modal" data-target="#registerModal">
-                            <i class="icon-rocket"></i> Probar Gratis (3 Docs/Mes)
-                        </button>
-                        <a href="https://app.rubricalo.com/login" class="btn btn-rubric-outline">
-                            Ver Demostración
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                        <a href="downloads/Rubrica-Desktop-Setup.exe" class="btn btn-rubric-primary">
+                            <i class="icon-cloud-download" style="font-size: 1.3rem;"></i> Descargar para Windows (.exe)
+                        </a>
+                        <a href="#precios" class="btn btn-rubric-outline">
+                            <i class="icon-basket"></i> Ver Paquetes de Firmas
                         </a>
                     </div>
+
+                    <p style="font-size: 0.88rem; color: #cbd5e1; margin-top: 10px;">
+                        ✓ Instalador nativo de 5.9 MB &nbsp;|&nbsp; ✓ Sin registros obligatorios &nbsp;|&nbsp; ✓ Base SQLite WAL local
+                    </p>
+
+                    <div class="trust-pills">
+                        <div class="trust-pill-item">
+                            <i class="icon-shield"></i> 100% Privado (SQLite)
+                        </div>
+                        <div class="trust-pill-item">
+                            <i class="icon-speedometer"></i> Motor Nativo Rust
+                        </div>
+                        <div class="trust-pill-item">
+                            <i class="icon-badge"></i> Validez NOM-151
+                        </div>
+                        <div class="trust-pill-item">
+                            <i class="icon-wallet"></i> Sin Mensualidades
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-5 text-center" style="margin-top: 30px;">
-                    <div style="background: rgba(255,255,255,0.08); padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-                        <svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 15px;">
-                            <circle cx="50" cy="50" r="45" fill="#3D4ED8" fill-opacity="0.3" stroke="#ffffff" stroke-width="2"/>
-                            <path d="M30 40H70V45H30V40ZM30 50H70V55H30V50ZM30 60H55V65H30V60Z" fill="white"/>
-                            <circle cx="70" cy="70" r="16" fill="#10B981"/>
-                            <path d="M64 70L68 74L76 66" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <h4 class="hero-card-title">Validez Jurídica Garantizada</h4>
-                        <p class="hero-card-text">
-                            Estampado de tiempo y constancia de conservación NOM-151 respaldada por la Secretaría de Economía de México.
-                        </p>
+
+                <div class="col-md-5" style="margin-top: 30px;">
+                    <div class="app-preview-card">
+                        <div class="app-window-header">
+                            <span class="window-dot red"></span>
+                            <span class="window-dot yellow"></span>
+                            <span class="window-dot green"></span>
+                            <span style="color: #94a3b8; font-size: 0.8rem; margin-left: 10px; font-weight: 600;">Rúbrica Desktop — Taller PDF Local & Base SQLite</span>
+                        </div>
+                        <div style="background: rgba(15, 23, 42, 0.8); border-radius: 8px; padding: 18px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span style="color: #ffffff; font-weight: 700; font-size: 0.95rem;">Saldo de Firmas Prepago</span>
+                                <span style="background: #10b981; color: #ffffff; font-size: 0.8rem; font-weight: 700; padding: 2px 10px; border-radius: 12px;">Activo</span>
+                            </div>
+                            <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8;">
+                                100 <span style="font-size: 0.9rem; color: #94a3b8; font-weight: normal;">créditos disponibles</span>
+                            </div>
+                            <small style="color: #64748b; display: block; margin-top: 4px;">Tus créditos se conservan indefinidamente.</small>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; text-align: center;">
+                                <i class="icon-layers" style="color: #818cf8; font-size: 1.4rem;"></i>
+                                <div style="color: #ffffff; font-weight: 600; font-size: 0.85rem; margin-top: 6px;">Unir PDFs en Rust</div>
+                                <small style="color: #94a3b8; font-size: 0.75rem;">0.04s en memoria</small>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; text-align: center;">
+                                <i class="icon-check" style="color: #34d399; font-size: 1.4rem;"></i>
+                                <div style="color: #ffffff; font-weight: 600; font-size: 0.85rem; margin-top: 6px;">Sellado NOM-151</div>
+                                <small style="color: #94a3b8; font-size: 0.75rem;">Constancia legal</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- TRUST BAR -->
-    <div class="trust-bar">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-3 col-sm-6 text-center">
-                    <div class="trust-badge">
-                        <i class="icon-shield3"></i> Cumplimiento NOM-151
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 text-center">
-                    <div class="trust-badge">
-                        <i class="icon-cpu"></i> IA Google Magika
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 text-center">
-                    <div class="trust-badge">
-                        <i class="icon-lock"></i> Encriptación SSL 256-bit
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 text-center">
-                    <div class="trust-badge">
-                        <i class="icon-cloud"></i> Disponibilidad 99.9%
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CARACTERÍSTICAS CLAVE -->
+    <!-- CARACTERÍSTICAS PRINCIPALES -->
     <section id="caracteristicas" style="padding: 90px 0; background: #ffffff;">
         <div class="container">
             <div class="text-center" style="margin-bottom: 60px;">
-                <h2 style="font-weight: 800; color: #0f172a; font-size: 2.4rem;">Todo lo que tu empresa necesita en una sola plataforma</h2>
-                <p style="color: #475569; font-size: 1.3rem; font-weight: 600; max-width: 780px; margin: 15px auto 0; line-height: 1.6;">
-                    Elimina licencias costosas y simplifica tu gestión documental con tecnología de punta.
+                <h2 style="font-weight: 800; color: #0f172a; font-size: 2.3rem;">La combinación perfecta: Velocidad local y respaldo legal</h2>
+                <p style="color: #64748b; font-size: 1.15rem; max-width: 750px; margin: 15px auto 0; line-height: 1.6;">
+                    Diseñamos Rúbrica para resolver lo que los SaaS en la nube complican: privacidad real, velocidad inmediata y costos proporcionales a lo que usas.
                 </p>
             </div>
 
             <div class="row">
-                <!-- Tarjeta 1: Firma NOM-151 -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
-                    <div class="feature-icon-box text-center">
-                        <i class="icon-pen" style="font-size: 2.8rem; color: #3d4ed8; display: block; margin-bottom: 15px;"></i>
-                        <h4 class="feature-title">Firma Digital NOM-151</h4>
-                        <p class="feature-desc">
-                            Envía y firma contratos con sellado de tiempo oficial conforme al Código de Comercio en México.
+                    <div class="feature-icon-box">
+                        <div class="feature-icon-circle">
+                            <i class="icon-shield"></i>
+                        </div>
+                        <h4>100% Privado (SQLite)</h4>
+                        <p>
+                            Tus expedientes, borradores y contactos residen únicamente en tu computadora en base SQLite WAL. Cero riesgo de filtraciones en la nube.
                         </p>
                     </div>
                 </div>
 
-                <!-- Tarjeta 2: Edición de archivos en la nube -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
-                    <div class="feature-icon-box text-center">
-                        <i class="icon-cloud" style="font-size: 2.8rem; color: #3d4ed8; display: block; margin-bottom: 15px;"></i>
-                        <h4 class="feature-title">Edición de archivos en la nube</h4>
-                        <p class="feature-desc">
-                            Edita documentos de Word, Excel y PowerPoint directamente en el navegador sin pagar licencias adicionales.
+                    <div class="feature-icon-box">
+                        <div class="feature-icon-circle">
+                            <i class="icon-energy"></i>
+                        </div>
+                        <h4>Motor PDF en Rust</h4>
+                        <p>
+                            Une, extrae, rota y manipula archivos PDF de cientos de páginas en milisegundos con el motor nativo <code>lopdf</code>. Sin cuelgues ni esperas.
                         </p>
                     </div>
                 </div>
 
-                <!-- Tarjeta 3: Herramientas PDF -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
-                    <div class="feature-icon-box text-center">
-                        <i class="icon-tools" style="font-size: 2.8rem; color: #3d4ed8; display: block; margin-bottom: 15px;"></i>
-                        <h4 class="feature-title">Herramientas PDF</h4>
-                        <p class="feature-desc">
-                            Une, divide, comprime, aplica OCR, rotar y marca de agua a tus archivos PDF en segundos.
+                    <div class="feature-icon-box">
+                        <div class="feature-icon-circle">
+                            <i class="icon-badge"></i>
+                        </div>
+                        <h4>Validez Legal NOM-151</h4>
+                        <p>
+                            Envía a firmar a clientes o contrapartes. Al completarse, se genera la constancia oficial de conservación ante la Secretaría de Economía de México.
                         </p>
                     </div>
                 </div>
 
-                <!-- Tarjeta 4: Seguridad con IA -->
                 <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
-                    <div class="feature-icon-box text-center">
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#3d4ed8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 15px; display: block;">
-                            <rect x="3" y="11" width="18" height="10" rx="3"></rect>
-                            <circle cx="12" cy="5" r="2"></circle>
-                            <path d="M12 7v4"></path>
-                            <circle cx="8.5" cy="15.5" r="1" fill="#3d4ed8"></circle>
-                            <circle cx="15.5" cy="15.5" r="1" fill="#3d4ed8"></circle>
-                            <path d="M9 18.5h6"></path>
-                        </svg>
-                        <h4 class="feature-title">Seguridad con IA</h4>
-                        <p class="feature-desc">
-                            Inspección binaria en tiempo real impulsada por Google Magika para bloquear cualquier malware o amenaza.
+                    <div class="feature-icon-box">
+                        <div class="feature-icon-circle">
+                            <i class="icon-wallet"></i>
+                        </div>
+                        <h4>Saldo Prepago Vitalicio</h4>
+                        <p>
+                            Sin suscripciones forzosas de $30 USD al mes. Adquiere paquetes de firmas que nunca caducan y utilízalos cuando tus clientes lo requieran.
                         </p>
                     </div>
                 </div>
@@ -443,200 +517,413 @@
         </div>
     </section>
 
-    <!-- CÓMO FUNCIONA -->
-    <section id="proceso" style="padding: 90px 0; background: #f8fafc;">
+    <!-- MOTOR RUST VS HERRAMIENTAS WEB -->
+    <section id="taller-rust" style="padding: 90px 0; background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
         <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
-                <h2 style="font-weight: 800; color: #0f172a;">Flujo de trabajo en 3 sencillos pasos</h2>
-            </div>
-
-            <div class="row text-center">
-                <div class="col-md-4" style="margin-bottom: 30px;">
-                    <div style="background: #ffffff; padding: 35px 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                        <span style="background: #3d4ed8; color: #ffffff; font-weight: 800; width: 45px; height: 45px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 20px;">1</span>
-                        <h4 style="font-weight: 700;">Sube tu Documento</h4>
-                        <p style="color: #64748b;">Carga archivos PDF, Word o Excel desde tu computadora o dispositivo móvil.</p>
-                    </div>
+            <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+                <div class="col-md-6">
+                    <span style="color: #4f46e5; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">Privacidad y Eficiencia</span>
+                    <h2 style="font-weight: 800; color: #0f172a; font-size: 2.2rem; margin-top: 10px;">
+                        ¿Por qué subir contratos confidenciales a internet para unir dos PDFs?
+                    </h2>
+                    <p style="color: #475569; font-size: 1.1rem; line-height: 1.65; margin: 20px 0;">
+                        Los sitios web gratuitos de PDFs exponen contratos privados a servidores de terceros y publicidad. Con Rúbrica Desktop, el procesamiento de documentos se realiza en el procesador de tu PC mediante código binario compilado en Rust.
+                    </p>
+                    <ul style="list-style: none; padding: 0; line-height: 2.2; font-size: 1.05rem; color: #334155;">
+                        <li><i class="icon-check" style="color: #10b981; font-weight: bold; margin-right: 8px;"></i> <strong>Cero subidas a internet</strong> para tareas de edición PDF.</li>
+                        <li><i class="icon-check" style="color: #10b981; font-weight: bold; margin-right: 8px;"></i> <strong>Velocidad instantánea</strong> sin colas de procesamiento.</li>
+                        <li><i class="icon-check" style="color: #10b981; font-weight: bold; margin-right: 8px;"></i> <strong>Cumplimiento de confidencialidad</strong> y secreto profesional.</li>
+                        <li><i class="icon-check" style="color: #10b981; font-weight: bold; margin-right: 8px;"></i> <strong>Funciona sin conexión</strong> a internet cuando estás de viaje o en juzgados.</li>
+                    </ul>
                 </div>
-
-                <div class="col-md-4" style="margin-bottom: 30px;">
-                    <div style="background: #ffffff; padding: 35px 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                        <span style="background: #3d4ed8; color: #ffffff; font-weight: 800; width: 45px; height: 45px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 20px;">2</span>
-                        <h4 style="font-weight: 700;">Edita o Envía a Firmar</h4>
-                        <p style="color: #64748b;">Edita texto en tiempo real o agrega campos de firma enviando enlaces por correo.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-4" style="margin-bottom: 30px;">
-                    <div style="background: #ffffff; padding: 35px 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                        <span style="background: #3d4ed8; color: #ffffff; font-weight: 800; width: 45px; height: 45px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 20px;">3</span>
-                        <h4 style="font-weight: 700;">Descarga con NOM-151</h4>
-                        <p style="color: #64748b;">Obtén el documento con su constancia de conservación lista para cualquier trámite legal.</p>
+                <div class="col-md-6" style="margin-top: 30px;">
+                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px; padding: 35px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06);">
+                        <h4 style="font-weight: 700; color: #0f172a; margin-bottom: 20px;">Taller PDF Nativo Incluido en la App</h4>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <div style="background: #ede9fe; color: #4f46e5; padding: 10px; border-radius: 8px;"><i class="icon-docs"></i></div>
+                                <div>
+                                    <h5 style="margin: 0; font-weight: 700;">Unir Documentos PDF</h5>
+                                    <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Combina múltiples contratos, anexos y expedientes en un solo archivo con orden exacto.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <div style="background: #ede9fe; color: #4f46e5; padding: 10px; border-radius: 8px;"><i class="icon-refresh"></i></div>
+                                <div>
+                                    <h5 style="margin: 0; font-weight: 700;">Rotación Inteligente</h5>
+                                    <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Gira páginas escaneadas vertical u horizontalmente sin perder calidad vectorial.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px; align-items: flex-start;">
+                                <div style="background: #ede9fe; color: #4f46e5; padding: 10px; border-radius: 8px;"><i class="icon-trash"></i></div>
+                                <div>
+                                    <h5 style="margin: 0; font-weight: 700;">Depuración y Extracción de Hojas</h5>
+                                    <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Elimina hojas sobrantes o extrae capítulos completos al instante.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- PRECIOS Y PLANES -->
-    <section id="precios" style="padding: 90px 0; background: #ffffff;">
+    <!-- TABLA COMPARATIVA -->
+    <section id="comparativa" style="padding: 90px 0; background: #ffffff;">
         <div class="container">
-            <div class="text-center" style="margin-bottom: 40px;">
-                <h2 style="font-weight: 800; color: #0f172a;">Planes transparentes para cada etapa de tu empresa</h2>
-                <p style="color: #64748b; font-size: 1.1rem; margin-bottom: 25px;">Comienza gratis y escala conforme crezca tu volumen documental.</p>
-                
-                <!-- TOGGLE PAGO MENSUAL / ANUAL -->
-                <div style="display: inline-flex; align-items: center; background: #f1f5f9; padding: 6px 18px; border-radius: 30px; border: 1px solid #cbd5e1; gap: 12px;">
-                    <span id="btnMonthly" style="font-weight: 700; color: #3d4ed8; cursor: pointer; font-size: 0.95rem;">Pago Mensual</span>
-                    <input type="checkbox" id="pricingToggle" style="width: 18px; height: 18px; cursor: pointer;">
-                    <span id="btnAnnual" style="font-weight: 700; color: #64748b; cursor: pointer; font-size: 0.95rem;">
-                        Pago Anual <span style="background: #dcfce7; color: #15803d; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; margin-left: 4px;">2 Meses Gratis 🎉</span>
+            <div class="text-center" style="margin-bottom: 50px;">
+                <h2 style="font-weight: 800; color: #0f172a; font-size: 2.2rem;">¿Cómo se compara Rúbrica con otras alternativas?</h2>
+                <p style="color: #64748b; font-size: 1.15rem; max-width: 700px; margin: 15px auto 0;">
+                    Compara la transparencia de costos y la seguridad técnica de nuestro modelo local.
+                </p>
+            </div>
+
+            <div class="comparison-table-wrapper">
+                <table class="table comparison-table" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Aspecto</th>
+                            <th style="width: 32%;">Plataformas SaaS Tradicionales</th>
+                            <th style="width: 33%; background: #4f46e5; color: #ffffff;">Rúbrica Desktop v2.0</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Privacidad de Documentos</strong></td>
+                            <td style="color: #ef4444;">Subidos a la nube obligatoriamente</td>
+                            <td style="color: #10b981; font-weight: 700; background: #f5f3ff;">100% Local en SQLite en tu PC</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Modelo de Cobro</strong></td>
+                            <td style="color: #ef4444;">Suscripción mensual obligatoria ($30+ USD/mes)</td>
+                            <td style="color: #10b981; font-weight: 700; background: #f5f3ff;">Saldo prepago sin caducidad (desde $299 MXN)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Taller de Edición PDF</strong></td>
+                            <td>Limitado o con herramientas lentas</td>
+                            <td style="color: #10b981; font-weight: 700; background: #f5f3ff;">Motor Rust ilimitado de por vida</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Validez Legal en México</strong></td>
+                            <td>Firma simple sin constancia mexicana</td>
+                            <td style="color: #10b981; font-weight: 700; background: #f5f3ff;">NOM-151-SCFI-2016 y Código de Comercio</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peso e Instalación</strong></td>
+                            <td>Navegadores pesados o apps de 500 MB</td>
+                            <td style="color: #10b981; font-weight: 700; background: #f5f3ff;">Ejecutable ultra ligero de 5.9 MB</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAQUETES DE SALDO PREPAGO (STRIPE READY) -->
+    <section id="precios" style="padding: 90px 0; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 50px;">
+                <h2 style="font-weight: 800; color: #0f172a; font-size: 2.3rem;">Paquetes de Firmas Prepago</h2>
+                <p style="color: #64748b; font-size: 1.15rem; max-width: 700px; margin: 15px auto 0;">
+                    Sin rentas mensuales forzosas ni cobros sorpresa. Adquiere créditos de firma y úsalos a tu ritmo; tu saldo nunca expira.
+                </p>
+                <div style="margin-top: 15px;">
+                    <span style="background: #dcfce7; color: #15803d; font-size: 0.88rem; font-weight: 700; padding: 6px 16px; border-radius: 20px;">
+                        ✓ El Taller PDF Local y la Base SQLite son 100% gratuitos de por vida
                     </span>
                 </div>
             </div>
 
+            <!-- 
+            ================================================================
+            CONFIGURACIÓN DE ENLACES DE PAGO STRIPE:
+            Para cambiar los links de pago, simplemente edita los href de los 
+            botones a continuación con tus Payment Links generados en Stripe:
+            - Pack Básico (25 firmas):       STRIPE_LINK_PACK_25
+            - Pack Despacho (100 firmas):     STRIPE_LINK_PACK_100
+            - Pack Corporativo (500 firmas):  STRIPE_LINK_PACK_500
+            ================================================================
+            -->
+
             <div class="row">
-                <!-- Gratuito -->
-                <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
+                <!-- PACK BÁSICO -->
+                <div class="col-md-4 col-sm-6" style="margin-bottom: 30px;">
                     <div class="pricing-card">
-                        <h3 style="font-weight: 700;">Gratuito</h3>
-                        <p style="color: #64748b; font-size: 0.9rem;">Prueba sin compromiso</p>
-                        <div class="price-amount">$0</div>
-                        <div class="price-period">Gratis para siempre</div>
-                        <hr style="margin: 20px 0;" />
+                        <span class="pack-badge">Profesionales Independientes</span>
+                        <h3 style="font-weight: 800; color: #0f172a; margin: 10px 0;">Pack Básico</h3>
+                        <p style="color: #64748b; font-size: 0.95rem;">Para abogados o peritos que firman contratos ocasionales.</p>
+                        
+                        <div class="price-amount">$299 <span style="font-size: 1.1rem; font-weight: 600; color: #64748b;">MXN</span></div>
+                        <div class="price-per-unit">Incluye <strong>25 Firmas NOM-151</strong> ($11.96 / firma)</div>
+                        
+                        <hr style="margin: 20px 0; border-top: 1px solid #e2e8f0;" />
+                        
                         <ul style="list-style: none; padding: 0; text-align: left; line-height: 2.2; font-size: 0.95rem; color: #334155;">
-                            <li>✓ <strong>3 Documentos</strong> / mes</li>
-                            <li>✓ 1 Usuario</li>
-                            <li>✓ Firma NOM-151 incluida</li>
-                            <li>✓ Editor Nube OnlyOffice</li>
-                            <li>✓ Herramientas PDF</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> <strong>25 documentos</strong> firmados con validez legal</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> <strong>Saldo vitalicio</strong> (nunca expira)</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Taller PDF en Rust ilimitado de por vida</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Portal web para firma remota de clientes</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Descarga de constancia NOM-151</li>
                         </ul>
-                        <button type="button" class="btn btn-rubric-card-outline" data-toggle="modal" data-target="#registerModal">
-                            Probar Gratis
-                        </button>
+
+                        <!-- BOTÓN DE PAGO STRIPE PACK 25 -->
+                        <a href="https://buy.stripe.com/TU_LINK_PACK_25" id="btnStripePack25" class="btn btn-rubric-card-outline" target="_blank" rel="noopener noreferrer">
+                            <i class="icon-basket"></i> Comprar 25 Firmas
+                        </a>
                     </div>
                 </div>
 
-                <!-- Estándar -->
-                <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
-                    <div class="pricing-card">
-                        <h3 style="font-weight: 700;">Estándar</h3>
-                        <p style="color: #64748b; font-size: 0.9rem;">Para profesionales y PyMEs</p>
-                        <div class="price-amount" id="priceStandard">$199</div>
-                        <div class="price-period" id="pricePeriodStandard">MXN / mes</div>
-                        <hr style="margin: 20px 0;" />
-                        <ul style="list-style: none; padding: 0; text-align: left; line-height: 2.2; font-size: 0.95rem; color: #334155;">
-                            <li>✓ <strong>15 Documentos</strong> / mes</li>
-                            <li>✓ Hasta 3 Usuarios</li>
-                            <li>✓ Firmas NOM-151</li>
-                            <li>✓ Editor Nube OnlyOffice</li>
-                            <li>✓ Herramientas PDF Ilimitadas</li>
-                        </ul>
-                        <button type="button" class="btn btn-rubric-card-solid" data-toggle="modal" data-target="#registerModal">
-                            Elegir Estándar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Pro (Recomendado) -->
-                <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
+                <!-- PACK DESPACHO / PYME (DESTACADO) -->
+                <div class="col-md-4 col-sm-6" style="margin-bottom: 30px;">
                     <div class="pricing-card featured">
-                        <h3 style="font-weight: 700;">Pro</h3>
-                        <p style="color: #64748b; font-size: 0.9rem;">Empresas en crecimiento</p>
-                        <div class="price-amount" id="pricePro">$499</div>
-                        <div class="price-period" id="pricePeriodPro">MXN / mes</div>
-                        <hr style="margin: 20px 0;" />
+                        <span class="pack-badge" style="background: #4f46e5; color: #ffffff;">Despachos y PyMEs</span>
+                        <h3 style="font-weight: 800; color: #0f172a; margin: 10px 0;">Pack Despacho</h3>
+                        <p style="color: #64748b; font-size: 0.95rem;">El volumen ideal para consultorías, notarías y arrendamiento.</p>
+                        
+                        <div class="price-amount" style="color: #4f46e5;">$899 <span style="font-size: 1.1rem; font-weight: 600; color: #64748b;">MXN</span></div>
+                        <div class="price-per-unit">Incluye <strong>100 Firmas NOM-151</strong> ($8.99 / firma)</div>
+                        
+                        <hr style="margin: 20px 0; border-top: 1px solid #e2e8f0;" />
+                        
                         <ul style="list-style: none; padding: 0; text-align: left; line-height: 2.2; font-size: 0.95rem; color: #334155;">
-                            <li>✓ <strong>70 Documentos</strong> / mes</li>
-                            <li>✓ Hasta 10 Usuarios</li>
-                            <li>✓ Firmas NOM-151</li>
-                            <li>✓ Marca de Agua Personalizada</li>
-                            <li>✓ Soporte Prioritario</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> <strong>100 documentos</strong> firmados con validez legal</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> <strong>Saldo vitalicio</strong> (nunca expira)</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Multi-firmantes simultáneos por documento</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Notificaciones automáticas por correo electrónico</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Taller PDF en Rust ilimitado</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Soporte técnico prioritario</li>
                         </ul>
-                        <button type="button" class="btn btn-rubric-card-solid" data-toggle="modal" data-target="#registerModal">
-                            Comenzar Pro
-                        </button>
+
+                        <!-- BOTÓN DE PAGO STRIPE PACK 100 -->
+                        <a href="https://buy.stripe.com/TU_LINK_PACK_100" id="btnStripePack100" class="btn btn-rubric-card-solid" target="_blank" rel="noopener noreferrer">
+                            <i class="icon-basket"></i> Comprar 100 Firmas
+                        </a>
                     </div>
                 </div>
 
-                <!-- Enterprise -->
-                <div class="col-md-3 col-sm-6" style="margin-bottom: 30px;">
+                <!-- PACK CORPORATIVO -->
+                <div class="col-md-4 col-sm-6" style="margin-bottom: 30px;">
                     <div class="pricing-card">
-                        <h3 style="font-weight: 700;">Enterprise</h3>
-                        <p style="color: #64748b; font-size: 0.9rem;">Alto volumen corporativo</p>
-                        <div class="price-amount" style="font-size: 2.1rem !important;">Contáctanos</div>
-                        <div class="price-period">Plan Personalizado</div>
-                        <hr style="margin: 20px 0;" />
+                        <span class="pack-badge">Alto Volumen</span>
+                        <h3 style="font-weight: 800; color: #0f172a; margin: 10px 0;">Pack Corporativo</h3>
+                        <p style="color: #64748b; font-size: 0.95rem;">Máximo ahorro por firma para empresas de alto volumen.</p>
+                        
+                        <div class="price-amount">$2,499 <span style="font-size: 1.1rem; font-weight: 600; color: #64748b;">MXN</span></div>
+                        <div class="price-per-unit">Incluye <strong>500 Firmas NOM-151</strong> (<strong style="color: #10b981;">$4.99 / firma</strong>)</div>
+                        
+                        <hr style="margin: 20px 0; border-top: 1px solid #e2e8f0;" />
+                        
                         <ul style="list-style: none; padding: 0; text-align: left; line-height: 2.2; font-size: 0.95rem; color: #334155;">
-                            <li>✓ <strong>Documentos Ilimitados</strong></li>
-                            <li>✓ <strong>Usuarios Ilimitados</strong></li>
-                            <li>✓ Firmas NOM-151 Ilimitadas</li>
-                            <li>✓ Marca Blanca Personalizada</li>
-                            <li>✓ Soporte Dedicado 24/7</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> <strong>500 documentos</strong> firmados con validez legal</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> <strong>Ahorro superior al 60%</strong> por firma</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Saldo permanente sin caducidad</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Exportación masiva de expedientes con constancia</li>
+                            <li><i class="icon-check" style="color: #10b981; font-weight: bold;"></i> Asistencia de configuración personalizada</li>
                         </ul>
-                        <button type="button" class="btn btn-rubric-card-dark" data-toggle="modal" data-target="#registerModal">
-                            Contactar Ventas
-                        </button>
+
+                        <!-- BOTÓN DE PAGO STRIPE PACK 500 -->
+                        <a href="https://buy.stripe.com/TU_LINK_PACK_500" id="btnStripePack500" class="btn btn-rubric-card-outline" target="_blank" rel="noopener noreferrer">
+                            <i class="icon-basket"></i> Comprar 500 Firmas
+                        </a>
                     </div>
+                </div>
+            </div>
+
+            <div class="text-center" style="margin-top: 20px;">
+                <p style="color: #64748b; font-size: 0.95rem;">
+                    ¿Requieres un paquete a la medida o integración API con tu ERP? <a href="#contacto" style="color: #4f46e5; font-weight: 700;">Escríbenos directamente</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE DESCARGA DIRECTA -->
+    <section id="descarga" style="padding: 80px 0; background: #ffffff;">
+        <div class="container">
+            <div class="download-box text-center">
+                <span style="background: rgba(255,255,255,0.15); color: #c7d2fe; padding: 6px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                    Instalador Oficial para Windows
+                </span>
+                <h2 style="font-weight: 800; color: #ffffff; font-size: 2.5rem; margin: 20px 0 15px;">
+                    Comienza hoy con Rúbrica Desktop
+                </h2>
+                <p style="font-size: 1.15rem; color: #e0e7ff; max-width: 650px; margin: 0 auto 30px; line-height: 1.6;">
+                    Descarga el ejecutable ligero de 5.9 MB y empieza a procesar tus archivos PDF en local de forma inmediata.
+                </p>
+                
+                <a href="downloads/Rubrica-Desktop-Setup.exe" class="btn btn-rubric-primary" style="background-color: #ffffff !important; color: #1e1b4b !important; font-size: 1.15rem; padding: 16px 36px;">
+                    <i class="icon-cloud-download" style="color: #4f46e5;"></i> Descargar Rubrica-Desktop-Setup.exe (5.9 MB)
+                </a>
+
+                <div style="margin-top: 20px; color: #cbd5e1; font-size: 0.88rem;">
+                    Compatible con Windows 10 y Windows 11 (64-bit) &nbsp;•&nbsp; No requiere Java ni motores pesados
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ -->
-    <section id="faq" style="padding: 90px 0; background: #f8fafc;">
+    <!-- PREGUNTAS FRECUENTES (FAQ) -->
+    <section id="faq" style="padding: 90px 0; background: #f8fafc; border-top: 1px solid #e2e8f0;">
         <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
-                <h2 style="font-weight: 800; color: #0f172a;">Preguntas Frecuentes</h2>
+            <div class="text-center" style="margin-bottom: 50px;">
+                <h2 style="font-weight: 800; color: #0f172a; font-size: 2.2rem;">Preguntas Frecuentes</h2>
+                <p style="color: #64748b; font-size: 1.15rem; max-width: 650px; margin: 15px auto 0;">
+                    Todo lo que necesitas saber sobre la suite local y la firma NOM-151.
+                </p>
             </div>
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel-group" id="accordion">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
+                        <div class="panel panel-default" style="border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                            <div class="panel-heading" style="background: #ffffff; padding: 18px 20px;">
                                 <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq1">
-                                        ¿Tienen validez legal las firmas digitales en México?
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq1" style="color: #0f172a; font-weight: 700; text-decoration: none; display: block;">
+                                        ¿Tienen validez jurídica en México los documentos firmados?
                                     </a>
                                 </h4>
                             </div>
                             <div id="faq1" class="panel-collapse collapse in">
-                                <div class="panel-body">
-                                    Sí. Rúbricalo genera la constancia de conservación de mensajes de datos conforme a la norma oficial <strong>NOM-151-SCFI-2016</strong> y el Código de Comercio de México, garantizando la inalterabilidad y fecha cierta de tus contratos ante juzgados o autoridades.
+                                <div class="panel-body" style="padding: 20px; color: #475569; line-height: 1.65;">
+                                    Sí, absoluta. Cada sobre de firma genera una constancia de conservación de mensajes de datos conforme a la norma oficial <strong>NOM-151-SCFI-2016</strong> y el <strong>Código de Comercio de México</strong> (Artículos 89 a 95), lo cual confiere presunción legal de integridad, fecha cierta y valor probatorio pleno ante cualquier juzgado o autoridad.
                                 </div>
                             </div>
                         </div>
 
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
+                        <div class="panel panel-default" style="border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                            <div class="panel-heading" style="background: #ffffff; padding: 18px 20px;">
                                 <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq2">
-                                        ¿Qué incluye el Plan Gratuito?
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq2" class="collapsed" style="color: #0f172a; font-weight: 700; text-decoration: none; display: block;">
+                                        ¿Caducan o se vencen mis créditos prepago si no los uso este mes?
                                     </a>
                                 </h4>
                             </div>
                             <div id="faq2" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    El Plan Gratuito te permite crear y firmar hasta 3 documentos por mes con validez NOM-151, usar el editor OnlyOffice en la nube y las herramientas PDF de forma permanente sin ingresar tarjeta de crédito.
+                                <div class="panel-body" style="padding: 20px; color: #475569; line-height: 1.65;">
+                                    No, tus créditos de firma <strong>nunca caducan</strong>. A diferencia de los modelos SaaS tradicionales con suscripciones mensuales obligatorias donde pierdes lo no consumido, en Rúbrica tu saldo prepago permanece intacto en tu cuenta hasta que decidas utilizarlo.
                                 </div>
                             </div>
                         </div>
 
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
+                        <div class="panel panel-default" style="border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                            <div class="panel-heading" style="background: #ffffff; padding: 18px 20px;">
                                 <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq3">
-                                        ¿Necesito instalar algún programa en mi computadora?
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq3" class="collapsed" style="color: #0f172a; font-weight: 700; text-decoration: none; display: block;">
+                                        ¿Mis archivos se suben a internet cuando utilizo el Taller PDF?
                                     </a>
                                 </h4>
                             </div>
                             <div id="faq3" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    No. Rúbricalo es 100% basado en la nube. Puedes acceder desde cualquier navegador web en computadora, tablet o teléfono móvil sin descargar ejecutables.
+                                <div class="panel-body" style="padding: 20px; color: #475569; line-height: 1.65;">
+                                    No. Las operaciones de unir, rotar, eliminar o extraer páginas se ejecutan de manera 100% nativa en tu propia computadora a través de nuestro motor compilado en Rust. Tus archivos jamás se transmiten a la nube para tareas de edición PDF, garantizando privacidad total.
                                 </div>
                             </div>
                         </div>
+
+                        <div class="panel panel-default" style="border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0;">
+                            <div class="panel-heading" style="background: #ffffff; padding: 18px 20px;">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#faq4" class="collapsed" style="color: #0f172a; font-weight: 700; text-decoration: none; display: block;">
+                                        ¿Cómo firman mis clientes o contrapartes? ¿Necesitan instalar la aplicación?
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="faq4" class="panel-collapse collapse">
+                                <div class="panel-body" style="padding: 20px; color: #475569; line-height: 1.65;">
+                                    Tus clientes no necesitan instalar nada. Cuando despachas un documento desde Rúbrica Desktop, el sistema envía un enlace web cifrado y seguro por correo electrónico. Tus clientes pueden revisar y firmar el contrato desde cualquier navegador web en su computadora o teléfono móvil.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORMULARIO DE CONTACTO / BREVO -->
+    <section id="contacto" style="padding: 90px 0; background: #ffffff; border-top: 1px solid #e2e8f0;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <span style="color: #4f46e5; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">Soporte y Ventas</span>
+                    <h2 style="font-weight: 800; color: #0f172a; font-size: 2.3rem; margin-top: 10px;">
+                        ¿Tienes dudas o necesitas un paquete empresarial?
+                    </h2>
+                    <p style="color: #64748b; font-size: 1.1rem; line-height: 1.65; margin: 20px 0;">
+                        Estamos aquí para orientarte en la adopción de firma digital legal NOM-151, planes a medida para notarías, corporativos o integraciones directas con tus sistemas internos.
+                    </p>
+
+                    <div style="margin-top: 30px;">
+                        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 44px; height: 44px; background: #ede9fe; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                <i class="icon-envelope"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; color: #0f172a;">Correo Electrónico:</strong>
+                                <a href="mailto:soporte@rubricalo.com" style="color: #4f46e5;">soporte@rubricalo.com</a>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div style="width: 44px; height: 44px; background: #ede9fe; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                <i class="icon-location-pin"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; color: #0f172a;">Ubicación:</strong>
+                                <span style="color: #64748b;">Ciudad de México, México</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7" style="margin-top: 20px;">
+                    <div class="contact-form-box">
+                        <h4 style="font-weight: 800; color: #0f172a; margin-bottom: 20px;">Envíanos un mensaje</h4>
+                        
+                        <div id="contactAlertSuccess" class="alert alert-success" style="display: none; border-radius: 8px;">
+                            <i class="icon-check"></i> <strong>¡Mensaje recibido!</strong> Tu consulta ha sido enviada exitosamente vía Brevo. Nos pondremos en contacto contigo a la brevedad.
+                        </div>
+                        <div id="contactAlertError" class="alert alert-danger" style="display: none; border-radius: 8px;"></div>
+
+                        <form id="contactForm">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="contactName" style="font-weight: 600; color: #334155;">Nombre Completo *</label>
+                                        <input type="text" class="form-control" id="contactName" placeholder="ej. Lic. Alejandro Flores" required style="border-radius: 6px; padding: 12px;">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="contactEmail" style="font-weight: 600; color: #334155;">Correo Electrónico *</label>
+                                        <input type="email" class="form-control" id="contactEmail" placeholder="alejandro@despacho.com" required style="border-radius: 6px; padding: 12px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="contactPhone" style="font-weight: 600; color: #334155;">Teléfono / WhatsApp</label>
+                                        <input type="tel" class="form-control" id="contactPhone" placeholder="ej. 55 1234 5678" style="border-radius: 6px; padding: 12px;">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="contactCompany" style="font-weight: 600; color: #334155;">Empresa / Despacho</label>
+                                        <input type="text" class="form-control" id="contactCompany" placeholder="ej. Flores y Asociados S.C." style="border-radius: 6px; padding: 12px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contactMessage" style="font-weight: 600; color: #334155;">Mensaje o Consulta *</label>
+                                <textarea class="form-control" id="contactMessage" rows="4" placeholder="Cuéntanos sobre tu volumen de firmas o requerimientos especiales..." required style="border-radius: 6px; padding: 12px;"></textarea>
+                            </div>
+
+                            <button type="submit" id="btnSubmitContact" class="btn btn-primary btn-block" style="background-color: #4f46e5; border-color: #4f46e5; font-weight: 700; padding: 14px; border-radius: 8px; font-size: 1.05rem;">
+                                <i class="icon-paper-plane"></i> Enviar Mensaje
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -644,58 +931,20 @@
     </section>
 
     <!-- FOOTER -->
-    <footer style="background: #0f172a; color: #cbd5e1; padding: 65px 0 35px;">
+    <footer style="background: #0f172a; color: #ffffff; padding: 60px 0 30px;">
         <div class="container text-center">
-            <h2 style="color: #ffffff; font-weight: 800; margin-bottom: 20px; font-size: 2rem; letter-spacing: 1px;">RÚBRICALO</h2>
-            <p style="font-size: 1.1rem; max-width: 680px; margin: 0 auto 25px; color: #cbd5e1; line-height: 1.6;">
-                Plataforma empresarial de gestión documental, edición en la nube y firma digital legal conforme a la NOM-151-SCFI-2016 en México.
+            <h3 style="color: #ffffff; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px;">
+                RÚBRICA <span style="font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #818cf8; padding: 3px 10px; border-radius: 12px;">DESKTOP</span>
+            </h3>
+            <p style="font-size: 1rem; max-width: 680px; margin: 0 auto 25px; color: #94a3b8; line-height: 1.6;">
+                Suite local de gestión documental, motor PDF en Rust y firma digital con validez oficial conforme a la NOM-151-SCFI-2016 y Código de Comercio en México.
             </p>
-            <p class="copyright-text">© 2026 Rúbricalo México. Todos los derechos reservados.</p>
+            <p style="color: #64748b; font-size: 0.9rem;">
+                © 2026 Rúbrica México. Todos los derechos reservados.
+            </p>
         </div>
     </footer>
 
-</div>
-
-<!-- MODAL DE REGISTRO AUTÓNOMO -->
-<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content" style="border-radius: 8px; border: none; overflow: hidden;">
-            <div class="modal-header modal-header-custom">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="registerModalLabel" style="font-weight: 700; color: #ffffff;">Crear Cuenta Gratis en Rúbricalo</h4>
-                <p style="margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9;">Plan Gratuito: 3 documentos al mes sin tarjeta de crédito.</p>
-            </div>
-            <div class="modal-body" style="padding: 25px;">
-                <div id="registerAlert" style="display: none;" class="alert alert-danger"></div>
-
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label for="companyName">Nombre de la Empresa u Organización</label>
-                        <input type="text" class="form-control" id="companyName" placeholder="ej. Mi Empresa S.A." required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="userName">Tu Nombre Completo</label>
-                        <input type="text" class="form-control" id="userName" placeholder="ej. Carlos Mendoza" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Correo Electrónico Corporativo</label>
-                        <input type="email" class="form-control" id="email" placeholder="carlos@miempresa.com" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Contraseña Deseada</label>
-                        <input type="password" class="form-control" id="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                    </div>
-
-                    <button type="submit" id="btnSubmitRegister" class="btn btn-primary btn-block btn-lg" style="background-color: #3d4ed8; border-color: #3d4ed8; font-weight: 700; margin-top: 20px;">
-                        Crear Mi Empresa Gratis
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- SCRIPTS -->
@@ -705,73 +954,60 @@
 <script src="js/main.js"></script>
 
 <script>
+    // ==============================================================
+    // STRIPE PAYMENT LINKS CONFIGURATION:
+    // Sustituye estos 3 enlaces directos por tus URLs de pago de Stripe.
+    // ==============================================================
+    const STRIPE_LINKS = {
+        pack25:  "https://buy.stripe.com/TU_LINK_PACK_25",
+        pack100: "https://buy.stripe.com/TU_LINK_PACK_100",
+        pack500: "https://buy.stripe.com/TU_LINK_PACK_500"
+    };
+
     $(document).ready(function() {
-        function checkScroll() {
-            if ($(window).scrollTop() > 30) {
-                $('.navbar-fixed-top').addClass('navbar-scrolled');
-            } else {
-                $('.navbar-fixed-top').removeClass('navbar-scrolled');
-            }
-        }
-        $(window).on('scroll load resize', checkScroll);
-        checkScroll();
+        // Asignar enlaces Stripe a los botones si están definidos
+        if (STRIPE_LINKS.pack25)  $('#btnStripePack25').attr('href', STRIPE_LINKS.pack25);
+        if (STRIPE_LINKS.pack100) $('#btnStripePack100').attr('href', STRIPE_LINKS.pack100);
+        if (STRIPE_LINKS.pack500) $('#btnStripePack500').attr('href', STRIPE_LINKS.pack500);
 
-        $('#pricingToggle').on('change', function() {
-            var isAnnual = $(this).is(':checked');
-            if (isAnnual) {
-                $('#btnMonthly').css('color', '#64748b');
-                $('#btnAnnual').css('color', '#3d4ed8');
-                $('#priceStandard').html('$1,990');
-                $('#pricePeriodStandard').html('MXN / año <small style="display:block; color:#10b981; font-weight:bold; font-size:0.8rem;">($165 MXN/mes)</small>');
-                $('#pricePro').html('$4,990');
-                $('#pricePeriodPro').html('MXN / año <small style="display:block; color:#10b981; font-weight:bold; font-size:0.8rem;">($415 MXN/mes)</small>');
-            } else {
-                $('#btnMonthly').css('color', '#3d4ed8');
-                $('#btnAnnual').css('color', '#64748b');
-                $('#priceStandard').html('$199');
-                $('#pricePeriodStandard').html('MXN / mes');
-                $('#pricePro').html('$499');
-                $('#pricePeriodPro').html('MXN / mes');
-            }
-        });
-
-        $('#registerForm').on('submit', function(e) {
+        // Envío de Formulario de Contacto vía Brevo Mailer API Gateway
+        $('#contactForm').on('submit', function(e) {
             e.preventDefault();
             
-            var $btn = $('#btnSubmitRegister');
-            var $alert = $('#registerAlert');
-            $alert.hide().text('');
-            $btn.prop('disabled', true).text('Creando empresa...');
+            var $btn = $('#btnSubmitContact');
+            var $successAlert = $('#contactAlertSuccess');
+            var $errorAlert = $('#contactAlertError');
+            
+            $successAlert.hide();
+            $errorAlert.hide().text('');
+            $btn.prop('disabled', true).html('<i class="icon-refresh fa-spin"></i> Enviando mensaje vía Brevo...');
 
             var payload = {
-                companyName: $('#companyName').val(),
-                userName: $('#userName').val(),
-                email: $('#email').val(),
-                password: $('#password').val()
+                name: $('#contactName').val().trim(),
+                email: $('#contactEmail').val().trim(),
+                phone: $('#contactPhone').val().trim(),
+                company: $('#contactCompany').val().trim(),
+                message: $('#contactMessage').val().trim()
             };
 
+            // Llamada al endpoint público del API Gateway
             $.ajax({
-                url: 'https://api.rubricalo.com/auth/register-tenant',
+                url: 'https://api.rubricalo.com/public/contact',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(payload),
-                success: function(data) {
-                    if (data && data.token) {
-                        localStorage.setItem('authUser', JSON.stringify(data));
-                        sessionStorage.setItem('authUser', JSON.stringify(data));
-                        window.location.href = 'https://app.rubricalo.com/dashboard';
-                    } else {
-                        $alert.text('Ocurrió un error al registrar la cuenta. Inténtalo de nuevo.').show();
-                        $btn.prop('disabled', false).text('Crear Mi Empresa Gratis');
-                    }
+                success: function(response) {
+                    $btn.prop('disabled', false).html('<i class="icon-paper-plane"></i> Enviar Mensaje');
+                    $successAlert.fadeIn();
+                    $('#contactForm')[0].reset();
                 },
                 error: function(xhr) {
-                    var msg = 'Error de conexión con el servidor.';
+                    $btn.prop('disabled', false).html('<i class="icon-paper-plane"></i> Enviar Mensaje');
+                    var errorMsg = 'No pudimos entregar tu mensaje en este momento. Por favor escríbenos directamente a soporte@rubricalo.com';
                     if (xhr.responseJSON && xhr.responseJSON.error) {
-                        msg = xhr.responseJSON.error;
+                        errorMsg = xhr.responseJSON.error;
                     }
-                    $alert.text(msg).show();
-                    $btn.prop('disabled', false).text('Crear Mi Empresa Gratis');
+                    $errorAlert.text(errorMsg).fadeIn();
                 }
             });
         });
